@@ -1,8 +1,11 @@
 import type { BuildOptions } from 'vite'
 
 export const external = [
-  'vue',
-  /^vue-router/,
+  'react',
+  'antd',
+  '@rf-render/core',
+  '@rf-render/react',
+  'antd',
 ]
 
 export const commonBuildOptions: BuildOptions = {

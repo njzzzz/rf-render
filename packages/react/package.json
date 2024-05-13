@@ -1,5 +1,5 @@
 {
-  "name": "@rf-render/core",
+  "name": "@rf-render/react",
   "type": "module",
   "version": "0.0.1",
   "description": "client",
@@ -35,7 +35,13 @@
   },
   "dependencies": {
     "@rf-render/core": "workspace:^",
+    "antd": "> 5.0",
     "react": "> 16.7",
     "react-dom": "> 16.7"
+  },
+  "devDependencies": {
+    "@unocss/reset": "^0.58.5",
+    "@unocss/transformer-attributify-jsx": "^0.58.5",
+    "unocss": "^0.58.5"
   }
 }
