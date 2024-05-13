@@ -1,0 +1,45 @@
+{
+  "name": "@rf-render/core",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "client",
+  "author": "njzzzz",
+  "license": "ISC",
+  "keywords": [],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style": {
+      "default": "./dist/style.css"
+    },
+    "./src/*": [
+      "./src/*",
+      "./src/*/index.ts",
+      "./src/*/index.tsx"
+    ]
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "index.ts",
+    "src"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@unocss/reset": "^0.58.5",
+    "@unocss/transformer-attributify-jsx": "^0.58.5",
+    "unocss": "^0.58.5"
+  }
+}

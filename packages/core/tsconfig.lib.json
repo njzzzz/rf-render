@@ -1,0 +1,11 @@
+{
+  // for build lib
+  "extends": "@tsconfig/vite-react",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": false,
+    "sourceMap": true
+  },
+  "include": ["./index.tsx", "lib/**/*.ts", "lib/**/*.tsx"]
+}
