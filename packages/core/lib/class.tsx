@@ -11,7 +11,7 @@ import { loader } from '@rf-render/core'
  * }
  */
 export interface Component {
-  // 用于设计器的设置项
+  // TODO: 直接加载或者手动引入用于设计器的设置项，如果不传则直接从platform下引入
   configure?: Configure
   name: string
   loader: (platform: Platform, fileName: FileName) => ReturnType<typeof lazy>
@@ -54,7 +54,7 @@ export class RfRender {
         throw new Error(`存在同名组件！, 请修改组件${component.name} 的name属性值，或设置RfRender cover属性为true，直接覆盖`)
 
       component.SuspenseProps = component.SuspenseProps || {
-        fallback: <span>error</span>,
+        fallback: null,
       }
       RfRender.components[component.name] = component
     })

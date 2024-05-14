@@ -10,4 +10,5 @@ export default antfu({
     },
   },
   react: true,
+  jsx: true,
 })

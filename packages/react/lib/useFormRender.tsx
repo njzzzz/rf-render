@@ -5,16 +5,43 @@ import { RfRender } from '@rf-render/core'
 import IntrinsicAttributes = React.JSX.IntrinsicAttributes
 
 export type TFormProps = IntrinsicAttributes & FormProps & { children?: ReactNode } & RefAttributes<FormInstance<any>>
-export interface IRfRenderItem<T = any> {
+
+// 定义 WidgetProps 类型, 供外部拓展{ name: propsType }形式
+export interface WidgetProps {
+
+}
+// 默认widget的props类型，需要用户在外部配置
+export interface DefaultWidgetProps {
+}
+
+export interface CommonRfRenderItemConf {
   name: string
-  widget?: string
-  props?: T
   label?: ReactNode
   ItemProps?: FormItemProps
+  dependOn?: any
+  changeConfig?: any
+  changeValue?: any
 }
-interface IProps<T = any> {
-  schema: IRfRenderItem<T>[]
+
+export interface DefaultRfRenderItemConf extends CommonRfRenderItemConf {
+  widget?: undefined
+  props?: DefaultWidgetProps
 }
+
+export interface RfRenderItemConf<W extends keyof WidgetProps> extends CommonRfRenderItemConf {
+  widget: W
+  props?: WidgetProps[W]
+}
+
+// 使用联合类型生成所有可能的组合
+export type IRfRenderItem = {
+  [K in keyof WidgetProps ]: RfRenderItemConf<K> | DefaultRfRenderItemConf
+}[keyof WidgetProps]
+
+interface IProps {
+  schema: IRfRenderItem[]
+}
+
 export type FormRenderProps = TFormProps & IProps
 export function useFormRender() {
   const [form] = Form.useForm()

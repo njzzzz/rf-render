@@ -40,11 +40,12 @@ type Story = StoryObj<typeof meta>
 export const Primary: Story = {
   args: {
     schema: [
-      { name: 'xx', label: 'xx' },
+      { name: 'xx', label: 'xx', props: { a: '', b: '' } },
+      { name: 'xx', label: 'xx', props: { aa: '' }, widget: 'Test' },
+      { name: 'xx', label: 'xx', props: { aa: '' }, widget: 'Test' },
     ],
   },
 }
-
 // export const Secondary: Story = {
 //   args: {
 //     label: 'Button',
