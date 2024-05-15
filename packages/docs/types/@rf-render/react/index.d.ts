@@ -1,4 +1,5 @@
 import '@rf-render/react'
+import { InputProps } from 'antd'
 
 declare module '@rf-render/react' {
   // 所有组件的属性
@@ -11,8 +12,7 @@ declare module '@rf-render/react' {
     }
   }
   // 默认组件的属性
-  export interface DefaultWidgetProps {
-    a: string
-    b: string
+  export interface DefaultWidgetProps extends InputProps {
+
   }
 }

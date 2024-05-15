@@ -9,9 +9,10 @@ export default function RfFormRender(props: FormRenderProps) {
     <>
       <FormRender {...props}>
       </FormRender>
-      <Button onClick={() => {
+      <Button onClick={async () => {
         const value = form.getFieldsValue()
-        console.log(value, form)
+        const valid = await form.validateFields()
+        console.log(value, form, valid)
       }}
       >
         showForm

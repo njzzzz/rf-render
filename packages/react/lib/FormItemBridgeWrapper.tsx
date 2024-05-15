@@ -17,22 +17,29 @@ export const FormItemBridgeWrapper = forwardRef((item: IRfRenderItem & { depsExe
   useImperativeHandle(ref, () => handler)
   const overrideProps = {
     ...props,
-    onChange(val: unknown) {
+    async onChange(val: unknown) {
       config.form.setFieldValue(name, val)
-      config.depsExec(name)
+      await config.depsExec(name)
     },
     // 自定义组件需要抛出这个，结果为对象格式
     onMapKeysChange(valueMap: Record<string, unknown>) {
-      mapKeys.forEach((key: string) => {
-        config.form.setFieldValue(key, valueMap[key])
+      mapKeys.forEach((key: string, index) => {
+        config.form.setFieldValue(key, valueMap[index])
         config.depsExec(key)
       })
     },
   }
   return (
-    <Form.Item key={name} name={name} label={label} {...(ItemProps ?? {})}>
-      {/* 加载组件，并传入属性 */}
-      {RfRender.load(widget)(overrideProps ?? {})}
-    </Form.Item>
+    <>
+      <Form.Item key={name} name={name} label={label} {...(ItemProps ?? {})}>
+        {/* 加载组件，并传入属性 */}
+        {RfRender.load(widget)(overrideProps ?? {})}
+      </Form.Item>
+      {
+        mapKeys.map((key) => {
+          return <Form.Item key={key} name={key} style={{ display: 'none' }} />
+        })
+      }
+    </>
   )
 })

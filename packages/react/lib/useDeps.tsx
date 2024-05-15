@@ -1,7 +1,6 @@
-import { DNCV, FormRenderProps, IRfRenderItem } from '@rf-render/react'
+import { DNCV, FormItemBridgeWrapperHandle, FormRenderProps, IRfRenderItem } from '@rf-render/react'
 import { useRef } from 'react'
 import { FormInstance } from 'antd'
-import { FormItemBridgeWrapperHandle } from './FormItemBridgeWrapper'
 
 export function useDeps(schema: FormRenderProps['schema'], form: FormInstance) {
   const items = useRef<Record<string, FormItemBridgeWrapperHandle>>({})
@@ -17,21 +16,28 @@ export function useDeps(schema: FormRenderProps['schema'], form: FormInstance) {
     return acc
   }, {})
 
-  function depsExec(nameOrKey: string) {
+  async function depsExec(nameOrKey: string) {
     const deps = dependOnMaps[nameOrKey]
     if (deps?.length) {
-      deps.forEach((dep) => {
-        const { changeConfig, changeValue } = dep
-        changeConfig && changeConfig(dep, form.getFieldsValue())
-        changeValue && changeValue(form.getFieldsValue())
-      })
+      const promises = deps.reduce((acc: unknown[], dep) => {
+        const { changeConfig, changeValue, ...config } = dep
+        const formData = form.getFieldsValue()
+        if (changeConfig) {
+          acc.push(changeConfig(config, formData))
+        }
+        if (changeValue) {
+          acc.push(changeValue(formData))
+        }
+        return acc
+      }, [])
+      await Promise.all(promises)
     }
   }
   schema.forEach((item) => {
     const { changeConfig, changeValue } = item
     if (changeConfig) {
-      item.changeConfig = (...args) => {
-        const config = changeConfig(...args)
+      item.changeConfig = async (cfg: any, formData: any) => {
+        const config = await changeConfig(cfg, formData)
         if (config)
         // 触发试图更新
           items.current[item.name].update(config)

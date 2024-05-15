@@ -12,8 +12,8 @@ export interface WidgetProps {
 export interface DefaultWidgetProps {
 
 }
-
-// 可被depenOn修改的属性,name不可修改，暂不开放修改widget
+export type MaybePromise = '1'
+// 可被dependOn修改的属性,name不可修改，暂不开放修改widget
 export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props'
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
 export interface CommonRfRenderItemConf<T extends string> {
@@ -21,20 +21,25 @@ export interface CommonRfRenderItemConf<T extends string> {
   label?: ReactNode
   ItemProps?: FormItemProps
   // 可以自定义其他键名，只要在组件里抛出即可
-  mapKeys: string[]
+  mapKeys?: string[]
   dependOn?: T[]
-  changeConfig?: (config: IRfRenderItem, formData: { [K in T]: any } & Record<string, any>) => CanModifyConfig | void
-  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => void | any[]
-}
 
+}
+export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemConf<T> {
+  props?: P
+}
 export interface DefaultRfRenderItemConf<T extends string> extends CommonRfRenderItemConf<T> {
   widget?: undefined
   props?: DefaultWidgetProps
+  changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => CanModifyConfig | void
+  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => void | any[]
 }
 
 export interface RfRenderItemConf<W extends keyof WidgetProps, T extends string> extends CommonRfRenderItemConf<T> {
   widget: W
   props?: WidgetProps[W]
+  changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => CanModifyConfig | void
+  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => void | any[]
 }
 
 // 使用联合类型生成所有可能的组合

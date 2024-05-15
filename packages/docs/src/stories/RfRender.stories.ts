@@ -41,21 +41,23 @@ type Story = StoryObj<typeof meta>
 // // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary: Story = {
   args: {
+    layout: 'vertical',
     schema: defineSchema([
       {
-        name: 'xx',
-        label: 'xx',
-        props: { a: '', b: '' },
-        dependOn: ['xx', 'xx1', 'xx2', 'xx'],
+        name: 'a',
+        label: 'a',
+        dependOn: ['b'],
+        mapKeys: ['a1'],
+        ItemProps: { rules: [{ required: true, message: '请输入a', validateTrigger: 'onChange' }] },
+        props: { disabled: false, placeholder: '请输入a' },
         changeConfig(config, formData) {
-          config.disabled = formData.xx1 === ''
+          config.props!.disabled = formData.b === '1'
           return config
         },
       },
       {
-        name: 'xx1',
-        label: 'xx',
-        props: { aa: '' },
+        name: 'b',
+        label: 'b',
         widget: 'Test',
       },
     ]),
