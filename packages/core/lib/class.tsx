@@ -11,7 +11,7 @@ import { loader } from '@rf-render/core'
  * }
  */
 export interface Component {
-  // TODO: 直接加载或者手动引入用于设计器的设置项，如果不传则直接从platform下引入
+  // TODO: 用于设计器，直接加载或者手动引入用于设计器的设置项，如果不传则直接从platform下引入
   configure?: Configure
   name: string
   loader: (platform: Platform, fileName: FileName) => ReturnType<typeof lazy>
@@ -62,6 +62,9 @@ export class RfRender {
 
   static load(componentName: string) {
     const component = RfRender.components[componentName]
+    if (!component)
+      throw new Error(`未找到widget${componentName}, 请确认是否已配置！`)
+
     return loader(component)
   }
 

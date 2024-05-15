@@ -6,9 +6,12 @@ export default antfu({
     overrides: {
       'ts/consistent-type-exports': 'off',
       'ts/consistent-type-imports': 'off',
-      'no-console': 'off',
     },
   },
   react: true,
   jsx: true,
+  rules: {
+    'curly': 'off',
+    'no-console': 'off',
+  },
 })

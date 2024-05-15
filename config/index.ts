@@ -5,7 +5,6 @@ export const external = [
   'antd',
   '@rf-render/core',
   '@rf-render/react',
-  'antd',
 ]
 
 export const commonBuildOptions: BuildOptions = {

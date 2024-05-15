@@ -2,6 +2,7 @@ import { fn } from '@storybook/test'
 import { StoryObj } from '@storybook/react'
 import { RfRender } from '@rf-render/core'
 import { lazy } from 'react'
+import { defineSchema } from '@rf-render/react'
 import RfFormRender from './RfFormRender.tsx'
 
 // eslint-disable-next-line no-new
@@ -36,14 +37,28 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 //
+
 // // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary: Story = {
   args: {
-    schema: [
-      { name: 'xx', label: 'xx', props: { a: '', b: '' } },
-      { name: 'xx', label: 'xx', props: { aa: '' }, widget: 'Test' },
-      { name: 'xx', label: 'xx', props: { aa: '' }, widget: 'Test' },
-    ],
+    schema: defineSchema([
+      {
+        name: 'xx',
+        label: 'xx',
+        props: { a: '', b: '' },
+        dependOn: ['xx', 'xx1', 'xx2', 'xx'],
+        changeConfig(config, formData) {
+          config.disabled = formData.xx1 === ''
+          return config
+        },
+      },
+      {
+        name: 'xx1',
+        label: 'xx',
+        props: { aa: '' },
+        widget: 'Test',
+      },
+    ]),
   },
 }
 // export const Secondary: Story = {
