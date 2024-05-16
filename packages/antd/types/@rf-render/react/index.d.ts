@@ -1,6 +1,6 @@
-import '@rf-render/react'
+import '@rf-render/antd'
 
-declare module '@rf-render/react' {
+declare module '@rf-render/antd' {
   // 所有组件的属性
   export interface WidgetProps {
     prop: any

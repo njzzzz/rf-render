@@ -4,7 +4,7 @@ export const external = [
   'react',
   'antd',
   '@rf-render/core',
-  '@rf-render/react',
+  '@rf-render/antd',
 ]
 
 export const commonBuildOptions: BuildOptions = {

@@ -1,11 +1,12 @@
-import { RfRender } from '@rf-render/core'
-import { CanModifyConfig, IRfRenderItem } from '@rf-render/react'
+import { FormItemBridgeProps, RfRender } from '@rf-render/core'
+import { CanModifyConfig, IRfRenderItem } from '@rf-render/antd'
 import { Form, FormInstance } from 'antd'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 
 export interface FormItemBridgeWrapperHandle {
   update: (config: CanModifyConfig) => void
 }
+
 export const FormItemBridgeWrapper = forwardRef((item: IRfRenderItem & { depsExec: (key: string) => void, form: FormInstance }, ref) => {
   const [config, setConfig] = useState(item)
   const { name, ItemProps, widget = RfRender.defaultWidget, props, label, mapKeys = [] } = config
@@ -14,16 +15,18 @@ export const FormItemBridgeWrapper = forwardRef((item: IRfRenderItem & { depsExe
       setConfig({ ...config, ...c })
     },
   }
+
   useImperativeHandle(ref, () => handler)
-  const overrideProps = {
+  // 传递onChange和onMapKeysChange给自定义的子组件
+  const overrideProps: FormItemBridgeProps = {
     ...props,
     async onChange(val: unknown) {
       config.form.setFieldValue(name, val)
-      await config.depsExec(name)
+      config.depsExec(name)
     },
     // 自定义组件需要抛出这个，结果为对象格式
     onMapKeysChange(valueMap: Record<string, unknown>) {
-      mapKeys.forEach((key: string, index) => {
+      mapKeys.forEach((key: string, index: number) => {
         config.form.setFieldValue(key, valueMap[index])
         config.depsExec(key)
       })

@@ -1,5 +1,5 @@
 {
-  "name": "@rf-render/react",
+  "name": "@rf-render/antd",
   "type": "module",
   "version": "0.0.1",
   "description": "client",
@@ -34,8 +34,8 @@
     "dev": "vite build --watch"
   },
   "dependencies": {
+    "@rf-render/antd": "workspace:^",
     "@rf-render/core": "workspace:^",
-    "@rf-render/react": "workspace:^",
     "antd": "> 5.0",
     "react": "> 16.7",
     "react-dom": "> 16.7"

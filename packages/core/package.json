@@ -34,6 +34,7 @@
     "dev": "vite build --watch"
   },
   "dependencies": {
+    "@rf-render/antd": "workspace:^",
     "@rf-render/core": "workspace:^",
     "react": "> 16.7",
     "react-dom": "> 16.7"

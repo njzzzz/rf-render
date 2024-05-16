@@ -2,7 +2,7 @@ import { fn } from '@storybook/test'
 import { StoryObj } from '@storybook/react'
 import { RfRender } from '@rf-render/core'
 import { lazy } from 'react'
-import { defineSchema } from '@rf-render/react'
+import { defineSchema } from '@rf-render/antd'
 import RfFormRender from './RfFormRender.tsx'
 
 // eslint-disable-next-line no-new
@@ -30,6 +30,7 @@ const meta = {
   argTypes: {
 
   },
+
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
   args: { onClick: fn() },
 }
@@ -44,41 +45,36 @@ export const Primary: Story = {
     layout: 'vertical',
     schema: defineSchema([
       {
-        name: 'a',
-        label: 'a',
-        dependOn: ['b'],
-        mapKeys: ['a1'],
-        ItemProps: { rules: [{ required: true, message: '请输入a', validateTrigger: 'onChange' }] },
-        props: { disabled: false, placeholder: '请输入a' },
+        name: 'name',
+        label: '姓名',
+        ItemProps: { rules: [{ required: true, message: '请输入姓名' }] },
+        props: { disabled: false, placeholder: '请输入姓名' },
         changeConfig(config, formData) {
           config.props!.disabled = formData.b === '1'
           return config
         },
       },
       {
-        name: 'b',
-        label: 'b',
-        widget: 'Test',
+        name: 'age',
+        label: '年龄',
+        ItemProps: { rules: [{ required: true, message: '请输入年龄' }] },
+        props: { disabled: false, placeholder: '请输入姓名', type: 'number' },
+      },
+      {
+        name: 'ageOver18',
+        label: '年龄是否大于18',
+        props: {
+          disabled: false,
+        },
+        dependOn: ['age'],
+        changeValue(formData) {
+          return [formData.age > 18 ? '是' : '否']
+        },
+        changeConfig(config, formData) {
+          config.props!.disabled = formData.age > 18
+          return config
+        },
       },
     ]),
   },
 }
-// export const Secondary: Story = {
-//   args: {
-//     label: 'Button',
-//   },
-// }
-//
-// export const Large: Story = {
-//   args: {
-//     size: 'large',
-//     label: 'Button',
-//   },
-// }
-//
-// export const Small: Story = {
-//   args: {
-//     size: 'small',
-//     label: 'Button',
-//   },
-// }

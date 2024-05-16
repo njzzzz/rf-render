@@ -12,7 +12,7 @@ export interface WidgetProps {
 export interface DefaultWidgetProps {
 
 }
-export type MaybePromise = '1'
+export type MaybePromise<T> = T | Promise<T>
 // 可被dependOn修改的属性,name不可修改，暂不开放修改widget
 export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props'
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
@@ -31,15 +31,15 @@ export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemCo
 export interface DefaultRfRenderItemConf<T extends string> extends CommonRfRenderItemConf<T> {
   widget?: undefined
   props?: DefaultWidgetProps
-  changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => CanModifyConfig | void
-  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => void | any[]
+  changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
+  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<void | any[]>
 }
 
 export interface RfRenderItemConf<W extends keyof WidgetProps, T extends string> extends CommonRfRenderItemConf<T> {
   widget: W
   props?: WidgetProps[W]
-  changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => CanModifyConfig | void
-  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => void | any[]
+  changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
+  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<void | any[]>
 }
 
 // 使用联合类型生成所有可能的组合

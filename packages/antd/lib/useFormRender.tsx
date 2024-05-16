@@ -1,5 +1,5 @@
 import { Form } from 'antd'
-import { FormItemBridgeWrapper, FormRenderProps, useDeps } from '@rf-render/react'
+import { FormItemBridgeWrapper, FormRenderProps, useDeps } from '@rf-render/antd'
 
 export function useFormRender() {
   const [form] = Form.useForm()

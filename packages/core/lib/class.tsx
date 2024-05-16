@@ -1,6 +1,5 @@
 import React, { SuspenseProps, lazy } from 'react'
-import { loader } from '@rf-render/core'
-
+import { loader } from '@rf-render/antd'
 /**
  * {
  *     name: 'input',
@@ -14,11 +13,20 @@ export interface Component {
   // TODO: 用于设计器，直接加载或者手动引入用于设计器的设置项，如果不传则直接从platform下引入
   configure?: Configure
   name: string
-  loader: (platform: Platform, fileName: FileName) => ReturnType<typeof lazy>
+  loader: Loader
   SuspenseProps?: SuspenseProps
 }
+export type Loader = (platform: Platform, fileName: FileName) => ReturnType<typeof lazy>
+export type CustomLoader = (component: Component) => (props: FormItemBridgeProps) => any
 export interface Configure {
 
+}
+/**
+ * 自定义的loader需要实现这两个函数以更新值
+ */
+export interface FormItemBridgeProps {
+  onChange: (val: unknown) => Promise<any>
+  onMapKeysChange: (valueMap: Record<string, unknown>) => any
 }
 export interface Listener {
   reload: boolean
@@ -41,10 +49,15 @@ export class RfRender {
   // 默认widget
   static defaultWidget = 'Input'
   static listeners = new Set<Listener>()
-  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string }) {
+  static loader: CustomLoader
+  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string, loader?: CustomLoader }) {
+    if (!opts.loader) {
+      opts.loader = loader
+    }
     RfRender.cover = opts.cover ?? false
     RfRender.plugins = opts.plugins ?? []
     RfRender.defaultWidget = opts.defaultWidget ?? ''
+    RfRender.loader = opts.loader!
     RfRender.loadComponents()
   }
 
@@ -65,7 +78,7 @@ export class RfRender {
     if (!component)
       throw new Error(`未找到widget${componentName}, 请确认是否已配置！`)
 
-    return loader(component)
+    return RfRender.loader(component)
   }
 
   /**

@@ -1,4 +1,4 @@
-import { DNCV, FormItemBridgeWrapperHandle, FormRenderProps, IRfRenderItem } from '@rf-render/react'
+import { DNCV, FormItemBridgeWrapperHandle, FormRenderProps, IRfRenderItem } from '@rf-render/antd'
 import { useRef } from 'react'
 import { FormInstance } from 'antd'
 
@@ -7,7 +7,6 @@ export function useDeps(schema: FormRenderProps['schema'], form: FormInstance) {
   const initializeRefs = (name: string) => (ref: FormItemBridgeWrapperHandle) => {
     items.current[name] = ref
   }
-
   const dependOnMaps = schema.reduce((acc: Record<string, IRfRenderItem[]>, item) => {
     const { dependOn = [] } = item
     dependOn.forEach((dep) => {
@@ -33,20 +32,22 @@ export function useDeps(schema: FormRenderProps['schema'], form: FormInstance) {
       await Promise.all(promises)
     }
   }
+
   schema.forEach((item) => {
     const { changeConfig, changeValue } = item
     if (changeConfig) {
       item.changeConfig = async (cfg: any, formData: any) => {
         const config = await changeConfig(cfg, formData)
-        if (config)
-        // 触发试图更新
+        if (config) {
+          // 触发视图更新
           items.current[item.name].update(config)
+        }
       }
     }
     if (changeValue) {
       const { mapKeys = [] } = item
-      item.changeValue = (...args) => {
-        const values = changeValue(...args)
+      item.changeValue = async (...args) => {
+        const values = await changeValue(...args)
         // values 格式为数组 [第一项的值，第二项的值]
         if (values?.length) {
           if (values[0] !== DNCV) {

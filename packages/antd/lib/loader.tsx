@@ -1,9 +1,10 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
-import { Component, RfRender } from '@rf-render/core'
+import { lazy, useEffect, useState } from 'react'
+import { Component, FormItemBridgeProps, RfRender } from '@rf-render/core'
+import { SuspenseWrapper } from '@rf-render/antd'
 
 // loader for react
 export function loader(component: Component) {
-  return <T extends Record<string, any>>(props: T) => {
+  return (props: FormItemBridgeProps) => {
     const [Component, setComponent] = useState<ReturnType<typeof lazy> | null>(null)
     const [reload, setReload] = useState(false)
     useEffect(() => {
@@ -17,10 +18,9 @@ export function loader(component: Component) {
     useEffect(() => {
       setComponent(component.loader(RfRender.platform, RfRender.fileName))
     }, [reload])
+
     return (
-      <Suspense {...component.SuspenseProps}>
-        {Component && <Component {...props} />}
-      </Suspense>
+      Component && <SuspenseWrapper Component={Component!} component={component} formItemBridgeProps={props} />
     )
   }
 }
