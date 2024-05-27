@@ -1,35 +1,24 @@
 import { FormItemBridgeProps, RfRender } from '@rf-render/core'
-import { CanModifyConfig, IRfRenderItem } from '@rf-render/antd'
+import { DepsExec, IRfRenderItem } from '@rf-render/antd'
 import { Form, FormInstance } from 'antd'
-import { forwardRef, useImperativeHandle, useState } from 'react'
 
-export interface FormItemBridgeWrapperHandle {
-  update: (config: CanModifyConfig) => void
-}
-
-export const FormItemBridgeWrapper = forwardRef((item: IRfRenderItem & { depsExec: (key: string) => void, form: FormInstance }, ref) => {
-  const [config, setConfig] = useState(item)
-  const { name, ItemProps, widget = RfRender.defaultWidget, props, label, mapKeys = [] } = config
-  const handler: FormItemBridgeWrapperHandle = {
-    update: (c) => {
-      setConfig({ ...config, ...c })
-    },
-  }
-
-  useImperativeHandle(ref, () => handler)
+export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec, form: FormInstance }) {
+  const { name, ItemProps, widget = RfRender.defaultWidget, props, label, mapKeys, form, depsExec } = item
   // 传递onChange和onMapKeysChange给自定义的子组件
   const overrideProps: FormItemBridgeProps = {
     ...props,
     async onChange(val: unknown) {
-      config.form.setFieldValue(name, val)
-      config.depsExec(name)
+      form.setFieldValue(name, val)
+      depsExec(name)
     },
     // 自定义组件需要抛出这个，结果为对象格式
     onMapKeysChange(valueMap: Record<string, unknown>) {
-      mapKeys.forEach((key: string, index: number) => {
-        config.form.setFieldValue(key, valueMap[index])
-        config.depsExec(key)
-      })
+      if (mapKeys?.length) {
+        mapKeys.forEach((key: string, index: number) => {
+          form.setFieldValue(key, valueMap[index])
+          depsExec(key)
+        })
+      }
     },
   }
   return (
@@ -39,10 +28,10 @@ export const FormItemBridgeWrapper = forwardRef((item: IRfRenderItem & { depsExe
         {RfRender.load(widget)(overrideProps ?? {})}
       </Form.Item>
       {
-        mapKeys.map((key) => {
-          return <Form.Item key={key} name={key} style={{ display: 'none' }} />
-        })
+       mapKeys?.length && mapKeys.map((key) => {
+         return <Form.Item key={key} name={key} style={{ display: 'none' }} />
+       })
       }
     </>
   )
-})
+}

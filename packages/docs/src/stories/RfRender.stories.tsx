@@ -75,6 +75,7 @@ export const Primary: Story = {
           return config
         },
       },
+
     ]),
   },
 }

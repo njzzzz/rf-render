@@ -5,13 +5,13 @@ export function useFormRender() {
   const [form] = Form.useForm()
   const FormRender = (props: FormRenderProps) => {
     const { schema, ...antdFromProps } = props
-    const { initializeRefs, depsExec } = useDeps(schema, form)
+    const { depsExec, rtSchema } = useDeps(schema, form)
     return (
       <Form form={form} {...antdFromProps}>
         {
-          schema.map((item) => {
+          rtSchema.map((item) => {
             return (
-              <FormItemBridgeWrapper key={item.name} {...item} ref={initializeRefs(item.name)} depsExec={depsExec} form={form} />
+              <FormItemBridgeWrapper key={item.name} {...item} depsExec={depsExec} form={form} />
             )
           })
         }

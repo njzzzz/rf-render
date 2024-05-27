@@ -9,10 +9,10 @@ interface IProps {
 }
 export function SuspenseWrapper(props: IProps) {
   const { component, Component, formItemBridgeProps, ...antdInjectedProps } = props
-  const { onMapKeysChange, onChange: bridgeProps, ...configProps } = formItemBridgeProps
+  const { onMapKeysChange, onChange: bridgeOnChange, ...configProps } = formItemBridgeProps
   const { onChange: antdOnChange } = antdInjectedProps
   const onChange = (val: unknown) => {
-    bridgeProps(val)
+    bridgeOnChange(val)
     antdOnChange && antdOnChange(val)
   }
   return (

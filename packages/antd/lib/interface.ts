@@ -56,8 +56,4 @@ export function defineSchema<T extends string = string>(schema: IRfRenderItem<T>
   return schema
 }
 
-export interface IRfRenderItemBridge {
-  _update: (config: IRfRenderItem) => void
-}
-export type IRfRenderItemWithBridge = IRfRenderItem & IRfRenderItemBridge
 export const DNCV = Symbol('do_not_change_value')
