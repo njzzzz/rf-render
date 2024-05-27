@@ -48,31 +48,26 @@ export const Primary: Story = {
         name: 'name',
         label: '姓名',
         ItemProps: { rules: [{ required: true, message: '请输入姓名' }] },
-        props: { disabled: false, placeholder: '请输入姓名' },
-        changeConfig(config, formData) {
-          config.props!.disabled = formData.b === '1'
-          return config
-        },
+        props: { placeholder: '请输入姓名' },
       },
       {
         name: 'age',
         label: '年龄',
         ItemProps: { rules: [{ required: true, message: '请输入年龄' }] },
-        props: { disabled: false, placeholder: '请输入姓名', type: 'number' },
+        props: { placeholder: '请输入姓名', type: 'number' },
       },
       {
         name: 'ageOver18',
         label: '年龄是否大于18',
-        props: {
-          disabled: false,
-        },
-        dependOn: ['age'],
+        mapKeys: ['ageOver18Egnlish'],
+        dependOn: ['age', 'ageOver18', 'ageOver18Egnlish'],
         changeValue(formData) {
-          return [formData.age > 18 ? '是' : '否']
+          return [formData.age > 18 ? '是' : '否', formData.age > 18 ? 'yes' : 'no']
         },
         changeConfig(config, formData) {
-          config.props!.disabled = formData.age > 18
-          return config
+          const { props = {} } = config
+          props.disabled = formData.age > 18
+          return { ...config, props }
         },
       },
 
