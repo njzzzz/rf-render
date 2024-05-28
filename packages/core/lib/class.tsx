@@ -62,7 +62,7 @@ export class RfRender {
    * @param {CustomLoader} [opts.loader] - 自定义组件loader，默认情况下loader需要实现组件的加载，以及对switchPlatform和switchFileName的响应.
    * @param {boolean} [opts.debugger] - 是否启动debugger，启用将展示哪些依赖变动导致哪些依赖项被执行.
    */
-  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string, loader?: CustomLoader, debugger: Debugger }) {
+  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string, loader?: CustomLoader, debugger?: Debugger }) {
     if (!opts.loader) {
       opts.loader = loader
     }
