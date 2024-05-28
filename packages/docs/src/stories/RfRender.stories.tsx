@@ -15,7 +15,7 @@ new RfRender({
     },
     {
       name: 'CheckboxGroup',
-      loader: (platform, fileName) => lazy(() => import('antd/es/checkbox/Group')),
+      loader: () => lazy(() => import('antd/es/checkbox/Group')),
     },
   ],
 })

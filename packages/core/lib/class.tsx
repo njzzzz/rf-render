@@ -50,6 +50,14 @@ export class RfRender {
   static defaultWidget = 'Input'
   static listeners = new Set<Listener>()
   static loader: CustomLoader
+  /**
+   *
+   * @param {object} opts
+   * @param {boolean} [opts.cover] - 是否直接覆盖重名widget，不建议，默认情况下加载到重名组件时会报错.
+   * @param {Array<Component>} [opts.plugins] - 组件插件，重要，用于配置最终渲染使用的组件.
+   * @param {string} [opts.defaultWidget] - 默认的widget类型，当为配置widget属性时，会默认使用此配置.
+   * @param {CustomLoader} [opts.loader] - 自定义组件loader，默认情况下loader需要实现组件的加载，以及对switchPlatform和switchFileName的响应.
+   */
   constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string, loader?: CustomLoader }) {
     if (!opts.loader) {
       opts.loader = loader
