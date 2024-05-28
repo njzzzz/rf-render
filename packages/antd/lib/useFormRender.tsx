@@ -9,9 +9,9 @@ export function useFormRender() {
     return (
       <Form form={form} {...antdFromProps}>
         {
-          rtSchema.map((item) => {
+          rtSchema.map((item, index) => {
             return (
-              <FormItemBridgeWrapper key={item.name} {...item} depsExec={depsExec} form={form} />
+              <FormItemBridgeWrapper key={item.name || index} {...item} depsExec={depsExec} form={form} />
             )
           })
         }

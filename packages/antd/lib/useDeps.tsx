@@ -8,14 +8,23 @@ const logColors = ['color: green', 'color: black', 'color: red', 'color: black',
 export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
   const [rtSchema, setRtSchema] = useState(schema)
 
-  const dependOnMaps = useMemo(() => {
-    return rtSchema.reduce((acc: Record<string, IRfRenderItem[]>, item) => {
-      const { dependOn = [] } = item
+  function genDependOnMaps(schema: IRfRenderItem[], acc: Record<string, IRfRenderItem[]> = {}) {
+    schema.forEach((item) => {
+      const { dependOn = [], layout = [] } = item
       dependOn.forEach((dep) => {
         acc[dep] = acc[dep] ? [...acc[dep], item] : [item]
       })
-      return acc
-    }, {})
+      // 递归处理layout
+      if (layout.length) {
+        genDependOnMaps(layout, acc)
+      }
+    })
+    return acc
+  }
+
+  const dependOnMaps = useMemo(() => {
+    return genDependOnMaps(rtSchema)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rtSchema])
 
   async function depsExec(nameOrKey: string) {
@@ -56,11 +65,9 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
       })
     }
   }
-
-  useEffect(() => {
-    // 初始化
-    setRtSchema(rtSchema.map((item) => {
-      const { changeConfig, changeValue, initConfig, name } = item
+  const getItemBridge = (item: IRfRenderItem) => {
+    const { changeConfig, changeValue, initConfig, name, mapKeys = [] } = item
+    if (name?.length) {
       // 初始化钩子，可异步
       if (initConfig) {
         Promise.resolve(initConfig(item)).then((config) => {
@@ -80,21 +87,20 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
       }
       // 重写changeValue，加入更新和赋值逻辑
       if (changeValue) {
-        const { mapKeys = [] } = item
         item.changeValue = async (...args) => {
           const values = await changeValue(...args)
           // values 格式为数组 [第一项的值，第二项的值]
           if (values?.length) {
             if (values[0] !== DNCV) {
-            // 更新name值
-              form.setFieldValue(item.name, values[0])
+              // 更新name值
+              form.setFieldValue(name, values[0])
               // 触发依赖项更新
-              depsExec(item.name)
+              depsExec(name)
             }
             mapKeys.forEach((key, index) => {
               const mapValue = values[index + 1]
               if (mapValue !== DNCV) {
-              // 更新mapKeys的值
+                // 更新mapKeys的值
                 form.setFieldValue(key, mapValue)
                 // 触发依赖项更新
                 depsExec(key)
@@ -103,7 +109,20 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
           }
         }
       }
-      return item
+    }
+
+    // 递归处理layout
+    if (item.layout) {
+      item.layout = item.layout.map((item) => {
+        return getItemBridge(item)
+      })
+    }
+    return item
+  }
+  useEffect(() => {
+    // 初始化
+    setRtSchema(rtSchema.map((item) => {
+      return getItemBridge(item)
     }))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

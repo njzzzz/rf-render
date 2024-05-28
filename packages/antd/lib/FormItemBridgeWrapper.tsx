@@ -7,12 +7,19 @@ export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec
   // 传递onChange和onMapKeysChange给自定义的子组件
   const overrideProps: FormItemBridgeProps = {
     ...props,
-    async onChange(val: unknown) {
-      form.setFieldValue(name, val)
-      depsExec(name)
+    rfrender: {
+      depsExec,
+      form,
+      item,
     },
-    // 自定义组件需要抛出这个，结果为对象格式
-    onMapKeysChange(valueMap: Record<string, unknown>) {
+    async onChange(val: unknown) {
+      if (name) {
+        form.setFieldValue(name, val)
+        depsExec(name)
+      }
+    },
+    // 自定义组件需要抛出这个，结果为数组
+    onMapKeysChange(valueMap: unknown[]) {
       if (mapKeys?.length) {
         mapKeys.forEach((key: string, index: number) => {
           form.setFieldValue(key, valueMap[index])
@@ -27,18 +34,17 @@ export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec
       {
         withFormItem
           ? (
-            <Form.Item key={name} name={name} label={label} {...(ItemProps ?? {})}>
+            <Form.Item name={name} label={label} {...(ItemProps ?? {})}>
               {/* 加载组件，并传入属性 */}
               {Component(overrideProps ?? {})}
             </Form.Item>
             )
           : Component(overrideProps ?? {})
-    }
-
+      }
       {
-       mapKeys?.length && mapKeys.map((key) => {
-         return <Form.Item key={key} name={key} style={{ display: 'none' }} />
-       })
+        mapKeys?.length && mapKeys.map((key) => {
+          return <Form.Item key={key} name={key} style={{ display: 'none' }} />
+        })
       }
     </>
   )

@@ -41,7 +41,7 @@ export interface CommonRfRenderItemConf<T extends string> {
   /**
    * 字段名
    */
-  name: T
+  name?: T
   /**
    * 表单label
    */
@@ -67,12 +67,12 @@ export interface CommonRfRenderItemConf<T extends string> {
    *  这样在表单字段中就会产生selectedItem字段，值为你抛出的值
    *  常用场景为Select返回的是id但是你又需要Select选中对象中的值，就可以使用mapKeys抛出
    */
-  mapKeys?: string[]
+  mapKeys?: Array<T>
   /**
    * 当前表单的依赖项，
    * 当依赖项的值发生变动时会执行当前配置的changeConfig和changeValue函数以修改当前项的值或者配置
    */
-  dependOn?: T[]
+  dependOn?: Array<T>
   /**
    * 是否使用Form.Item包裹
    * 设为false不会使用Form.Item包裹
@@ -80,6 +80,10 @@ export interface CommonRfRenderItemConf<T extends string> {
    * @default true
    */
   withFormItem?: boolean
+  /**
+   * 布局组件使用，传入layout的子项也会参与dependOn
+   */
+  layout?: Array<IRfRenderItem<T>>
 }
 export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemConf<T> {
   props?: P

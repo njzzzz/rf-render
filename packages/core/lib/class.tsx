@@ -1,5 +1,5 @@
 import React, { SuspenseProps, lazy } from 'react'
-import { loader } from '@rf-render/antd'
+import { DepsExec, IRfRenderItem, loader } from '@rf-render/antd'
 /**
  * {
  *     name: 'input',
@@ -24,9 +24,14 @@ export interface Configure {
 /**
  * 自定义的loader需要实现这两个函数以更新值
  */
-export interface FormItemBridgeProps {
+export interface FormItemBridgeProps<T = any> {
   onChange: (val: unknown) => Promise<any>
-  onMapKeysChange: (valueMap: Record<string, unknown>) => any
+  onMapKeysChange: (valueMap: unknown[]) => any
+  rfrender: {
+    depsExec: DepsExec
+    form: T
+    item: IRfRenderItem
+  }
 }
 export interface Listener {
   reload: boolean

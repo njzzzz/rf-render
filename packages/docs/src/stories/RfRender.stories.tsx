@@ -7,15 +7,27 @@ import RfFormRender from './RfFormRender.tsx'
 
 // eslint-disable-next-line no-new
 new RfRender({
+  debugger: 'info',
   defaultWidget: 'Test',
   plugins: [
     {
       name: 'Test',
-      loader: (platform, fileName) => lazy(() => import((`../RfRenderComponents/Test/${platform}/${fileName}.tsx`))),
+      loader: (platform, fileName) =>
+        lazy(
+          () => import(`../RfRenderComponents/Test/${platform}/${fileName}.tsx`),
+        ),
     },
     {
       name: 'CheckboxGroup',
       loader: () => lazy(() => import('antd/es/checkbox/Group')),
+    },
+    {
+      name: 'Layout',
+      loader: (platform, fileName) =>
+        lazy(
+          () =>
+            import(`../RfRenderComponents/Layout/${platform}/${fileName}.tsx`),
+        ),
     },
   ],
 })
@@ -30,9 +42,7 @@ const meta = {
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
   tags: ['autodocs'],
   // More on argTypes: https://storybook.js.org/docs/api/argtypes
-  argTypes: {
-
-  },
+  argTypes: {},
 
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
   args: { onClick: fn() },
@@ -72,7 +82,10 @@ export const Primary: Story = {
         mapKeys: ['ageOver18Egnlish'],
         dependOn: ['age'],
         changeValue(formData) {
-          return [formData.age > 18 ? '是' : '否', formData.age > 18 ? 'yes' : 'no']
+          return [
+            formData.age > 18 ? '是' : '否',
+            formData.age > 18 ? 'yes' : 'no',
+          ]
         },
         changeConfig(config, formData) {
           const { props = {} } = config
@@ -111,26 +124,49 @@ export const Primary: Story = {
           return [[]]
         },
       },
-
+      {
+        label: '布局',
+        widget: 'Layout',
+        withFormItem: false,
+        layout: [
+          {
+            name: 'date',
+            label: '日期',
+            dependOn: ['date-1'],
+            changeValue() {
+              return ['xxx']
+            },
+          },
+          { name: 'date-1', label: '日期-1' },
+        ],
+      },
     ]),
   },
 }
 async function getOptions1(): Promise<any> {
   return new Promise((resolve) => {
-    setTimeout(() => resolve([
-      { label: 'Apple1', value: 'Apple1' },
-      { label: 'Pear1', value: 'Pear1' },
-      { label: 'Orange1', value: 'Orange1' },
-    ]), 1000)
+    setTimeout(
+      () =>
+        resolve([
+          { label: 'Apple1', value: 'Apple1' },
+          { label: 'Pear1', value: 'Pear1' },
+          { label: 'Orange1', value: 'Orange1' },
+        ]),
+      1000,
+    )
   })
 }
 
 async function getOptions2() {
   return new Promise((resolve) => {
-    setTimeout(() => resolve([
-      { label: 'Apple2', value: 'Apple2' },
-      { label: 'Pear2', value: 'Pear2' },
-      { label: 'Orange2', value: 'Orange2' },
-    ]), 1000)
+    setTimeout(
+      () =>
+        resolve([
+          { label: 'Apple2', value: 'Apple2' },
+          { label: 'Pear2', value: 'Pear2' },
+          { label: 'Orange2', value: 'Orange2' },
+        ]),
+      1000,
+    )
   })
 }
