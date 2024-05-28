@@ -13,9 +13,12 @@ new RfRender({
       name: 'Test',
       loader: (platform, fileName) => lazy(() => import((`../RfRenderComponents/Test/${platform}/${fileName}.tsx`))),
     },
+    {
+      name: 'CheckboxGroup',
+      loader: (platform, fileName) => lazy(() => import('antd/es/checkbox/Group')),
+    },
   ],
 })
-
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
   title: 'Components/RfFormRender',
@@ -60,7 +63,7 @@ export const Primary: Story = {
         name: 'ageOver18',
         label: '年龄是否大于18',
         mapKeys: ['ageOver18Egnlish'],
-        dependOn: ['age', 'ageOver18', 'ageOver18Egnlish'],
+        dependOn: ['age'],
         changeValue(formData) {
           return [formData.age > 18 ? '是' : '否', formData.age > 18 ? 'yes' : 'no']
         },
@@ -69,6 +72,26 @@ export const Primary: Story = {
           props.disabled = formData.age > 18
           return { ...config, props }
         },
+      },
+      {
+        name: 'favo',
+        widget: 'CheckboxGroup',
+        label: '爱好',
+        async initConfig(config) {
+          return {
+            ...config,
+            props: {
+              options: [
+                { label: 'Apple', value: 'Apple' },
+                { label: 'Pear', value: 'Pear' },
+                { label: 'Orange', value: 'Orange' },
+              ],
+            },
+          }
+        },
+        // props: {
+        //   options:
+        // },
       },
 
     ]),

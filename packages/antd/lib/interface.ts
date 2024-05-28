@@ -23,7 +23,6 @@ export interface CommonRfRenderItemConf<T extends string> {
   // 可以自定义其他键名，只要在组件里抛出即可
   mapKeys?: string[]
   dependOn?: T[]
-
 }
 export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemConf<T> {
   props?: P
@@ -33,6 +32,7 @@ export interface DefaultRfRenderItemConf<T extends string> extends CommonRfRende
   props?: DefaultWidgetProps
   changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
   changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<void | any[]>
+  initConfig?: (config: ChangedConfig<T, DefaultWidgetProps>) => MaybePromise<CanModifyConfig | void>
 }
 
 export interface RfRenderItemConf<W extends keyof WidgetProps, T extends string> extends CommonRfRenderItemConf<T> {
@@ -40,6 +40,7 @@ export interface RfRenderItemConf<W extends keyof WidgetProps, T extends string>
   props?: WidgetProps[W]
   changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
   changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<void | any[]>
+  initConfig?: (config: ChangedConfig<T, WidgetProps[W]>) => MaybePromise<CanModifyConfig | void>
 }
 
 // 使用联合类型生成所有可能的组合
@@ -51,7 +52,10 @@ export interface IProps {
   schema: IRfRenderItem[]
 }
 export type FormRenderProps = TFormProps & IProps
-// 收束name
+
+/**
+ * 定义表单schema，使用此函数可以获得更好的类型提示
+ */
 export function defineSchema<T extends string = string>(schema: IRfRenderItem<T>[]) {
   return schema
 }

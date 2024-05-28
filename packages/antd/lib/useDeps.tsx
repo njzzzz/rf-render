@@ -1,4 +1,4 @@
-import { DNCV, IRfRenderItem } from '@rf-render/antd'
+import { CanModifyConfig, DNCV, IRfRenderItem } from '@rf-render/antd'
 import { useEffect, useMemo, useState } from 'react'
 import { FormInstance } from 'antd'
 
@@ -32,32 +32,45 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
       await Promise.all(promises)
     }
   }
+  // 更新配置
+  const updateConfig = (config: CanModifyConfig | void, name: string) => {
+    if (config) {
+      setRtSchema((schema) => {
+        return schema.map((item) => {
+          if (item.name === name) {
+            item = {
+              ...item,
+              ...config,
+            }
+          }
+          return item
+        })
+      })
+    }
+  }
+
   useEffect(() => {
-  // 初始化
+    // 初始化
     setRtSchema(rtSchema.map((item) => {
-      const { changeConfig, changeValue } = item
+      const { changeConfig, changeValue, initConfig, name } = item
+      // 初始化钩子，可异步
+      if (initConfig) {
+        Promise.resolve(initConfig(item)).then((config) => {
+          updateConfig(config, name)
+        })
+      }
+      // 重写changeConfig，加入更新逻辑
       if (changeConfig) {
         item = {
           ...item,
           changeConfig: async (cfg, formData) => {
             const config = await changeConfig(cfg, formData)
-            if (config) {
-              setRtSchema((schema) => {
-                return schema.map((item) => {
-                  if (item.name === cfg.name) {
-                    item = {
-                      ...item,
-                      ...config,
-                    }
-                  }
-                  return item
-                })
-              })
-            }
+            updateConfig(config, name)
           },
 
         }
       }
+      // 重写changeValue，加入更新和赋值逻辑
       if (changeValue) {
         const { mapKeys = [] } = item
         item.changeValue = async (...args) => {

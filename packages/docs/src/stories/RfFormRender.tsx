@@ -8,6 +8,7 @@ export default function RfFormRender(props: FormRenderProps) {
       <FormRender {...props}>
       </FormRender>
       <Button onClick={() => {
+        form.validateFields()
         console.log(form.getFieldsValue())
       }}
       >
