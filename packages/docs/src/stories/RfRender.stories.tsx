@@ -83,6 +83,7 @@ export const Primary: Story = {
       {
         name: 'favo',
         widget: 'CheckboxGroup',
+        withFormItem: true,
         label: '爱好',
         dependOn: ['age'],
         async initConfig(config) {
@@ -105,6 +106,9 @@ export const Primary: Story = {
             ...config,
             props,
           }
+        },
+        changeValue() {
+          return [[]]
         },
       },
 

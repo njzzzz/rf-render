@@ -1,6 +1,9 @@
 import { CanModifyConfig, DNCV, IRfRenderItem } from '@rf-render/antd'
 import { useEffect, useMemo, useState } from 'react'
 import { FormInstance } from 'antd'
+import { RfRender } from '@rf-render/core'
+
+const logColors = ['color: green', 'color: black', 'color: red', 'color: black', 'color: blue']
 
 export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
   const [rtSchema, setRtSchema] = useState(schema)
@@ -22,10 +25,12 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
         const { changeConfig, changeValue, ...config } = dep
         const formData = form.getFieldsValue()
         if (changeConfig) {
+          RfRender.debug(`表单%c【${nameOrKey}】%c变动，触发了表单%c【${config.name}】%c的%c 【changeConfig】`, ...logColors)
           acc.push(changeConfig(config as any, formData))
         }
         if (changeValue) {
           acc.push(changeValue(formData))
+          RfRender.debug(`表单%c【${nameOrKey}】%c变动，触发了表单%c【${config.name}】%c的%c 【changeValue】`, ...logColors)
         }
         return acc
       }, [])

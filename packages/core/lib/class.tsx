@@ -38,6 +38,7 @@ export type Platform = 'mobile' | 'pc'
 // view表示的是纯展示状态
 // 在切换fileName时会重新加载
 export type FileName = 'index' | 'view'
+export type Debugger = boolean | 'info' | 'trace'
 // 单例
 export class RfRender {
   static components: Record<string, Component> = {}
@@ -48,6 +49,8 @@ export class RfRender {
   static cover = false
   // 默认widget
   static defaultWidget = 'Input'
+  // 是否启动debugger
+  static debugger: Debugger = false
   static listeners = new Set<Listener>()
   static loader: CustomLoader
   /**
@@ -57,12 +60,14 @@ export class RfRender {
    * @param {Array<Component>} [opts.plugins] - 组件插件，重要，用于配置最终渲染使用的组件.
    * @param {string} [opts.defaultWidget] - 默认的widget类型，当为配置widget属性时，会默认使用此配置.
    * @param {CustomLoader} [opts.loader] - 自定义组件loader，默认情况下loader需要实现组件的加载，以及对switchPlatform和switchFileName的响应.
+   * @param {boolean} [opts.debugger] - 是否启动debugger，启用将展示哪些依赖变动导致哪些依赖项被执行.
    */
-  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string, loader?: CustomLoader }) {
+  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string, loader?: CustomLoader, debugger: Debugger }) {
     if (!opts.loader) {
       opts.loader = loader
     }
     RfRender.cover = opts.cover ?? false
+    RfRender.debugger = opts.debugger ?? false
     RfRender.plugins = opts.plugins ?? []
     RfRender.defaultWidget = opts.defaultWidget ?? ''
     RfRender.loader = opts.loader!
@@ -72,7 +77,7 @@ export class RfRender {
   static loadComponents() {
     RfRender.plugins.forEach((component) => {
       if (RfRender.components[component.name] && !RfRender.cover)
-        throw new Error(`存在同名组件！, 请修改组件${component.name} 的name属性值，或设置RfRender cover属性为true，直接覆盖`)
+        throw new Error(`存在同名组件！请修改组件${component.name} 的name属性值，或设置RfRender cover属性为true，直接覆盖`)
 
       component.SuspenseProps = component.SuspenseProps || {
         fallback: null,
@@ -117,6 +122,15 @@ export class RfRender {
     RfRender.listeners.forEach(({ reload, setReload }) => {
       setReload(!reload)
     })
+  }
+
+  static debug(...args: any[]) {
+    if (RfRender.debugger === true || RfRender.debugger === 'info') {
+      console.log(...args)
+    }
+    if (RfRender.debugger === 'trace') {
+      console.trace(...args)
+    }
   }
 }
 

@@ -73,6 +73,13 @@ export interface CommonRfRenderItemConf<T extends string> {
    * 当依赖项的值发生变动时会执行当前配置的changeConfig和changeValue函数以修改当前项的值或者配置
    */
   dependOn?: T[]
+  /**
+   * 是否使用Form.Item包裹
+   * 设为false不会使用Form.Item包裹
+   * ItemProps以及和antd Form.Item相关功能都会失效
+   * @default true
+   */
+  withFormItem?: boolean
 }
 export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemConf<T> {
   props?: P
