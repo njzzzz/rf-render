@@ -35,7 +35,7 @@ export interface DefaultWidgetProps {
 }
 export type MaybePromise<T> = T | Promise<T>
 // 可被dependOn修改的属性,name不可修改，暂不开放修改widget
-export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props'
+export type CanModifyConfigKeys = 'label' | 'ItemProps' | 'props'
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
 export interface CommonRfRenderItemConf<T extends string> {
   /**

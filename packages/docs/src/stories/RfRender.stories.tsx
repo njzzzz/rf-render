@@ -46,6 +46,13 @@ type Story = StoryObj<typeof meta>
 export const Primary: Story = {
   args: {
     layout: 'vertical',
+    initialValues: {
+      name: 'xxxx',
+      age: '19',
+      ageOver18: '是',
+      favo: ['Apple', 'Pear', 'Orange'],
+      ageOver18Egnlish: 'xxx',
+    },
     schema: defineSchema([
       {
         name: 'name',
@@ -77,23 +84,49 @@ export const Primary: Story = {
         name: 'favo',
         widget: 'CheckboxGroup',
         label: '爱好',
+        dependOn: ['age'],
         async initConfig(config) {
           return {
             ...config,
             props: {
               options: [
-                { label: 'Apple', value: 'Apple' },
-                { label: 'Pear', value: 'Pear' },
-                { label: 'Orange', value: 'Orange' },
+                { label: 'AppleDefault', value: 'AppleDefault' },
+                { label: 'PearDefault', value: 'PearDefault' },
+                { label: 'OrangeDefault', value: 'OrangeDefault' },
               ],
             },
           }
         },
-        // props: {
-        //   options:
-        // },
+        async changeConfig(config, formData) {
+          const { props = {} } = config
+          const { age } = formData
+          props.options = age > 18 ? await getOptions1() : await getOptions2()
+          return {
+            ...config,
+            props,
+          }
+        },
       },
 
     ]),
   },
+}
+async function getOptions1(): Promise<any> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve([
+      { label: 'Apple1', value: 'Apple1' },
+      { label: 'Pear1', value: 'Pear1' },
+      { label: 'Orange1', value: 'Orange1' },
+    ]), 1000)
+  })
+}
+
+async function getOptions2() {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve([
+      { label: 'Apple2', value: 'Apple2' },
+      { label: 'Pear2', value: 'Pear2' },
+      { label: 'Orange2', value: 'Orange2' },
+    ]), 1000)
+  })
 }

@@ -35,12 +35,15 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
   // 更新配置
   const updateConfig = (config: CanModifyConfig | void, name: string) => {
     if (config) {
+      const { ItemProps, label, props } = config
       setRtSchema((schema) => {
         return schema.map((item) => {
           if (item.name === name) {
             item = {
               ...item,
-              ...config,
+              ItemProps,
+              label,
+              props,
             }
           }
           return item
