@@ -1,0 +1,52 @@
+# 安装
+
+```bash
+npm i @rf-render/core @rf-render/antd --save-dev
+```
+```bash
+pnpm i @rf-render/core @rf-render/antd --save-dev
+```
+```bash
+yarn add @rf-render/core @rf-render/antd --save-dev
+```
+# 引入
+在项目主入口引入
+1. 引入RfRender及antd插件包
+```ts
+import { RfRender } from '@rf-render/core'
+import { antdRfRenderPlugin } from '@rf-render/antd'
+
+new RfRender({
+  defaultWidget: 'Input',
+  plugins: [... antdRfRenderPlugin],
+})
+```
+
+2. 配置ts提示
+
+    - 创建declare module 类型文件
+        在当前项目根目录下创建文件`/types/@rf-render/antd/index.d.ts`，并写入以下内容
+
+        ```ts
+        import '@rf-render/antd'
+        import { AntdDefaultWidgetProps, AntdWidgetProps } from '@rf-render/antd'
+
+        declare module '@rf-render/antd' {
+            
+            export interface WidgetProps extends AntdWidgetProps { }
+            // 默认组件的属性，如果你的默认组件不是Input需要改这里，同时修改传入new RfRender的defaultWidget属性
+            export interface DefaultWidgetProps extends AntdDefaultWidgetProps { }
+        }
+        ```
+
+    - 在`jsconfig.json`或`tsconfig.json`文件中`include`此类型文件
+
+        ```json
+        {
+            //...
+            "include": [
+                //....
+                "types"
+            ]
+        }
+        ```

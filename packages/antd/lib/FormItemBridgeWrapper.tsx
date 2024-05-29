@@ -3,7 +3,9 @@ import { DepsExec, IRfRenderItem } from '@rf-render/antd'
 import { Form, FormInstance } from 'antd'
 
 export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec, form: FormInstance }) {
-  const { name, ItemProps, widget = RfRender.defaultWidget, props, label, mapKeys, form, depsExec, withFormItem = true } = item
+  const { name, itemProps, widget = RfRender.defaultWidget, props, label, mapKeys, form, depsExec, withFormItem = true, display = true } = item
+  if (!display)
+    return null
   // 传递onChange和onMapKeysChange给自定义的子组件
   const overrideProps: FormItemBridgeProps = {
     ...props,
@@ -34,7 +36,7 @@ export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec
       {
         withFormItem
           ? (
-            <Form.Item name={name} label={label} {...(ItemProps ?? {})}>
+            <Form.Item name={name} label={label} {...(itemProps ?? {})}>
               {/* 加载组件，并传入属性 */}
               {Component(overrideProps ?? {})}
             </Form.Item>

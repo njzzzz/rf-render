@@ -11,6 +11,7 @@
   "dependencies": {
     "@rf-render/antd": "workspace:^",
     "@rf-render/core": "workspace:^",
+    "@storybook/components": "^8.1.4",
     "antd": "> 5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

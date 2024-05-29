@@ -1,6 +1,7 @@
 import React, { SuspenseProps, lazy } from 'react'
 import { DepsExec, IRfRenderItem, loader } from '@rf-render/antd'
 /**
+ * ```ts
  * {
  *     name: 'input',
  *     configure: {
@@ -8,6 +9,7 @@ import { DepsExec, IRfRenderItem, loader } from '@rf-render/antd'
  *     },
  *     loader: (platform, viewType) => React.lazy(() => import("@/rf-render-components/input/${platform}/${viewType}.tsx"))
  * }
+ * ```
  */
 export interface Component {
   // TODO: 用于设计器，直接加载或者手动引入用于设计器的设置项，如果不传则直接从platform下引入
@@ -21,12 +23,19 @@ export type CustomLoader = (component: Component) => (props: FormItemBridgeProps
 export interface Configure {
 
 }
+// eslint-disable-next-line react-refresh/only-export-components
+export function definePlugin(plugin: Component[]) {
+  return plugin
+}
 /**
  * 自定义的loader需要实现这两个函数以更新值
  */
 export interface FormItemBridgeProps<T = any> {
-  onChange: (val: unknown) => Promise<any>
+  onChange: <T extends any[]>(...val: T) => Promise<any>
   onMapKeysChange: (valueMap: unknown[]) => any
+  /**
+   * 包含当前表单项的配置项、form实例、执行依赖项函数
+   */
   rfrender: {
     depsExec: DepsExec
     form: T
@@ -37,12 +46,14 @@ export interface Listener {
   reload: boolean
   setReload: React.Dispatch<React.SetStateAction<boolean>>
 }
-export type Platform = 'mobile' | 'pc'
+// eslint-disable-next-line ts/ban-types
+export type Platform = 'mobile' | 'pc' | string & {}
 // 目前
 // index表示的是可编辑状态
 // view表示的是纯展示状态
 // 在切换fileName时会重新加载
-export type FileName = 'index' | 'view'
+// eslint-disable-next-line ts/ban-types
+export type FileName = 'index' | 'view' | string & {}
 export type Debugger = boolean | 'info' | 'trace'
 // 单例
 export class RfRender {

@@ -2,13 +2,14 @@ import { fn } from '@storybook/test'
 import { StoryObj } from '@storybook/react'
 import { RfRender } from '@rf-render/core'
 import { lazy } from 'react'
-import { defineSchema } from '@rf-render/antd'
-import RfFormRender from './RfFormRender.tsx'
+import { antdRfRenderPlugin, defineSchema } from '@rf-render/antd'
+import RfFormRender from './components/RfFormRender'
 
 // eslint-disable-next-line no-new
 new RfRender({
   debugger: 'info',
   defaultWidget: 'Test',
+  cover: true,
   plugins: [
     {
       name: 'Test',
@@ -21,14 +22,7 @@ new RfRender({
       name: 'CheckboxGroup',
       loader: () => lazy(() => import('antd/es/checkbox/Group')),
     },
-    {
-      name: 'Layout',
-      loader: (platform, fileName) =>
-        lazy(
-          () =>
-            import(`../RfRenderComponents/Layout/${platform}/${fileName}.tsx`),
-        ),
-    },
+    ...antdRfRenderPlugin,
   ],
 })
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
@@ -50,123 +44,71 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
-//
-
 // // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
-export const Primary: Story = {
+export const 简单表单: Story = {
   args: {
     layout: 'vertical',
     initialValues: {
-      name: 'xxxx',
-      age: '19',
-      ageOver18: '是',
-      favo: ['Apple', 'Pear', 'Orange'],
-      ageOver18Egnlish: 'xxx',
+      name: '',
+      age: '',
+      ageOver18: '',
+      favo: [],
     },
     schema: defineSchema([
       {
-        name: 'name',
         label: '姓名',
-        ItemProps: { rules: [{ required: true, message: '请输入姓名' }] },
-        props: { placeholder: '请输入姓名' },
+        name: 'name',
+        itemProps: {
+          rules: [{ required: true, message: '请输入姓名' }],
+        },
       },
       {
-        name: 'age',
         label: '年龄',
-        ItemProps: { rules: [{ required: true, message: '请输入年龄' }] },
-        props: { placeholder: '请输入姓名', type: 'number' },
+        name: 'age',
+        props: {
+          type: 'number',
+        },
+        itemProps: {
+          rules: [{ required: true, message: '请输入年龄' }],
+        },
       },
       {
-        name: 'ageOver18',
         label: '年龄是否大于18',
-        mapKeys: ['ageOver18Egnlish'],
+        name: 'ageOver18',
         dependOn: ['age'],
-        changeValue(formData) {
-          return [
-            formData.age > 18 ? '是' : '否',
-            formData.age > 18 ? 'yes' : 'no',
-          ]
+        props: {
+          disabled: true,
         },
-        changeConfig(config, formData) {
-          const { props = {} } = config
-          props.disabled = formData.age > 18
-          return { ...config, props }
+        changeValue(formData) {
+          return [formData.age ? formData.age > 18 ? '是' : '否' : '']
         },
       },
       {
+        label: '爱好',
         name: 'favo',
         widget: 'CheckboxGroup',
-        withFormItem: true,
-        label: '爱好',
-        dependOn: ['age'],
-        async initConfig(config) {
-          return {
-            ...config,
-            props: {
-              options: [
-                { label: 'AppleDefault', value: 'AppleDefault' },
-                { label: 'PearDefault', value: 'PearDefault' },
-                { label: 'OrangeDefault', value: 'OrangeDefault' },
-              ],
-            },
-          }
-        },
-        async changeConfig(config, formData) {
-          const { props = {} } = config
-          const { age } = formData
-          props.options = age > 18 ? await getOptions1() : await getOptions2()
-          return {
-            ...config,
-            props,
-          }
-        },
-        changeValue() {
-          return [[]]
+        props: {
+          options: [
+            { label: '吃', value: 'eat' },
+            { label: '喝', value: 'drink' },
+            { label: '玩', value: 'play' },
+            { label: '乐', value: 'happy' },
+          ],
         },
       },
       {
-        label: '布局',
         widget: 'Layout',
-        withFormItem: false,
         layout: [
           {
-            name: 'date',
-            label: '日期',
-            dependOn: ['date-1'],
-            changeValue() {
-              return ['xxx']
-            },
+            label: '省',
+            name: 'province',
           },
-          { name: 'date-1', label: '日期-1' },
+          {
+            label: '市',
+            name: 'city',
+          },
         ],
       },
     ]),
   },
-}
-async function getOptions1(): Promise<any> {
-  return new Promise((resolve) => {
-    setTimeout(
-      () =>
-        resolve([
-          { label: 'Apple1', value: 'Apple1' },
-          { label: 'Pear1', value: 'Pear1' },
-          { label: 'Orange1', value: 'Orange1' },
-        ]),
-      1000,
-    )
-  })
-}
-
-async function getOptions2() {
-  return new Promise((resolve) => {
-    setTimeout(
-      () =>
-        resolve([
-          { label: 'Apple2', value: 'Apple2' },
-          { label: 'Pear2', value: 'Pear2' },
-          { label: 'Orange2', value: 'Orange2' },
-        ]),
-      1000,
-    )
-  })
 }

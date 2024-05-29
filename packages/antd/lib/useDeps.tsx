@@ -46,22 +46,28 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
       await Promise.all(promises)
     }
   }
+  const updateWithLayout = (schema: IRfRenderItem[], config: CanModifyConfig, name: string) => {
+    const { itemProps, label, props, display } = config
+    return schema.map((item) => {
+      if (item.name === name) {
+        Object.assign(item, {
+          itemProps,
+          label,
+          props,
+          display,
+        })
+      }
+      if (item.layout) {
+        item.layout = updateWithLayout(item.layout, config, name)
+      }
+      return item
+    })
+  }
   // 更新配置
   const updateConfig = (config: CanModifyConfig | void, name: string) => {
     if (config) {
-      const { ItemProps, label, props } = config
       setRtSchema((schema) => {
-        return schema.map((item) => {
-          if (item.name === name) {
-            item = {
-              ...item,
-              ItemProps,
-              label,
-              props,
-            }
-          }
-          return item
-        })
+        return updateWithLayout(schema, config, name)
       })
     }
   }
@@ -70,20 +76,18 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
     if (name?.length) {
       // 初始化钩子，可异步
       if (initConfig) {
-        Promise.resolve(initConfig(item)).then((config) => {
+        Promise.resolve(initConfig(item as any)).then((config) => {
           updateConfig(config, name)
         })
       }
       // 重写changeConfig，加入更新逻辑
       if (changeConfig) {
-        item = {
-          ...item,
-          changeConfig: async (cfg, formData) => {
+        Object.assign(item, {
+          changeConfig: async (cfg: any, formData: any) => {
             const config = await changeConfig(cfg, formData)
             updateConfig(config, name)
           },
-
-        }
+        })
       }
       // 重写changeValue，加入更新和赋值逻辑
       if (changeValue) {
@@ -124,9 +128,14 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
     setRtSchema(rtSchema.map((item) => {
       return getItemBridge(item)
     }))
+    // 初始化完成执行一次
+    initRunChange()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  function initRunChange() {
+    Object.keys(dependOnMaps).forEach(name => depsExec(name))
+  }
   return {
     rtSchema,
     depsExec,

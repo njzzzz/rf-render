@@ -1,4 +1,4 @@
 {
   "extends": "@tsconfig/vite-react",
-  "include": ["./index.tsx", "lib/**/*.ts", "lib/**/*.tsx", "./types/**/*.d.ts"]
+  "include": ["./index.tsx", "lib/**/*.ts", "lib/**/*.tsx", "./types/**/*.d.ts", "plugin/**/*.ts", "plugin/**/*.tsx", "./plugin/index.tsx"]
 }
