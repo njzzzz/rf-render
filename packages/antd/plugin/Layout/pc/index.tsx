@@ -1,4 +1,4 @@
-import { CustomerLayout, FormItemBridgeWrapper } from '@rf-render/antd'
+import { CustomerLayout, FormItemBridgeWrapper, getItemStyle } from '@rf-render/antd'
 import { FormItemBridgeProps } from '@rf-render/core'
 import { Col, FormInstance, Row } from 'antd'
 import { ReactElement } from 'react'
@@ -9,10 +9,7 @@ import { ReactElement } from 'react'
 export default function Layout(props: FormItemBridgeProps<FormInstance> & CustomerLayout) {
   const { rfrender, span = 2, rowProps, colProps } = props
   const { depsExec, form, item } = rfrender
-  const { layout = [], display = true } = item
-  if (!display) {
-    return null
-  }
+  const { layout = [] } = item
   const getRows = () => {
     if (!layout.length) {
       return null
@@ -20,10 +17,12 @@ export default function Layout(props: FormItemBridgeProps<FormInstance> & Custom
     let index = 0
     return layout.reduce((acc: ReactElement[][], item, currentIndex: number) => {
       const stack: ReactElement[] = acc[index] ?? []
-      const { name, colProps: itemColProps, display = true } = item
+      const { name, colProps: itemColProps, display = true, visibility = true } = item
+      const { itemStyle } = getItemStyle({ visibility })
+
       if (display) {
         const col = (
-          <Col key={name || currentIndex} {...(itemColProps ?? (colProps ?? {}))}>
+          <Col key={name || currentIndex} {...(itemColProps ?? (colProps ?? {}))} style={itemStyle}>
             <FormItemBridgeWrapper {...item} depsExec={depsExec} form={form}></FormItemBridgeWrapper>
           </Col>
         )

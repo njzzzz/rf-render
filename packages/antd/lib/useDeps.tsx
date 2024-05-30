@@ -47,7 +47,7 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
     }
   }
   const updateWithLayout = (schema: IRfRenderItem[], config: CanModifyConfig, name: string) => {
-    const { itemProps, label, props, display } = config
+    const { itemProps, label, props, display, visibility } = config
     return schema.map((item) => {
       if (item.name === name) {
         Object.assign(item, {
@@ -55,6 +55,7 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
           label,
           props,
           display,
+          visibility,
         })
       }
       if (item.layout) {

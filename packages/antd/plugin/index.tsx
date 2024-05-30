@@ -1,4 +1,5 @@
 import { FormItemBridgeProps, definePlugin } from '@rf-render/core'
+import { FormInstance } from 'antd'
 import { lazy } from 'react'
 /**
  * 暂时只适配了pc
@@ -25,11 +26,11 @@ export interface DefinefRenderComponentProps {
   /**
    * 自定义onChange事件
    */
-  onChange?: (rfrender: FormItemBridgeProps['rfrender'], ...val: any) => any
+  onChange?: (rfrender: FormItemBridgeProps<FormInstance>['rfrender'], ...val: any) => any
   /**
    * 自定义onMapKeysChange事件
    */
-  onMapKeysChange?: (rfrender: FormItemBridgeProps['rfrender'], ...val: any) => any
+  onMapKeysChange?: (rfrender: FormItemBridgeProps<FormInstance>['rfrender'], ...val: any) => any
   /**
    * 事件映射，比如你的组件修改值的事件不叫onChange可以在此处做映射
    */
@@ -47,7 +48,7 @@ export interface DefinefRenderComponentProps {
  *   - 同时执行onMapKeysChange事件，往mapKeys配置的字段中写入组件onChange事件第二项的值，因为antd的onChange事件第二项的值是个obj
  */
 export function defineRfRenderComponent(Component: any, customer: DefinefRenderComponentProps = {}) {
-  return function RfrenderComponent(props: FormItemBridgeProps) {
+  return function RfrenderComponent(props: FormItemBridgeProps<FormInstance>) {
     const { onChange, onMapKeysChange, rfrender, ...inherits } = props
     const { item = {} } = rfrender
     const { props: compProps = {} } = item

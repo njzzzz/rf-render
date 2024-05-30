@@ -35,7 +35,7 @@ export interface DefaultWidgetProps {
 }
 export type MaybePromise<T> = T | Promise<T>
 // 可被dependOn修改的属性,name不可修改，暂不开放修改widget
-export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props' | 'display'
+export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props' | 'display' | 'visibility'
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
 export interface CommonRfRenderItemConf<T extends string> {
   /**
@@ -47,7 +47,11 @@ export interface CommonRfRenderItemConf<T extends string> {
    */
   label?: ReactNode
   /**
-   * 是否显示
+   * 是否显示，falses时会隐藏组件，值会被保留
+   */
+  visibility?: boolean
+  /**
+   * 是否显示,false时组件会被卸载，值不会被保留
    */
   display?: boolean
   /**
@@ -107,7 +111,7 @@ export interface DefaultRfRenderItemConf<T extends string> extends CommonRfRende
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改配置后返回
-   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' 这4个属性
+   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
   changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
   /**
@@ -134,7 +138,7 @@ export interface RfRenderItemConf<W extends keyof WidgetProps, T extends string>
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改配置后返回
-   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' 这4个属性
+   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
   changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
   /**

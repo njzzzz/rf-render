@@ -97,9 +97,20 @@ export const 简单表单: Story = {
         },
       },
       {
-        name: 'showlayout',
+        name: 'showlayoutDispaly',
         widget: 'RadioGroup',
-        label: '是否显示省市',
+        label: '是否显示省市（卸载组件，不保留表单值）',
+        props: {
+          options: [
+            '是',
+            '否',
+          ],
+        },
+      },
+      {
+        name: 'showlayoutVisibility',
+        widget: 'RadioGroup',
+        label: '是否显示省市（不展示组件，但保留表单值）',
         props: {
           options: [
             '是',
@@ -110,9 +121,10 @@ export const 简单表单: Story = {
       {
         name: 'location',
         widget: 'Layout',
-        dependOn: ['showlayout'],
+        dependOn: ['showlayoutVisibility', 'showlayoutDispaly'],
         changeConfig(config, formData) {
-          config.display = formData.showlayout === '是'
+          config.display = !!formData.showlayoutDispaly && (formData.showlayoutDispaly === '是')
+          config.visibility = !!formData.showlayoutVisibility && (formData.showlayoutVisibility === '是')
           return config
         },
         layout: [
