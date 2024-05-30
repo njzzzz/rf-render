@@ -1,5 +1,5 @@
 import { IRfRenderItem } from '@rf-render/antd'
-import { ButtonProps, ColProps, FormInstance, InputProps, RowProps } from 'antd'
+import { ButtonProps, ColProps, FormInstance, InputProps, RadioGroupProps, RowProps } from 'antd'
 
 export interface CustomerLayout {
   /**
@@ -17,6 +17,7 @@ export interface CustomerLayout {
 export interface AntdWidgetProps {
   Layout: CustomerLayout
   Button: ButtonProps
+  RadioGroup: RadioGroupProps
 }
 export interface AntdDefaultWidgetProps extends InputProps {
 

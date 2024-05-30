@@ -4,7 +4,7 @@ import { FormInstance } from 'antd'
 import { RfRender } from '@rf-render/core'
 
 const logColors = ['color: green', 'color: black', 'color: red', 'color: black', 'color: blue']
-
+interface OverrideItem { originalChangeConfig?: IRfRenderItem['changeConfig'], originalChangeValue?: IRfRenderItem['changeValue'] }
 export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
   const [rtSchema, setRtSchema] = useState(schema)
 
@@ -71,8 +71,11 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
       })
     }
   }
-  const getItemBridge = (item: IRfRenderItem) => {
+  const getItemBridge = (item: IRfRenderItem & OverrideItem) => {
     const { changeConfig, changeValue, initConfig, name, mapKeys = [] } = item
+    item.originalChangeConfig = item.originalChangeConfig || changeConfig
+    item.originalChangeValue = item.originalChangeValue || changeValue
+    const { originalChangeConfig, originalChangeValue } = item
     if (name?.length) {
       // 初始化钩子，可异步
       if (initConfig) {
@@ -84,34 +87,36 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
       if (changeConfig) {
         Object.assign(item, {
           changeConfig: async (cfg: any, formData: any) => {
-            const config = await changeConfig(cfg, formData)
+            const config = await originalChangeConfig!(cfg, formData)
             updateConfig(config, name)
           },
         })
       }
       // 重写changeValue，加入更新和赋值逻辑
       if (changeValue) {
-        item.changeValue = async (...args) => {
-          const values = await changeValue(...args)
-          // values 格式为数组 [第一项的值，第二项的值]
-          if (values?.length) {
-            if (values[0] !== DNCV) {
-              // 更新name值
-              form.setFieldValue(name, values[0])
-              // 触发依赖项更新
-              depsExec(name)
-            }
-            mapKeys.forEach((key, index) => {
-              const mapValue = values[index + 1]
-              if (mapValue !== DNCV) {
-                // 更新mapKeys的值
-                form.setFieldValue(key, mapValue)
+        Object.assign(item, {
+          changeValue: async (formData: any) => {
+            const values = await originalChangeValue!(formData)
+            // values 格式为数组 [第一项的值，第二项的值]
+            if (values?.length) {
+              if (values[0] !== DNCV) {
+                // 更新name值
+                form.setFieldValue(name, values[0])
                 // 触发依赖项更新
-                depsExec(key)
+                depsExec(name)
               }
-            })
-          }
-        }
+              mapKeys.forEach((key, index) => {
+                const mapValue = values[index + 1]
+                if (mapValue !== DNCV) {
+                  // 更新mapKeys的值
+                  form.setFieldValue(key, mapValue)
+                  // 触发依赖项更新
+                  depsExec(key)
+                }
+              })
+            }
+          },
+        })
       }
     }
 

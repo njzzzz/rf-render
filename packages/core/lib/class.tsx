@@ -31,7 +31,7 @@ export function definePlugin(plugin: Component[]) {
  * 自定义的loader需要实现这两个函数以更新值
  */
 export interface FormItemBridgeProps<T = any> {
-  onChange: <T extends any[]>(...val: T) => Promise<any>
+  onChange: <T>(...val: T[]) => Promise<any>
   onMapKeysChange: (valueMap: unknown[]) => any
   /**
    * 包含当前表单项的配置项、form实例、执行依赖项函数

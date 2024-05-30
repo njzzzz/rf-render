@@ -12,6 +12,10 @@ export const antdRfRenderPlugin = definePlugin([
     name: 'Button',
     loader: (_platform, fileName) => lazy(() => import(`./Button/pc/${fileName}.tsx`)),
   },
+  {
+    name: 'RadioGroup',
+    loader: (_platform, fileName) => lazy(() => import(`./RadioGroup/pc/${fileName}.tsx`)),
+  },
 ])
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -21,11 +25,11 @@ export interface DefinefRenderComponentProps {
   /**
    * 自定义onChange事件
    */
-  onChange?: <T extends any[] = any[]>(rfrender: FormItemBridgeProps['rfrender'], ...val: T) => any
+  onChange?: (rfrender: FormItemBridgeProps['rfrender'], ...val: any) => any
   /**
    * 自定义onMapKeysChange事件
    */
-  onMapKeysChange?: <T extends any[] = any[]>(rfrender: FormItemBridgeProps['rfrender'], ...val: T) => any
+  onMapKeysChange?: (rfrender: FormItemBridgeProps['rfrender'], ...val: any) => any
   /**
    * 事件映射，比如你的组件修改值的事件不叫onChange可以在此处做映射
    */

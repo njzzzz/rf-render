@@ -97,7 +97,24 @@ export const 简单表单: Story = {
         },
       },
       {
+        name: 'showlayout',
+        widget: 'RadioGroup',
+        label: '是否显示省市',
+        props: {
+          options: [
+            '是',
+            '否',
+          ],
+        },
+      },
+      {
+        name: 'location',
         widget: 'Layout',
+        dependOn: ['showlayout'],
+        changeConfig(config, formData) {
+          config.display = formData.showlayout === '是'
+          return config
+        },
         layout: [
           {
             label: '省',
