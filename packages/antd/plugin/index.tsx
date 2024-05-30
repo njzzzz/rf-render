@@ -22,7 +22,7 @@ export const antdRfRenderPlugin = definePlugin([
 // eslint-disable-next-line react-refresh/only-export-components
 export * from './props'
 
-export interface DefinefRenderComponentProps {
+export interface DefineRfRenderComponentProps {
   /**
    * 自定义onChange事件
    */
@@ -47,7 +47,7 @@ export interface DefinefRenderComponentProps {
  *   - 直接抛出组件onChange事件的值
  *   - 同时执行onMapKeysChange事件，往mapKeys配置的字段中写入组件onChange事件第二项的值，因为antd的onChange事件第二项的值是个obj
  */
-export function defineRfRenderComponent(Component: any, customer: DefinefRenderComponentProps = {}) {
+export function defineRfRenderComponent(Component: any, customer: DefineRfRenderComponentProps = {}) {
   return function RfrenderComponent(props: FormItemBridgeProps<FormInstance>) {
     const { onChange, onMapKeysChange, rfrender, ...inherits } = props
     const { item = {} } = rfrender
