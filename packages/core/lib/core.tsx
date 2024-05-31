@@ -1,5 +1,5 @@
 import React, { SuspenseProps, lazy } from 'react'
-import { DepsExec, IRfRenderItem, loader } from '@rf-render/antd'
+import { DepsExec, IRfRenderItem, MaybePromise, RfRenderItemConf, WidgetProps, loader } from '@rf-render/antd'
 /**
  * ```ts
  * {
@@ -8,21 +8,41 @@ import { DepsExec, IRfRenderItem, loader } from '@rf-render/antd'
  *       placeholder: 'placeholder'
  *     },
  *     loader: (platform, viewType) => React.lazy(() => import("@/rf-render-components/input/${platform}/${viewType}.tsx"))
+ *     configure: (platform, viewType) =>import("@/rf-render-components/input/${platform}/configure.ts")
  * }
  * ```
  */
-export interface Component {
-  // TODO: 用于设计器，直接加载或者手动引入用于设计器的设置项，如果不传则直接从platform下引入
-  configure?: Configure
-  name: string
-  loader: Loader
-  SuspenseProps?: SuspenseProps
-}
-export type Loader = (platform: Platform, fileName: FileName) => ReturnType<typeof lazy>
-export type CustomLoader = (component: Component) => (props: FormItemBridgeProps) => any
-export interface Configure {
+export type Component<T extends keyof WidgetProps = keyof WidgetProps> = {
+  [K in keyof WidgetProps]: {
+    /**
+     * 配置文件加载器
+     */
+    configure?: ConfigureLoader<K>
+    /**
+     * widget 名称
+     */
+    name: K
+    loader: Loader
+    SuspenseProps?: SuspenseProps
+  }
+}[T]
 
+/**
+ * @description 定义默认的configure
+ * - 优先级最低，会被用户自定义的覆盖
+ * - 只处理第一层属性以及props、itemProps的第一层属性
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function defineConfigure<T extends keyof WidgetProps = keyof WidgetProps, F = any>(configure: ReturnType<ConfigureLoader<T, F>>['default']) {
+  return configure
 }
+type DefineConfigure<T extends keyof WidgetProps = keyof WidgetProps, F = any> = (rfrender: FormItemBridgeProps<F>['rfrender']) => MaybePromise<(Partial<RfRenderItemConf<T>>)>
+export type Loader = (platform: Platform, fileName: FileName) => ReturnType<typeof lazy>
+export type ConfigureLoader<T extends keyof WidgetProps = keyof WidgetProps, F = any> = (platform: Platform, fileName: FileName) => ({
+  default: DefineConfigure<T, F>
+})
+export type CustomLoader = (component: Component) => (props: FormItemBridgeProps) => any
+
 // eslint-disable-next-line react-refresh/only-export-components
 export function definePlugin(plugin: Component[]) {
   return plugin
@@ -56,6 +76,8 @@ export type Platform = 'mobile' | 'pc' | string & {}
 // eslint-disable-next-line ts/ban-types
 export type FileName = 'index' | 'view' | string & {}
 export type Debugger = boolean | 'info' | 'trace'
+// eslint-disable-next-line ts/ban-types
+export type DefaultWidget = keyof WidgetProps | string & {}
 // 单例
 export class RfRender {
   static components: Record<string, Component> = {}
@@ -65,7 +87,7 @@ export class RfRender {
   // 重名组件是否覆盖
   static cover = false
   // 默认widget
-  static defaultWidget = 'Input'
+  static defaultWidget: DefaultWidget = 'Input'
   // 是否启动debugger
   static debugger: Debugger = false
   static listeners = new Set<Listener>()
@@ -79,7 +101,7 @@ export class RfRender {
    * @param {CustomLoader} [opts.loader] - 自定义组件loader，默认情况下loader需要实现组件的加载，以及对switchPlatform和switchFileName的响应.
    * @param {boolean} [opts.debugger] - 是否启动debugger，启用将展示哪些依赖变动导致哪些依赖项被执行.
    */
-  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: string, loader?: CustomLoader, debugger?: Debugger }) {
+  constructor(opts: { cover?: boolean, plugins?: Component[], defaultWidget?: DefaultWidget, loader?: CustomLoader, debugger?: Debugger }) {
     if (!opts.loader) {
       opts.loader = loader
     }
@@ -99,16 +121,25 @@ export class RfRender {
       component.SuspenseProps = component.SuspenseProps || {
         fallback: null,
       }
+      component.configure = component.configure || (() => ({ default: defineConfigure(() => ({})) }))
       RfRender.components[component.name] = component
     })
   }
 
-  static load(componentName: string) {
-    const component = RfRender.components[componentName]
+  static load(widget: string = RfRender.defaultWidget) {
+    const component = RfRender.components[widget]
     if (!component)
-      throw new Error(`未找到widget${componentName}, 请确认是否已配置！`)
+      throw new Error(`未找到widget 【${widget}】, 请确认是否已配置！`)
 
     return RfRender.loader(component)
+  }
+
+  static loadConfigure(widget: string = RfRender.defaultWidget) {
+    const configure = RfRender.components[widget].configure!(RfRender.platform, RfRender.fileName)
+    if (!configure)
+      throw new Error(`未找到widget 【${widget}】对应的configure文件, 请确认是否已配置！`)
+
+    return configure
   }
 
   /**

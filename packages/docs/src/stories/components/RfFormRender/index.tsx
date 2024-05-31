@@ -12,10 +12,15 @@ export default function RfFormRender(props: FormRenderProps) {
           <Button type="primary" onClick={() => form.validateFields()}>validate</Button>
         </Col>
         <Col>
-          <Button onClick={() => console.log(form.getFieldsValue())}>console formData</Button>
+          <Button onClick={() => {
+            const formData = form.getFieldsValue()
+            console.log(formData)
+          }}
+          >
+            console formData
+          </Button>
         </Col>
       </Row>
-
     </div>
   )
 }

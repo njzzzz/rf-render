@@ -13,6 +13,7 @@
     "@rf-render/core": "workspace:^",
     "@storybook/components": "^8.1.4",
     "antd": "> 5.0",
+    "dayjs": "^1.11.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

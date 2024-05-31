@@ -7,6 +7,7 @@ export type TFormProps = IntrinsicAttributes & FormProps & { children?: ReactNod
 /**
  * @description 定义 WidgetProps 类型, 供外部拓展 { widget: widgetPropsType } 形式
  * @example
+ *
  * 比如我自定义了一个组件 Example 其属性类型为
  * ```ts
  * interface IExampleProps {
@@ -37,7 +38,7 @@ export type MaybePromise<T> = T | Promise<T>
 // 可被dependOn修改的属性,name不可修改，暂不开放修改widget
 export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props' | 'display' | 'visibility'
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
-export interface CommonRfRenderItemConf<T extends string> {
+export interface CommonRfRenderItemConf<T extends string = string> {
   /**
    * @description 字段名
    */
@@ -102,7 +103,7 @@ export interface CommonRfRenderItemConf<T extends string> {
 export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemConf<T> {
   props?: P
 }
-export interface DefaultRfRenderItemConf<T extends string> extends CommonRfRenderItemConf<T> {
+export interface DefaultRfRenderItemConf<T extends string = string> extends CommonRfRenderItemConf<T> {
   widget?: undefined
   /**
    * 当前widget对应的组件的属性
@@ -129,7 +130,7 @@ export interface DefaultRfRenderItemConf<T extends string> extends CommonRfRende
   initConfig?: (config: ChangedConfig<T, DefaultWidgetProps>) => MaybePromise<CanModifyConfig | void>
 }
 
-export interface RfRenderItemConf<W extends keyof WidgetProps, T extends string> extends CommonRfRenderItemConf<T> {
+export interface RfRenderItemConf<W extends keyof WidgetProps = keyof WidgetProps, T extends string = string> extends CommonRfRenderItemConf<T> {
   widget: W
   /**
    * 当前widget对应的组件的属性

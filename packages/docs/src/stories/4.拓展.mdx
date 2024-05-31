@@ -3,6 +3,7 @@
 ### 在增加自定义组件之前需要了解平台和文件的概念
 
 目前，内置的平台为`pc` 和 `mobile`, 文件为 `index` 和 `view`
+configures 文件为整个项目默认的组件配置
 主要利用了dynamic import做的动态引入，在切换平台或文件时加载不同的组件
 所以在自定义组件时要注意文件的摆放位置
 
@@ -17,10 +18,12 @@
         |--Button
             |--index.tsx
             |--view.tsx
+            |--configure.tsx
     |--mobile  
         |--Button
             |--index.tsx
             |--view.tsx
+            |--configure.tsx
 ```
 
 3. 自定义组件代码（下面以pc举例）
@@ -29,16 +32,16 @@
             - 比如我想集成antd的Button组件  
 
                 ```ts
-                import { defineRfRenderComponent } from '@rf-render/antd'
+                import { defineRfRenderComponentApi } from '@rf-render/antd'
                 import { Button } from 'antd'
-                export default defineRfRenderComponent(Button)
+                export default defineRfRenderComponentApi(Button)
                 ```
             - 假如我有个组件叫UserSelct,他抛出值的事件叫onValue
 
                 ```ts
-                import { defineRfRenderComponent } from '@rf-render/antd'
+                import { defineRfRenderComponentApi } from '@rf-render/antd'
                 import UserSelct from 'UserSelct'
-                export default defineRfRenderComponent(UserSelct, {
+                export default defineRfRenderComponentApi(UserSelct, {
                     propsMap: {
                         onChange: 'onValue'
                     }
@@ -47,9 +50,9 @@
             - 如果我想支持mapKeys属性，比如UserSelct组件只给了id， 我还想返回整个对象，其中包含了name等字段, 那就需要自定义onMapKeysChange返回这个对象
 
               ```ts
-                import { defineRfRenderComponent } from '@rf-render/antd'
+                import { defineRfRenderComponentApi } from '@rf-render/antd'
                 import UserSelct from 'UserSelct'
-                export default defineRfRenderComponent(UserSelct, {
+                export default defineRfRenderComponentApi(UserSelct, {
                     // 这里的val是changeConfig返回的值, rfrender里包含了当前表单的配置项
                     onMapKeysChange:(rfrender, ...val) => {
                         const userInfo  {}
@@ -138,3 +141,4 @@ new RfRender({
   ],
 })
 ```
+import { defineConfigure } from "@rf-render/core"

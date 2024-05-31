@@ -72,7 +72,29 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
       })
     }
   }
-  const getItemBridge = (item: IRfRenderItem & OverrideItem) => {
+  const getItemBridge = async (item: IRfRenderItem & OverrideItem) => {
+    const configure = await RfRender.loadConfigure(item.widget)
+    const { props = {}, itemProps = {} } = item
+    const { props: cfProps, itemProps: cfItemProps, ...cfg } = await configure.default({
+      depsExec,
+      form,
+      item,
+    })
+    /**
+     * 合并配置，props， itemProps 合并第一层
+     */
+    Object.assign(item, {
+      ...cfg,
+      ...item,
+      props: {
+        ...cfProps,
+        ...props,
+      },
+      itemProps: {
+        ...cfItemProps,
+        ...itemProps,
+      },
+    })
     const { changeConfig, changeValue, initConfig, name, mapKeys = [] } = item
     item.originalChangeConfig = item.originalChangeConfig || changeConfig
     item.originalChangeValue = item.originalChangeValue || changeValue
@@ -123,19 +145,23 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
 
     // 递归处理layout
     if (item.layout) {
-      item.layout = item.layout.map((item) => {
+      item.layout = await Promise.all(item.layout.map((item) => {
         return getItemBridge(item)
-      })
+      }))
     }
     return item
   }
   useEffect(() => {
-    // 初始化
-    setRtSchema(rtSchema.map((item) => {
+    // 初始化, 覆写changeConfig和changeValue等
+    Promise.all(rtSchema.map(async (item) => {
       return getItemBridge(item)
-    }))
-    // 初始化完成执行一次
-    initRunChange()
+    })).then((schema) => {
+      setRtSchema(schema)
+      // 初始化完成执行一次change函数
+      initRunChange()
+    }).catch((err) => {
+      console.error('表单初始化失败！', err)
+    })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
