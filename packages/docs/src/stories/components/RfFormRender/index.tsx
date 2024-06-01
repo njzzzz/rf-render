@@ -1,4 +1,5 @@
 import { FormRenderProps, useFormRender } from '@rf-render/antd'
+import { RfRender } from '@rf-render/core'
 import { Button, Col, Row } from 'antd'
 
 export default function RfFormRender(props: FormRenderProps) {
@@ -18,6 +19,14 @@ export default function RfFormRender(props: FormRenderProps) {
           }}
           >
             console formData
+          </Button>
+        </Col>
+        <Col>
+          <Button onClick={() => {
+            RfRender.switchFileName('view')
+          }}
+          >
+            to view file
           </Button>
         </Col>
       </Row>

@@ -155,16 +155,23 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
     return item
   }
   useEffect(() => {
-    // 初始化, 覆写changeConfig和changeValue等
-    Promise.all(rtSchema.map(async (item) => {
-      return getItemBridge(item)
-    })).then((schema) => {
-      setRtSchema(schema)
-      // 初始化完成执行一次change函数
-      initRunChange()
-    }).catch((err) => {
-      console.error('表单初始化失败！', err)
-    })
+    const init = () => {
+      // 初始化, 覆写changeConfig和changeValue等
+      Promise.all(rtSchema.map(async (item) => {
+        return getItemBridge(item)
+      })).then((schema) => {
+        setRtSchema(schema)
+        // 初始化完成执行一次change函数
+        initRunChange()
+      }).catch((err) => {
+        console.error('表单初始化失败！', err)
+      })
+    }
+    init()
+    RfRender.addSwitchListener(init)
+    return () => {
+      RfRender.removeSwitchListener(init)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

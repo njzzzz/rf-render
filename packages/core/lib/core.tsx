@@ -1,4 +1,4 @@
-import React, { SuspenseProps, lazy } from 'react'
+import { SuspenseProps, lazy } from 'react'
 import { DepsExec, IRfRenderItem, MaybePromise, RfRenderItemConf, WidgetProps, loader } from '@rf-render/antd'
 /**
  * ```ts
@@ -63,10 +63,7 @@ export interface FormItemBridgeProps<T = any> {
     item: IRfRenderItem
   }
 }
-export interface Listener {
-  reload: boolean
-  setReload: React.Dispatch<React.SetStateAction<boolean>>
-}
+export type Listener = (...args: unknown[]) => unknown
 // eslint-disable-next-line ts/ban-types
 export type Platform = 'mobile' | 'pc' | string & {}
 // 目前
@@ -166,9 +163,7 @@ export class RfRender {
   }
 
   static runListeners() {
-    RfRender.listeners.forEach(({ reload, setReload }) => {
-      setReload(!reload)
-    })
+    RfRender.listeners.forEach(listener => listener())
   }
 
   static debug(...args: any[]) {

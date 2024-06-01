@@ -8,7 +8,9 @@ export function loader(component: Component) {
     const [Component, setComponent] = useState<ReturnType<typeof lazy> | null>(null)
     const [reload, setReload] = useState(false)
     useEffect(() => {
-      const listener = { reload, setReload }
+      const listener = () => {
+        setReload(!reload)
+      }
       RfRender.addSwitchListener(listener)
       return () => {
         RfRender.removeSwitchListener(listener)
