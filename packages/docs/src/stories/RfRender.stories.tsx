@@ -1,8 +1,7 @@
-import { fn } from '@storybook/test'
 import { StoryObj } from '@storybook/react'
 import { RfRender } from '@rf-render/core'
 import { antdRfRenderPlugin, defineSchema } from '@rf-render/antd'
-import dayjs from 'dayjs'
+// import dayjs from 'dayjs'
 import RfFormRender from './components/RfFormRender'
 
 // eslint-disable-next-line no-new
@@ -28,7 +27,7 @@ const meta = {
   },
 
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
-  args: { onClick: fn() },
+  // args: { onClick: fn() },
 }
 
 export default meta
@@ -216,8 +215,8 @@ export const 所有内置antd组件: Story = {
       Checkbox: true,
       CheckboxGroup: ['Apple'],
       ColorPicker: '#5F9670',
-      DatePicker: dayjs('2023/01/22'),
-      DateRangePicker: [dayjs('2023/01/22 11:11:11'), dayjs('2024/01/22 12:12:12')],
+      // DatePicker: dayjs('2023/01/22'),
+      // DateRangePicker: [dayjs('2023/01/22 11:11:11'), dayjs('2024/01/22 12:12:12')],
       Input: '输入啥',
       InputNumber: 888,
       Mentions: 'simple',
@@ -227,8 +226,8 @@ export const 所有内置antd组件: Story = {
       Slider: [10, 40],
       Steps: 2,
       Switch: true,
-      TimePicker: dayjs('12:08:00', 'HH:mm:ss'),
-      TimeRangePicker: [dayjs('12:00:00', 'HH:mm:ss'), dayjs('13:08:00', 'HH:mm:ss')],
+      // TimePicker: dayjs('12:08:00', 'HH:mm:ss'),
+      // TimeRangePicker: [dayjs('12:00:00', 'HH:mm:ss'), dayjs('13:08:00', 'HH:mm:ss')],
       Transfer: ['0', '1', '2'],
       TransferSelectedKeys: ['0', '1', '2'],
       TreeSelect: 'leaf5',
