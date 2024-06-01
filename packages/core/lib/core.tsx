@@ -17,7 +17,7 @@ export type Component<T extends keyof WidgetProps = keyof WidgetProps> = {
     /**
      * 配置文件加载器
      */
-    configure?: ConfigureLoader<K>
+    configure?: ConfigureLoader
     /**
      * widget 名称
      */
@@ -33,14 +33,14 @@ export type Component<T extends keyof WidgetProps = keyof WidgetProps> = {
  * - 只处理第一层属性以及props、itemProps的第一层属性
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export function defineConfigure<T extends keyof WidgetProps = keyof WidgetProps, F = any>(configure: ReturnType<ConfigureLoader<T, F>>['default']) {
+export function defineConfigure<T extends keyof WidgetProps = keyof WidgetProps, F = any>(configure: DefineConfigure<T, F>) {
   return configure
 }
 type DefineConfigure<T extends keyof WidgetProps = keyof WidgetProps, F = any> = (rfrender: FormItemBridgeProps<F>['rfrender']) => MaybePromise<(Partial<RfRenderItemConf<T>>)>
 export type Loader = (platform: Platform, fileName: FileName) => ReturnType<typeof lazy>
-export type ConfigureLoader<T extends keyof WidgetProps = keyof WidgetProps, F = any> = (platform: Platform, fileName: FileName) => ({
+export type ConfigureLoader<T extends keyof WidgetProps = keyof WidgetProps, F = any> = (platform: Platform, fileName: FileName) => Promise<({
   default: DefineConfigure<T, F>
-})
+})>
 export type CustomLoader = (component: Component) => (props: FormItemBridgeProps) => any
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -76,8 +76,8 @@ export type Platform = 'mobile' | 'pc' | string & {}
 // eslint-disable-next-line ts/ban-types
 export type FileName = 'index' | 'view' | string & {}
 export type Debugger = boolean | 'info' | 'trace'
-// eslint-disable-next-line ts/ban-types
-export type DefaultWidget = keyof WidgetProps | string & {}
+
+export type DefaultWidget = keyof WidgetProps
 // 单例
 export class RfRender {
   static components: Record<string, Component> = {}
@@ -108,7 +108,7 @@ export class RfRender {
     RfRender.cover = opts.cover ?? false
     RfRender.debugger = opts.debugger ?? false
     RfRender.plugins = opts.plugins ?? []
-    RfRender.defaultWidget = opts.defaultWidget ?? ''
+    RfRender.defaultWidget = opts.defaultWidget ?? 'Input'
     RfRender.loader = opts.loader!
     RfRender.loadComponents()
   }
@@ -121,7 +121,6 @@ export class RfRender {
       component.SuspenseProps = component.SuspenseProps || {
         fallback: null,
       }
-      component.configure = component.configure || (() => ({ default: defineConfigure(() => ({})) }))
       RfRender.components[component.name] = component
     })
   }
@@ -134,12 +133,12 @@ export class RfRender {
     return RfRender.loader(component)
   }
 
-  static loadConfigure(widget: string = RfRender.defaultWidget) {
-    const configure = RfRender.components[widget].configure!(RfRender.platform, RfRender.fileName)
-    if (!configure)
-      throw new Error(`未找到widget 【${widget}】对应的configure文件, 请确认是否已配置！`)
-
-    return configure
+  static loadConfigure<T extends keyof WidgetProps>(widget: T) {
+    const configureLoader = RfRender.components[widget].configure
+    if (configureLoader) {
+      const configure = configureLoader(RfRender.platform, RfRender.fileName)
+      return configure
+    }
   }
 
   /**

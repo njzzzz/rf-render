@@ -1,4 +1,5 @@
 import '@rf-render/antd'
+import { ConfigureProps } from '@rf-render/antd'
 import { AntdDefaultWidgetProps, AntdWidgetProps } from '@rf-render/antd'
 
 declare module '@rf-render/antd' {
@@ -9,4 +10,6 @@ declare module '@rf-render/antd' {
   export interface DefaultWidgetProps extends AntdDefaultWidgetProps {
 
   }
+  // 拓展属性
+  export interface CustomerProps extends ConfigureProps {}
 }

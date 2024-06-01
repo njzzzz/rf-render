@@ -32,7 +32,7 @@ export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec
       }
     },
   }
-  const Component = RfRender.load(widget)
+  const Component = RfRender.load(widget as string)
   return (
     <>
       {

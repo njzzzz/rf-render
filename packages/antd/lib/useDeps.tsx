@@ -1,11 +1,12 @@
 import { CanModifyConfig, DNCV, IRfRenderItem } from '@rf-render/antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { FormInstance } from 'antd'
 import { RfRender } from '@rf-render/core'
 
 const logColors = ['color: green', 'color: black', 'color: red', 'color: black', 'color: blue']
 interface OverrideItem { originalChangeConfig?: IRfRenderItem['changeConfig'], originalChangeValue?: IRfRenderItem['changeValue'] }
 export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
+  const init = useRef(false)
   const [rtSchema, setRtSchema] = useState(schema)
 
   function genDependOnMaps(schema: IRfRenderItem[], acc: Record<string, IRfRenderItem[]> = {}) {
@@ -73,28 +74,28 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
     }
   }
   const getItemBridge = async (item: IRfRenderItem & OverrideItem) => {
-    const configure = await RfRender.loadConfigure(item.widget)
+    const configure = await RfRender.loadConfigure(item.widget || RfRender.defaultWidget)
     const { props = {}, itemProps = {} } = item
-    const { props: cfProps, itemProps: cfItemProps, ...cfg } = await configure.default({
-      depsExec,
-      form,
-      item,
-    })
-    /**
-     * 合并配置，props， itemProps 合并第一层
-     */
-    Object.assign(item, {
-      ...cfg,
-      ...item,
-      props: {
-        ...cfProps,
-        ...props,
-      },
-      itemProps: {
-        ...cfItemProps,
-        ...itemProps,
-      },
-    })
+    if (configure) {
+      const { default: getConfigure } = configure
+      const { props: cfProps = {}, itemProps: cfItemProps = {}, ...cfg } = await getConfigure({ depsExec, form, item })
+      /**
+       * 合并配置，props， itemProps 合并第一层
+       */
+      Object.assign(item, {
+        ...cfg,
+        ...item,
+        props: {
+          ...cfProps,
+          ...props,
+        },
+        itemProps: {
+          ...cfItemProps,
+          ...itemProps,
+        },
+      })
+    }
+
     const { changeConfig, changeValue, initConfig, name, mapKeys = [] } = item
     item.originalChangeConfig = item.originalChangeConfig || changeConfig
     item.originalChangeValue = item.originalChangeValue || changeValue
@@ -125,6 +126,8 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
               if (values[0] !== DNCV) {
                 // 更新name值
                 form.setFieldValue(name, values[0])
+                // 初始化不要触发校验
+                !init.current && form.validateFields([name])
                 // 触发依赖项更新
                 depsExec(name)
               }
@@ -165,8 +168,10 @@ export function useDeps(schema: IRfRenderItem[], form: FormInstance) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function initRunChange() {
-    Object.keys(dependOnMaps).forEach(name => depsExec(name))
+  async function initRunChange() {
+    init.current = true
+    await Promise.all(Object.keys(dependOnMaps).map(name => depsExec(name)))
+    init.current = false
   }
   return {
     rtSchema,

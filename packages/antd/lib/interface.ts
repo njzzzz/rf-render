@@ -34,6 +34,12 @@ export interface WidgetProps {
 export interface DefaultWidgetProps {
 
 }
+/**
+ * 用于拓展自定义属性类型
+ */
+export interface CustomerProps {
+
+}
 export type MaybePromise<T> = T | Promise<T>
 // 可被dependOn修改的属性,name不可修改，暂不开放修改widget
 export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props' | 'display' | 'visibility'
@@ -48,7 +54,7 @@ export interface CommonRfRenderItemConf<T extends string = string> {
    */
   label?: ReactNode
   /**
-   * 是否显示，falses时会隐藏组件，值会被保留
+   * 是否显示，false时会隐藏组件，值会被保留
    */
   visibility?: boolean
   /**
@@ -99,6 +105,10 @@ export interface CommonRfRenderItemConf<T extends string = string> {
      */
     colProps?: ColProps
   }>
+  /**
+   * @description 拓展属性，用于拓展属性和类型
+   */
+  customerProps?: CustomerProps
 }
 export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemConf<T> {
   props?: P

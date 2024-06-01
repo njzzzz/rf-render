@@ -139,6 +139,10 @@ export const 联动表单: Story = {
         dependOn: ['age'],
         props: {
           disabled: true,
+          placeholder: '',
+        },
+        customerProps: {
+          requiredWithRules: true,
         },
         changeValue(formData) {
           return [formData.age ? formData.age > 18 ? '是' : '否' : '']
@@ -479,7 +483,7 @@ export const 所有内置antd组件: Story = {
         label: 'TimePicker',
         name: 'TimePicker',
         widget: 'TimePicker',
-        props: {
+        customerProps: {
           requiredWithRules: true,
         },
       },

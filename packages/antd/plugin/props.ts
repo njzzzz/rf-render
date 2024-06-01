@@ -1,4 +1,4 @@
-import { ConfigureProps, IRfRenderItem } from '@rf-render/antd'
+import { IRfRenderItem } from '@rf-render/antd'
 import {
   AutoComplete,
   Breadcrumb,
@@ -75,4 +75,4 @@ export interface AntdDefaultWidgetProps extends InputProps {
 
 }
 
-export type GetPropsType<T extends (...ars: any[]) => any> = Parameters<T>[0] & ConfigureProps
+export type GetPropsType<T extends (...ars: any[]) => any> = Parameters<T>[0]
