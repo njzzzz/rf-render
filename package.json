@@ -10,7 +10,7 @@
     "clean:node_modules": "find . -name \"node_modules\" -type d -prune -exec rm -r '{}' + ",
     "clean:locks": "find . -name \"pnpm-lock.yaml\" -prune -exec rm -r '{}' + ",
     "build": "pnpm --filter @rf-render/* run build",
-    "publish-all": "pnpm --filter @rf-render/* publish --publish-branch release",
+    "publish-all": "pnpm --filter @rf-render/* publish --publish-branch main",
     "dev": "pnpm -r --parallel dev ",
     "bump": "bumpp -r"
   },
