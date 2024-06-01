@@ -1,14 +1,3 @@
-## This is a monorepo template respository
+RfRender monorepo
 
-* [X]  vite
-* [X]  vue@next
-* [X]  typescript
-* [X]  pnpm
-* [X]  npm package publish
-* [X]  commitlint
-* [X]  eslint powerd by @antfu/eslint-config
-* [X]  unocss powerd by @antfu
-* [X]  nestjs
-* [X]  typeorm
-
-## Usage
+[Docs](https://rf-render.pages.dev)
