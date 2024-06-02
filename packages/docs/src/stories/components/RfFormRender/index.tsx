@@ -10,7 +10,7 @@ export default function RfFormRender(props: FormRenderProps) {
       </FormRender>
       <Row gutter={24}>
         <Col>
-          <Button type="primary" onClick={() => form.validateFields()}>validate</Button>
+          <Button type="primary" onClick={() => form.validateFields()}>表单校验</Button>
         </Col>
         <Col>
           <Button onClick={() => {
@@ -18,7 +18,7 @@ export default function RfFormRender(props: FormRenderProps) {
             console.log(formData)
           }}
           >
-            console formData
+            打印表单值
           </Button>
         </Col>
         <Col>
@@ -26,7 +26,15 @@ export default function RfFormRender(props: FormRenderProps) {
             RfRender.switchFileName('view')
           }}
           >
-            to view file
+            切换为view文件
+          </Button>
+        </Col>
+        <Col>
+          <Button onClick={() => {
+            RfRender.switchFileName('index')
+          }}
+          >
+            切换为index文件
           </Button>
         </Col>
       </Row>
