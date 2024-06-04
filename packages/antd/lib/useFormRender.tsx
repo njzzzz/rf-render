@@ -1,5 +1,7 @@
 import { Form } from 'antd'
 import { FormItemBridgeWrapper, FormRenderProps, useDeps } from '@rf-render/antd'
+import { RfRender } from '@rf-render/core'
+import { useEffect } from 'react'
 
 export function useFormRender() {
   /**
@@ -11,13 +13,22 @@ export function useFormRender() {
    */
   function FormRender(props: FormRenderProps) {
     const { schema, ...antdFromProps } = props
-    const { depsExec, rtSchema } = useDeps(schema, form)
+    const { dependOnMaps } = useDeps(schema)
+    const formName = Symbol('formName')
+    useEffect(() => {
+      const deps = RfRender.getAllDeps(formName) ?? []
+      deps.forEach(async (dep) => {
+        const { changeConfig, changeValue } = dep
+        changeValue && await dep.changeValue()
+        changeConfig && await dep.changeConfig()
+      })
+    }, [])
     return (
       <Form form={form} {...antdFromProps}>
         {
-          rtSchema.map((item, index) => {
+          schema.map((item, index) => {
             return (
-              <FormItemBridgeWrapper key={item.name || index} {...item} depsExec={depsExec} form={form} />
+              <FormItemBridgeWrapper key={item.name || index} {...item} dependOnMaps={dependOnMaps} form={form} formName={formName} />
             )
           })
         }

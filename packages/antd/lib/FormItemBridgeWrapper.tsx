@@ -1,25 +1,170 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { FormItemBridgeProps, RfRender } from '@rf-render/core'
-import { DepsExec, IRfRenderItem, getItemStyle } from '@rf-render/antd'
+import { DNCV, DependOnMaps, IRfRenderItem, SuspenseWrapper, getItemStyle } from '@rf-render/antd'
 import { Form, FormInstance } from 'antd'
+import { lazy, useEffect, useState } from 'react'
 
-export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec, form: FormInstance }) {
-  const { name, itemProps, widget = RfRender.defaultWidget, props, label, mapKeys, form, depsExec, withFormItem = true, display = true, visibility = true } = item
-  if (!display)
+export interface FormItemBridgeWrapperAttachProps { dependOnMaps: DependOnMaps, form: FormInstance, formName: symbol }
+export type FormItemBridgeWrapperProps = IRfRenderItem & FormItemBridgeWrapperAttachProps
+
+export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
+  const [Component, setComponent] = useState<ReturnType<typeof lazy> | null>(null)
+  const [configure, setConfigure] = useState<Partial<IRfRenderItem>>({})
+  const [runtimeItem, setRuntimeItem] = useState<FormItemBridgeWrapperProps>(item)
+  const [reload, setReload] = useState(false)
+  useEffect(() => {
+  // 调用RfRender switch的时候，触发组件刷新
+    const listener = () => {
+      setReload(!reload)
+    }
+    RfRender.addSwitchListener(listener)
+    return () => {
+      RfRender.removeSwitchListener(listener)
+    }
+  }, [reload])
+  const config = {
+    ...configure,
+    ...runtimeItem,
+    props: {
+      ...configure.props,
+      ...runtimeItem.props,
+    },
+    itemProps: {
+      ...configure.itemProps,
+      ...runtimeItem.itemProps,
+    },
+  }
+  // 合并configure---------------------------
+  const {
+    name,
+    itemProps,
+    widget = RfRender.defaultWidget,
+    props,
+    label,
+    mapKeys,
+    form,
+    dependOnMaps,
+    withFormItem = true,
+    display = true,
+    visibility = true,
+    formName,
+    initConfig,
+  } = config
+  // -------------------------------------
+
+  const component = RfRender.components[widget]!
+  const { dependOnMaps: _, form: __, changeConfig, changeValue, ...runtimeItemFields } = config
+  const rfrender = {
+    dependOnMaps,
+    form,
+    item: runtimeItemFields,
+    formName,
+  }
+
+  // 初始化配置
+  if (initConfig) {
+    Promise.resolve(initConfig(config)).then((newConfig) => {
+      const { itemProps = {}, label = '', props = {}, display = true, visibility = true } = newConfig
+      setRuntimeItem(item => ({
+        ...item,
+        itemProps,
+        label,
+        props,
+        display,
+        visibility,
+      }))
+    })
+  }
+  // 注入更新钩子
+  useEffect(() => {
+    RfRender.addDep(formName, name!, {
+      changeConfig: async () => {
+        if (!changeConfig)
+          return
+        const formData = form.getFieldsValue()
+        const newConfig = await changeConfig(config, formData)
+        const { itemProps = {}, label = '', props = {}, display = true, visibility = true } = newConfig ?? {}
+        setRuntimeItem(item => ({
+          ...item,
+          itemProps,
+          label,
+          props,
+          display,
+          visibility,
+        }))
+      },
+      changeValue: async () => {
+        if (!changeValue)
+          return
+        const formData = form.getFieldsValue()
+        const values = await changeValue(formData)
+        // values 格式为数组 [第一项的值，第二项的值]
+        if (values?.length) {
+          if (values[0] !== DNCV) {
+            // 更新name值
+            form.setFieldValue(name, values[0])
+            form.validateFields([name])
+            const deps = dependOnMaps.deps[name]
+            deps.forEach(async ({ name }) => {
+              const { changeValue, changeConfig } = RfRender.getDep(formName, name)
+              changeValue && await changeValue()
+              changeConfig && await changeConfig()
+            })
+          }
+          mapKeys.forEach((key, index) => {
+            const mapValue = values[index + 1]
+            if (mapValue !== DNCV) {
+              // 更新mapKeys的值
+              form.setFieldValue(key, mapValue)
+              const deps = dependOnMaps.deps[key]
+              deps.forEach(async ({ name }) => {
+                const { changeValue, changeConfig } = RfRender.getDep(formName, name)
+                changeValue && await changeValue()
+                changeConfig && await changeConfig()
+              })
+            }
+          })
+        }
+      },
+    })
+    return () => {
+      RfRender.removeDep(formName, name!)
+    }
+  }, [runtimeItem, config])
+  // reload的时候重新加载组件和默认配置
+  useEffect(() => {
+    const dynamicConfigure = RfRender.loadConfigure(widget)
+    if (dynamicConfigure) {
+      dynamicConfigure.then(async ({ default: defaultExport }) => {
+        const configure = await defaultExport(rfrender)
+        if (configure) {
+          setConfigure(configure)
+        }
+        setComponent(RfRender.load(widget))
+      })
+    }
+  }, [reload])
+
+  if (typeof name === 'string' && !name?.length) {
+    console.log(`表单项${runtimeItem}缺少name字段，可能导致异常！`)
+  }
+  if (!display || !component || !Component)
     return null
 
-  const { itemStyle } = getItemStyle({ visibility })
   // 传递onChange和onMapKeysChange给自定义的子组件
   const overrideProps: FormItemBridgeProps = {
     ...props,
-    rfrender: {
-      depsExec,
-      form,
-      item,
-    },
+    rfrender,
     async onChange(val: unknown) {
       if (name) {
         form.setFieldValue(name, val)
-        depsExec(name)
+        // dependOnMaps(name)
+        const deps = dependOnMaps.deps[name]
+        deps.forEach(async ({ name }) => {
+          const { changeValue, changeConfig } = RfRender.getDep(formName, name)
+          changeValue && await changeValue()
+          changeConfig && await changeConfig()
+        })
       }
     },
     // 自定义组件需要抛出这个，结果为数组
@@ -27,23 +172,28 @@ export function FormItemBridgeWrapper(item: IRfRenderItem & { depsExec: DepsExec
       if (mapKeys?.length) {
         mapKeys.forEach((key: string, index: number) => {
           form.setFieldValue(key, valueMap[index])
-          depsExec(key)
+          const deps = dependOnMaps.deps[key]
+          deps.forEach(async ({ name }) => {
+            const { changeValue, changeConfig } = RfRender.getDep(formName, name)
+            changeValue && await changeValue()
+            changeConfig && await changeConfig()
+          })
         })
       }
     },
   }
-  const Component = RfRender.load(widget as string)
+  const { itemStyle } = getItemStyle({ visibility })
   return (
     <>
       {
         withFormItem
           ? (
-            <Form.Item name={name} label={label} {...(itemProps ?? {})} style={itemStyle}>
+            <Form.Item name={name} label={label} {...itemProps} style={itemStyle}>
               {/* 加载组件，并传入属性 */}
-              {Component(overrideProps ?? {})}
+              <SuspenseWrapper Component={Component!} component={component} formItemBridgeProps={overrideProps} />
             </Form.Item>
             )
-          : Component(overrideProps ?? {})
+          : <SuspenseWrapper Component={Component!} component={component} formItemBridgeProps={overrideProps} />
       }
       {
         mapKeys?.length && mapKeys.map((key) => {

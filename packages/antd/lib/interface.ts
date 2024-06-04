@@ -124,7 +124,7 @@ export interface DefaultRfRenderItemConf<T extends string = string> extends Comm
    * - 可修改配置后返回
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
-  changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
+  changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig>
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
@@ -133,11 +133,11 @@ export interface DefaultRfRenderItemConf<T extends string = string> extends Comm
    * import {DNCV} from "@rf-render/antd"
    * ```
    */
-  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<void | any[]>
+  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<any[]>
   /**
    * @description 初始化config，常用于异步配置一些属性
    */
-  initConfig?: (config: ChangedConfig<T, DefaultWidgetProps>) => MaybePromise<CanModifyConfig | void>
+  initConfig?: (config: ChangedConfig<T, DefaultWidgetProps>) => MaybePromise<CanModifyConfig>
 }
 
 export interface RfRenderItemConf<W extends keyof WidgetProps = keyof WidgetProps, T extends string = string> extends CommonRfRenderItemConf<T> {
@@ -151,7 +151,7 @@ export interface RfRenderItemConf<W extends keyof WidgetProps = keyof WidgetProp
    * - 可修改配置后返回
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
-  changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig | void>
+  changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig>
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
@@ -160,11 +160,11 @@ export interface RfRenderItemConf<W extends keyof WidgetProps = keyof WidgetProp
    * import {DNCV} from "@rf-render/antd"
    * ```
    */
-  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<void | any[]>
+  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<any[]>
   /**
    * @description 初始化config，常用于异步配置一些属性
    */
-  initConfig?: (config: ChangedConfig<T, WidgetProps[W]>) => MaybePromise<CanModifyConfig | void>
+  initConfig?: (config: ChangedConfig<T, WidgetProps[W]>) => MaybePromise<CanModifyConfig>
 }
 
 // 使用联合类型生成所有可能的组合
