@@ -14,7 +14,7 @@ export interface CustomerLayout {
  */
 export default function Layout(props: FormItemBridgeProps & CustomerLayout) {
   const { rfrender, span = 2, rowProps, colProps } = props
-  const { dependOnMaps, form, item } = rfrender
+  const { dependOnMaps, form, item, formName } = rfrender
   const { layout = [] } = item
   const getRows = () => {
     if (!layout.length) {
@@ -25,7 +25,7 @@ export default function Layout(props: FormItemBridgeProps & CustomerLayout) {
       const stack: ReactElement[] = acc[index] ?? []
       const col = (
         <Col key={item.name} {...(colProps ?? {})}>
-          <FormItemBridgeWrapper {...item} dependOnMaps={dependOnMaps} form={form}></FormItemBridgeWrapper>
+          <FormItemBridgeWrapper {...item} dependOnMaps={dependOnMaps} form={form} formName={formName}></FormItemBridgeWrapper>
         </Col>
       )
       acc[index] = [...stack, col]

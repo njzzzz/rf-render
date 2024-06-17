@@ -199,7 +199,7 @@ export class RfRender {
   static getAllDeps(formName: RfRenderFormName) {
     const formDeps = RfRender.deps.get(formName)
     if (formDeps) {
-      return formDeps.values()
+      return Array.from(formDeps.values())
     }
   }
 

@@ -8,7 +8,7 @@ import { ReactElement } from 'react'
  */
 export default function Layout(props: FormItemBridgeProps<FormInstance> & CustomerLayout) {
   const { rfrender, span = 2, rowProps, colProps } = props
-  const { dependOnMaps, form, item } = rfrender
+  const { dependOnMaps, form, item, formName } = rfrender
   const { layout = [] } = item
   const getRows = () => {
     if (!layout.length) {
@@ -23,7 +23,7 @@ export default function Layout(props: FormItemBridgeProps<FormInstance> & Custom
       if (display) {
         const col = (
           <Col key={name || currentIndex} {...(itemColProps ?? (colProps ?? {}))} style={itemStyle}>
-            <FormItemBridgeWrapper {...item} dependOnMaps={dependOnMaps} form={form}></FormItemBridgeWrapper>
+            <FormItemBridgeWrapper {...item} dependOnMaps={dependOnMaps} form={form} formName={formName}></FormItemBridgeWrapper>
           </Col>
         )
         acc[index] = [...stack, col]

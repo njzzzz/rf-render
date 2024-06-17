@@ -1,6 +1,6 @@
 import { StoryObj } from '@storybook/react'
 import { RfRender } from '@rf-render/core'
-import { antdRfRenderPlugin, defineSchema } from '@rf-render/antd'
+import { DNCV, antdRfRenderPlugin, defineSchema } from '@rf-render/antd'
 // import dayjs from 'dayjs'
 import RfFormRender from './components/RfFormRender'
 
@@ -54,11 +54,14 @@ export const 简单表单: Story = {
       {
         label: '年龄',
         name: 'age',
-        props: {
-          type: 'number',
-        },
+        widget: 'InputNumber',
         itemProps: {
           rules: [{ required: true, message: '请输入年龄' }],
+        },
+        dependOn: ['name'],
+        changeValue(formData) {
+          const value = formData.name === '张三' ? null : DNCV
+          return [value]
         },
       },
       {

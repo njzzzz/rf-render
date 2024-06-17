@@ -2,7 +2,8 @@ import { ColProps, FormInstance, FormItemProps, FormProps } from 'antd'
 import { ReactNode, RefAttributes } from 'react'
 import IntrinsicAttributes = JSX.IntrinsicAttributes
 
-export type TFormProps = IntrinsicAttributes & FormProps & { children?: ReactNode } & RefAttributes<FormInstance<any>>
+export type TFormProps = IntrinsicAttributes &
+  FormProps & { children?: ReactNode } & RefAttributes<FormInstance<any>>
 
 /**
  * @description 定义 WidgetProps 类型, 供外部拓展 { widget: widgetPropsType } 形式
@@ -23,26 +24,25 @@ export type TFormProps = IntrinsicAttributes & FormProps & { children?: ReactNod
  * ```
  * - 这样在定义widget时就会多出一个Example类型，同时props的类型即为IExampleProps
  */
-export interface WidgetProps {
-
-}
+export interface WidgetProps {}
 /**
  * @description 默认widget的props类型，需要用户在外部配置
  * - 意思就是不配置widget的时候，props的类型
  * - defaultWidget的配置，可以在new RfRender时传入
  */
-export interface DefaultWidgetProps {
-
-}
+export interface DefaultWidgetProps {}
 /**
  * 用于拓展自定义属性类型
  */
-export interface CustomerProps {
-
-}
+export interface CustomerProps {}
 export type MaybePromise<T> = T | Promise<T>
 // 可被dependOn修改的属性,name不可修改，暂不开放修改widget
-export type CanModifyConfigKeys = 'label' | 'itemProps' | 'props' | 'display' | 'visibility'
+export type CanModifyConfigKeys =
+  | 'label'
+  | 'itemProps'
+  | 'display'
+  | 'visibility'
+  | 'props'
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
 export interface CommonRfRenderItemConf<T extends string = string> {
   /**
@@ -98,22 +98,26 @@ export interface CommonRfRenderItemConf<T extends string = string> {
   /**
    * @description 布局组件使用，传入layout的子项也会参与dependOn
    */
-  layout?: Array<IRfRenderItem<T> & {
-    /**
-     * @description 如果没有使用内置的antd插件，则需要自己实现这个属性的效果
-     * - widget为Layout，其layout下的子组件可配
-     */
-    colProps?: ColProps
-  }>
+  layout?: Array<
+    IRfRenderItem<T> & {
+      /**
+       * @description 如果没有使用内置的antd插件，则需要自己实现这个属性的效果
+       * - widget为Layout，其layout下的子组件可配
+       */
+      colProps?: ColProps
+    }
+  >
   /**
    * @description 拓展属性，用于拓展属性和类型
    */
   customerProps?: CustomerProps
 }
-export interface ChangedConfig<T extends string, P> extends CommonRfRenderItemConf<T> {
+export interface ChangedConfig<T extends string, P>
+  extends CommonRfRenderItemConf<T> {
   props?: P
 }
-export interface DefaultRfRenderItemConf<T extends string = string> extends CommonRfRenderItemConf<T> {
+export interface DefaultRfRenderItemConf<T extends string = string>
+  extends CommonRfRenderItemConf<T> {
   widget?: undefined
   /**
    * 当前widget对应的组件的属性
@@ -124,7 +128,12 @@ export interface DefaultRfRenderItemConf<T extends string = string> extends Comm
    * - 可修改配置后返回
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
-  changeConfig?: (config: ChangedConfig<T, DefaultWidgetProps>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig>
+  changeConfig?: (
+    config: ChangedConfig<T, DefaultWidgetProps>,
+    formData: { [K in T]: any } & Record<string, any>
+  ) => MaybePromise<
+    Partial<Pick<DefaultRfRenderItemConf<T>, CanModifyConfigKeys>>
+  >
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
@@ -133,14 +142,23 @@ export interface DefaultRfRenderItemConf<T extends string = string> extends Comm
    * import {DNCV} from "@rf-render/antd"
    * ```
    */
-  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<any[]>
+  changeValue?: (
+    formData: { [K in T]: any } & Record<string, any>
+  ) => MaybePromise<any[]>
   /**
    * @description 初始化config，常用于异步配置一些属性
    */
-  initConfig?: (config: ChangedConfig<T, DefaultWidgetProps>) => MaybePromise<CanModifyConfig>
+  initConfig?: (
+    config: ChangedConfig<T, DefaultWidgetProps>
+  ) => MaybePromise<
+    Partial<Pick<DefaultRfRenderItemConf<T>, CanModifyConfigKeys>>
+  >
 }
 
-export interface RfRenderItemConf<W extends keyof WidgetProps = keyof WidgetProps, T extends string = string> extends CommonRfRenderItemConf<T> {
+export interface RfRenderItemConf<
+  W extends keyof WidgetProps = keyof WidgetProps,
+  T extends string = string,
+> extends CommonRfRenderItemConf<T> {
   widget: W
   /**
    * 当前widget对应的组件的属性
@@ -151,7 +169,10 @@ export interface RfRenderItemConf<W extends keyof WidgetProps = keyof WidgetProp
    * - 可修改配置后返回
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
-  changeConfig?: (config: ChangedConfig<T, WidgetProps[W]>, formData: { [K in T]: any } & Record<string, any>) => MaybePromise<CanModifyConfig>
+  changeConfig?: (
+    config: ChangedConfig<T, WidgetProps[W]>,
+    formData: { [K in T]: any } & Record<string, any>
+  ) => MaybePromise<Partial<Pick<RfRenderItemConf<W, T>, CanModifyConfigKeys>>>
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
@@ -160,16 +181,20 @@ export interface RfRenderItemConf<W extends keyof WidgetProps = keyof WidgetProp
    * import {DNCV} from "@rf-render/antd"
    * ```
    */
-  changeValue?: (formData: { [K in T]: any } & Record<string, any>) => MaybePromise<any[]>
+  changeValue?: (
+    formData: { [K in T]: any } & Record<string, any>
+  ) => MaybePromise<any[]>
   /**
    * @description 初始化config，常用于异步配置一些属性
    */
-  initConfig?: (config: ChangedConfig<T, WidgetProps[W]>) => MaybePromise<CanModifyConfig>
+  initConfig?: (
+    config: ChangedConfig<T, WidgetProps[W]>
+  ) => MaybePromise<Partial<Pick<RfRenderItemConf<W, T>, CanModifyConfigKeys>>>
 }
 
 // 使用联合类型生成所有可能的组合
 export type IRfRenderItem<T extends string = string> = {
-  [K in keyof WidgetProps]: RfRenderItemConf<K, T> | DefaultRfRenderItemConf<T>
+  [K in keyof WidgetProps]: RfRenderItemConf<K, T> | DefaultRfRenderItemConf<T>;
 }[keyof WidgetProps]
 
 export interface IProps {
@@ -180,7 +205,9 @@ export type FormRenderProps = TFormProps & IProps
 /**
  * @description 定义表单schema，使用此函数可以获得更好的类型提示
  */
-export function defineSchema<T extends string = string>(schema: IRfRenderItem<T>[]) {
+export function defineSchema<T extends string = string>(
+  schema: IRfRenderItem<T>[],
+) {
   return schema
 }
 

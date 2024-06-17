@@ -19,8 +19,8 @@ export function useFormRender() {
       const deps = RfRender.getAllDeps(formName) ?? []
       deps.forEach(async (dep) => {
         const { changeConfig, changeValue } = dep
-        changeValue && await dep.changeValue()
-        changeConfig && await dep.changeConfig()
+        await changeValue()
+        await changeConfig()
       })
     }, [])
     return (
