@@ -98,7 +98,9 @@ export const 简单表单: Story = {
 export const 联动表单: Story = {
   args: {
     layout: 'vertical',
-    initialValues: {},
+    initialValues: {
+      province: 'xx',
+    },
     schema: defineSchema([
       {
         name: 'steps',
@@ -202,6 +204,11 @@ export const 联动表单: Story = {
           {
             label: '市',
             name: 'city',
+            dependOn: ['province'],
+            changeValue(formData) {
+              console.log(111)
+              return [formData.province]
+            },
           },
         ],
       },

@@ -199,6 +199,7 @@ export type IRfRenderItem<T extends string = string> = {
 
 export interface IProps {
   schema: IRfRenderItem[]
+  immediateDeps?: boolean
 }
 export type FormRenderProps = TFormProps & IProps
 

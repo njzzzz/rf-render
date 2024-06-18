@@ -15,6 +15,7 @@ export interface FormItemBridgeWrapperAttachProps {
   dependOnMaps: DependOnMaps
   form: FormInstance
   formName: symbol
+  immediateDeps?: boolean
 }
 export type FormItemBridgeWrapperProps = IRfRenderItem &
   FormItemBridgeWrapperAttachProps
@@ -64,6 +65,7 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
     visibility = true,
     formName,
     initConfig,
+    immediateDeps = true,
   } = config
   // -------------------------------------
 
@@ -80,8 +82,8 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
     form,
     item: runtimeItemFields,
     formName,
+    immediateDeps,
   }
-
   // 初始化配置
   if (initConfig) {
     Promise.resolve(initConfig(config)).then((newConfig) => {
@@ -104,6 +106,8 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
   }
   // 注入更新钩子
   useEffect(() => {
+    if (!name?.length)
+      return
     RfRender.addDep(formName, name!, {
       changeConfig: async () => {
         if (!changeConfig)
@@ -164,6 +168,20 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
         }
       },
     })
+    /**
+     * 保证所有异步表单组件均加载完成后执行一次dependOn
+     */
+    if (immediateDeps) {
+      const deps = RfRender.getAllDeps(formName) ?? []
+      const isAllLazyComponentsLoaded = deps.length === Object.keys(dependOnMaps.maps).length
+      if (isAllLazyComponentsLoaded) {
+        deps.forEach(async (dep) => {
+          const { changeConfig, changeValue } = dep
+          await changeValue()
+          await changeConfig()
+        })
+      }
+    }
     return () => {
       RfRender.removeDep(formName, name!)
     }

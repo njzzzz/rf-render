@@ -62,6 +62,7 @@ export interface FormItemBridgeProps<T = any> {
     form: T
     item: IRfRenderItem
     formName: symbol
+    immediateDeps: boolean
   }
 }
 export type Listener = (...args: unknown[]) => unknown
