@@ -60,7 +60,8 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
     mapKeys,
     form,
     dependOnMaps,
-    withFormItem = true,
+    // 布局组件默认不需要FormItem
+    withFormItem = !config.layout?.length,
     display = true,
     visibility = true,
     formName,
