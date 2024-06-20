@@ -1,7 +1,8 @@
 import { StoryObj } from '@storybook/react'
 import { RfRender } from '@rf-render/core'
-import { DNCV, antdRfRenderPlugin, defineSchema } from '@rf-render/antd'
+import { antdRfRenderPlugin, defineSchema } from '@rf-render/antd'
 // import dayjs from 'dayjs'
+import { BaseOptionType } from 'antd/es/select'
 import RfFormRender from './components/RfFormRender'
 
 // eslint-disable-next-line no-new
@@ -47,109 +48,16 @@ export const 简单表单: Story = {
       {
         label: '姓名',
         name: 'name',
-        itemProps: {
-          rules: [{ required: true, message: '请输入姓名' }],
-        },
-      },
-      {
-        label: '年龄',
-        name: 'age',
-        widget: 'InputNumber',
-        itemProps: {
-          rules: [{ required: true, message: '请输入年龄' }],
-        },
-        dependOn: ['name'],
-        changeValue(formData) {
-          const value = formData.name === '张三' ? null : DNCV
-          return [value]
-        },
-      },
-      {
-        label: '爱好',
-        name: 'favo',
-        widget: 'CheckboxGroup',
-        props: {
-          options: [
-            { label: '吃', value: 'eat' },
-            { label: '喝', value: 'drink' },
-            { label: '玩', value: 'play' },
-            { label: '乐', value: 'happy' },
-          ],
-        },
-      },
-      {
-        name: 'location',
-        widget: 'Layout',
-        layout: [
-          {
-            label: '省',
-            name: 'province',
-          },
-          {
-            label: '市',
-            name: 'city',
-          },
-        ],
-      },
-    ]),
-  },
-}
-
-export const 联动表单: Story = {
-  args: {
-    layout: 'vertical',
-    initialValues: {
-      province: 'xx',
-    },
-    schema: defineSchema([
-      {
-        name: 'steps',
-        widget: 'Steps',
-        props: {
-          items: [
-            {
-              title: '第一步',
-            },
-            {
-              title: '第二步',
-            },
-            {
-              title: '第三步',
-            },
-          ],
-        },
-      },
-      {
-        label: '姓名',
-        name: 'name',
-        itemProps: {
-          rules: [{ required: true, message: '请输入姓名' }],
-        },
-      },
-      {
-        label: '年龄',
-        name: 'age',
-        widget: 'InputNumber',
-        props: {
-          type: 'number',
-        },
-        itemProps: {
-          rules: [{ required: true, message: '请输入年龄' }],
-        },
-      },
-      {
-        label: '年龄是否大于18',
-        name: 'ageOver18',
-        dependOn: ['age'],
-        props: {
-          disabled: true,
-          placeholder: '',
-        },
         customerProps: {
           requiredWithRules: true,
         },
-        changeValue(formData) {
-          return [formData.age ? formData.age > 18 ? '是' : '否' : '']
+      },
+      {
+        label: '年龄',
+        name: 'age',
+        widget: 'InputNumber',
+        customerProps: {
+          requiredWithRules: true,
         },
       },
       {
@@ -166,36 +74,8 @@ export const 联动表单: Story = {
         },
       },
       {
-        name: 'showlayoutDispaly',
-        widget: 'RadioGroup',
-        label: '是否显示省市（卸载组件，不保留表单值）',
-        props: {
-          options: [
-            '是',
-            '否',
-          ],
-        },
-      },
-      {
-        name: 'showlayoutVisibility',
-        widget: 'RadioGroup',
-        label: '是否显示省市（不展示组件，但保留表单值）',
-        props: {
-          options: [
-            '是',
-            '否',
-          ],
-        },
-      },
-      {
         name: 'location',
         widget: 'Layout',
-        dependOn: ['showlayoutVisibility', 'showlayoutDispaly'],
-        changeConfig(config, formData) {
-          config.display = !!formData.showlayoutDispaly && (formData.showlayoutDispaly === '是')
-          config.visibility = !!formData.showlayoutVisibility && (formData.showlayoutVisibility === '是')
-          return config
-        },
         layout: [
           {
             label: '省',
@@ -204,11 +84,6 @@ export const 联动表单: Story = {
           {
             label: '市',
             name: 'city',
-            dependOn: ['province'],
-            changeValue(formData) {
-              console.log(111)
-              return [formData.province]
-            },
           },
         ],
       },
@@ -216,6 +91,225 @@ export const 联动表单: Story = {
   },
 }
 
+export const 联动表单之修改配置: Story = {
+  args: {
+    layout: 'vertical',
+    initialValues: {
+      showSelect: '2',
+    },
+    schema: defineSchema([
+      {
+        label: '是否显示Select',
+        name: 'showSelect',
+        widget: 'RadioGroup',
+        props: {
+          options: [
+            {
+              value: '1',
+              label: '是',
+            },
+            {
+              value: '2',
+              label: '否',
+            },
+          ],
+        },
+      },
+      {
+        label: 'Select',
+        name: 'Select',
+        widget: 'Select',
+        props: {
+          options: [
+            {
+              value: '1',
+              label: '第一项',
+            },
+            {
+              value: '2',
+              label: '第二项',
+            },
+          ],
+        },
+        dependOn: ['showSelect'],
+        changeConfig(config, formData) {
+          return { ...config, display: formData.showSelect === '1' }
+        },
+      },
+    ]),
+  },
+}
+
+export const 联动表单之修改值: Story = {
+  args: {
+    layout: 'vertical',
+    initialValues: {
+      changeSelect: '2',
+    },
+    schema: defineSchema([
+      {
+        label: '同步修改Select的值',
+        name: 'changeSelect',
+        widget: 'RadioGroup',
+        props: {
+          options: [
+            {
+              value: '1',
+              label: '第一项',
+            },
+            {
+              value: '2',
+              label: '第二项',
+            },
+          ],
+        },
+      },
+      {
+        label: 'Select',
+        name: 'Select',
+        widget: 'Select',
+        props: {
+          options: [
+            {
+              value: '1',
+              label: '第一项',
+            },
+            {
+              value: '2',
+              label: '第二项',
+            },
+          ],
+        },
+        dependOn: ['changeSelect'],
+        changeValue(formData) {
+          return [formData.changeSelect]
+        },
+      },
+    ]),
+  },
+}
+async function mock3sRequest() {
+  return new Promise<BaseOptionType[]>((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          value: '1',
+          label: '第一项',
+        },
+        {
+          value: '2',
+          label: '第二项',
+        },
+      ])
+    }, 3000)
+  })
+}
+
+export const 联动表单之使用接口初始化Select选项: Story = {
+  args: {
+    layout: 'vertical',
+    initialValues: {
+      Select: '2',
+    },
+    schema: defineSchema([
+      {
+        label: 'Select-配置initConfig在3s后接口返回展示选中文案',
+        name: 'Select',
+        widget: 'Select',
+        async initConfig(config) {
+          const options = await mock3sRequest()
+          return {
+            ...config,
+            props: {
+              options,
+            },
+          }
+        },
+      },
+    ]),
+  },
+}
+export const 联动表单之取消首次渲染立即执行deps: Story = {
+  args: {
+    layout: 'vertical',
+    immediateDeps: false,
+    initialValues: {
+      changeSelect: '2',
+    },
+    schema: defineSchema([
+      {
+        label: '虽然设置了同步修改Select的值，且当前选项的值为第二项，但是设置immediateDeps=false后，不会立即触发，需要用户操作才能触发',
+        name: 'changeSelect',
+        widget: 'RadioGroup',
+        props: {
+          options: [
+            {
+              value: '1',
+              label: '点我触发修改Select值为第一项',
+            },
+            {
+              value: '2',
+              label: '第二项',
+            },
+          ],
+        },
+      },
+      {
+        label: 'Select',
+        name: 'Select',
+        widget: 'Select',
+        props: {
+          options: [
+            {
+              value: '1',
+              label: '第一项',
+            },
+            {
+              value: '2',
+              label: '第二项',
+            },
+          ],
+        },
+        dependOn: ['changeSelect'],
+        changeValue(formData) {
+          return [formData.changeSelect]
+        },
+      },
+    ]),
+  },
+}
+
+export const 联动表单之立即执行deps同时触发表单验证: Story = {
+  args: {
+    immediateValidate: true,
+    layout: 'vertical',
+    initialValues: {
+      first: 1,
+    },
+    schema: defineSchema([
+      {
+        label: '第一项',
+        name: 'first',
+        widget: 'InputNumber',
+        customerProps: {
+          requiredWithRules: true,
+        },
+      },
+      {
+        label: '当前项的值为第一项的值+1(当第一项为1是当前项的值为null)',
+        name: 'second',
+        widget: 'InputNumber',
+        customerProps: {
+          requiredWithRules: true,
+        },
+        dependOn: ['first'],
+        changeValue(formData) {
+          return [formData.first === 1 ? null : formData.first + 1]
+        },
+      },
+    ]),
+  },
+}
 export const 所有内置antd组件: Story = {
   args: {
     layout: 'vertical',

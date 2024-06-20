@@ -1,5 +1,5 @@
 import { SuspenseProps, lazy } from 'react'
-import { DependOnMaps, IRfRenderItem, MaybePromise, RfRenderItemConf, WidgetProps } from '@rf-render/antd'
+import { DependOnMaps, ILazyWrapperForCheckCompleteProps, IRfRenderItem, MaybePromise, RfRenderItemConf, WidgetProps } from '@rf-render/antd'
 /**
  * ```ts
  * {
@@ -63,6 +63,8 @@ export interface FormItemBridgeProps<T = any> {
     item: IRfRenderItem
     formName: symbol
     immediateDeps: boolean
+    immediateValidate: boolean
+    onComplete: ILazyWrapperForCheckCompleteProps['onComplete']
   }
 }
 export type Listener = (...args: unknown[]) => unknown
@@ -78,7 +80,7 @@ export type Debugger = boolean | 'info' | 'trace'
 export type DefaultWidget = keyof WidgetProps
 export type RfRenderFormName = symbol
 export type RfRenderDeps = Map<RfRenderFormName, RfRenderDep>
-export interface RfRenderDepEntity { changeConfig: () => any, changeValue: () => any }
+export interface RfRenderDepEntity { changeConfig: () => any, changeValue: (runValidate?: boolean) => any }
 export type RfRenderDep = Map<string, RfRenderDepEntity>
 // 单例
 export class RfRender {

@@ -199,7 +199,17 @@ export type IRfRenderItem<T extends string = string> = {
 
 export interface IProps {
   schema: IRfRenderItem[]
+  /**
+   * 初始化时是否直接执行一次changeConfig、changeValue
+   * @default true
+   */
   immediateDeps?: boolean
+  /**
+   * - 初始化时直接执行changeConfig、changeValue时是否需要触发表单验证
+   * - 仅当immediateDeps为true是生效，且只对关联的deps项生效
+   * @default false
+   */
+  immediateValidate?: boolean
 }
 export type FormRenderProps = TFormProps & IProps
 

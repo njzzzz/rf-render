@@ -91,7 +91,7 @@ configures 文件为整个项目默认的组件配置
 
      - 完全自定义
        - 完全自定义只要记住两点
-         1. 插件类型是单纯的layout组件还是参与表单运算的组件 Layout组件
+         1. 插件类型是单纯的layout组件还是参与表单运算的组件 Layout组件请参考`@rf-render/antd/plugins/Layout/pc/indexedDB.tsx`
          2. 调用props.onChange事件以修改表单值,如果要支持mapKeys属性请调用props.onMapKeysChange事件并传入一个数组，数组的值会和mapKeys定义的键顺序对应
        ```tsx
        import { FormItemBridgeProps } from "@rf-render/core";

@@ -4,11 +4,11 @@ import { Col, FormInstance, Row } from 'antd'
 import { ReactElement } from 'react'
 
 /**
- * 布局组件
+ * 布局组件-使用antd的 Row Col进行封装
  */
 export default function Layout(props: FormItemBridgeProps<FormInstance> & CustomerLayout) {
   const { rfrender, span = 2, rowProps, colProps } = props
-  const { dependOnMaps, form, item, formName, immediateDeps } = rfrender
+  const { item } = rfrender
   const { layout = [] } = item
   const getRows = () => {
     if (!layout.length) {
@@ -23,7 +23,7 @@ export default function Layout(props: FormItemBridgeProps<FormInstance> & Custom
       if (display) {
         const col = (
           <Col key={name || currentIndex} {...(itemColProps ?? (colProps ?? {}))} style={itemStyle}>
-            <FormItemBridgeWrapper {...item} dependOnMaps={dependOnMaps} form={form} formName={formName} immediateDeps={immediateDeps}></FormItemBridgeWrapper>
+            <FormItemBridgeWrapper {...item} {...rfrender}></FormItemBridgeWrapper>
           </Col>
         )
         acc[index] = [...stack, col]

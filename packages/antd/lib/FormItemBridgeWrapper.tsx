@@ -4,6 +4,7 @@ import {
   CanModifyConfig,
   DNCV,
   DependOnMaps,
+  ILazyWrapperForCheckCompleteProps,
   IRfRenderItem,
   SuspenseWrapper,
   getItemStyle,
@@ -15,7 +16,9 @@ export interface FormItemBridgeWrapperAttachProps {
   dependOnMaps: DependOnMaps
   form: FormInstance
   formName: symbol
+  onComplete: ILazyWrapperForCheckCompleteProps['onComplete']
   immediateDeps?: boolean
+  immediateValidate?: boolean
 }
 export type FormItemBridgeWrapperProps = IRfRenderItem &
   FormItemBridgeWrapperAttachProps
@@ -67,6 +70,8 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
     formName,
     initConfig,
     immediateDeps = true,
+    immediateValidate = false,
+    onComplete,
   } = config
   // -------------------------------------
 
@@ -84,6 +89,8 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
     item: runtimeItemFields,
     formName,
     immediateDeps,
+    immediateValidate,
+    onComplete,
   }
   // 初始化配置
   if (initConfig) {
@@ -131,7 +138,7 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
           visibility,
         }))
       },
-      changeValue: async () => {
+      changeValue: async (runValidate = true) => {
         if (!changeValue)
           return
         const formData = form.getFieldsValue(true)
@@ -141,7 +148,7 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
           if (values[0] !== DNCV) {
             // 更新name值
             form.setFieldValue(name, values[0])
-            form.validateFields([name])
+            runValidate && form.validateFields([name])
             const deps = dependOnMaps.deps[name!] ?? []
             deps.forEach(async ({ name }) => {
               const { changeValue, changeConfig }
@@ -169,20 +176,6 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
         }
       },
     })
-    /**
-     * 保证所有异步表单组件均加载完成后执行一次dependOn
-     */
-    if (immediateDeps) {
-      const deps = RfRender.getAllDeps(formName) ?? []
-      const isAllLazyComponentsLoaded = deps.length === Object.keys(dependOnMaps.maps).length
-      if (isAllLazyComponentsLoaded) {
-        deps.forEach(async (dep) => {
-          const { changeConfig, changeValue } = dep
-          await changeValue()
-          await changeConfig()
-        })
-      }
-    }
     return () => {
       RfRender.removeDep(formName, name!)
     }
@@ -240,6 +233,7 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
     },
   }
   const { itemStyle } = getItemStyle({ visibility })
+  const onCompleteWithName = () => onComplete(name)
   return (
     <>
       {withFormItem
@@ -249,6 +243,7 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
             <SuspenseWrapper
               Component={Component!}
               component={component}
+              onComplete={onCompleteWithName}
               formItemBridgeProps={overrideProps}
             />
           </Form.Item>
@@ -257,6 +252,7 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
           <SuspenseWrapper
             Component={Component!}
             component={component}
+            onComplete={onCompleteWithName}
             formItemBridgeProps={overrideProps}
           />
           )}
