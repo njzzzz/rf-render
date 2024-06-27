@@ -12,7 +12,7 @@
     "clean:locks": "find . -name \"pnpm-lock.yaml\" -prune -exec rm -r '{}' + ",
     "build": "pnpm --filter @rf-render/* run build",
     "publish-all": "pnpm --filter @rf-render/* publish --access=public --publish-branch main",
-    "dev": "pnpm -r --parallel dev ",
+    "dev": "pnpm -r --parallel dev",
     "changelog": "conventional-changelog -i ./packages/docs/src/stories/5.CHANGELOG.mdx -s -r 0",
     "bump": "bumpp -r"
   },
