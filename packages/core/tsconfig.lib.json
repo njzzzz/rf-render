@@ -1,6 +1,6 @@
 {
   // for build lib
-  "extends": "@tsconfig/vite-react",
+  "extends": ["@tsconfig/vite-react", "../../tsconfig.path.json"],
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,

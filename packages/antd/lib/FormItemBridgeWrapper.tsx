@@ -31,16 +31,7 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
   const [runtimeItem, setRuntimeItem]
     = useState<FormItemBridgeWrapperProps>(item)
   const [reload, setReload] = useState(false)
-  useEffect(() => {
-    // 调用RfRender switch的时候，触发组件刷新
-    const listener = () => {
-      setReload(!reload)
-    }
-    RfRender.addSwitchListener(listener)
-    return () => {
-      RfRender.removeSwitchListener(listener)
-    }
-  }, [reload])
+
   // 合并configure---------------------------
   const config = {
     ...configure,
@@ -74,7 +65,16 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
     onComplete,
   } = config
   // -------------------------------------
-
+  useEffect(() => {
+    // 调用RfRender switch的时候，触发组件刷新
+    const listener = () => {
+      setReload(!reload)
+    }
+    RfRender.addSwitchListener(formName, listener)
+    return () => {
+      RfRender.removeSwitchListener(formName, listener)
+    }
+  }, [reload])
   const component = RfRender.components[widget]!
   const {
     dependOnMaps: _,
@@ -182,14 +182,14 @@ export function FormItemBridgeWrapper(item: FormItemBridgeWrapperProps) {
   }, [])
   // reload的时候重新加载组件和默认配置
   useEffect(() => {
-    const dynamicConfigure = RfRender.loadConfigure(widget)
+    const dynamicConfigure = RfRender.loadConfigure(widget, formName)
     if (dynamicConfigure) {
       dynamicConfigure.then(async ({ default: defaultExport }) => {
         const configure = await defaultExport(rfrender)
         if (configure) {
           setConfigure(configure)
         }
-        setComponent(RfRender.load(widget))
+        setComponent(RfRender.load(widget, formName))
       })
     }
   }, [reload])

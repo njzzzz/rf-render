@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@rf-render/core": ["./packages/core/index.tsx"],
+      "@rf-render/antd": ["./packages/antd/index.tsx"]
+    }
+  }
+}

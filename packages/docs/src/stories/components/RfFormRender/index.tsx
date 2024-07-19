@@ -1,9 +1,8 @@
 import { FormRenderProps, useFormRender } from '@rf-render/antd'
-import { RfRender } from '@rf-render/core'
 import { Button, Col, Row } from 'antd'
 
 export default function RfFormRender(props: FormRenderProps) {
-  const { FormRender, form } = useFormRender()
+  const { FormRender, form, switchFileName } = useFormRender()
   return (
     <div style={{ width: '680px' }}>
       <FormRender {...props}>
@@ -23,7 +22,7 @@ export default function RfFormRender(props: FormRenderProps) {
         </Col>
         <Col>
           <Button onClick={() => {
-            RfRender.switchFileName('view')
+            switchFileName('view')
           }}
           >
             切换为view文件
@@ -31,7 +30,7 @@ export default function RfFormRender(props: FormRenderProps) {
         </Col>
         <Col>
           <Button onClick={() => {
-            RfRender.switchFileName('index')
+            switchFileName('index')
           }}
           >
             切换为index文件
