@@ -13,7 +13,7 @@
     "build": "pnpm --filter @rf-render/* run build",
     "publish-all": "pnpm --filter @rf-render/* publish --access=public --publish-branch main",
     "dev": "pnpm -r --parallel dev",
-    "changelog": "conventional-changelog -i ./packages/docs/src/stories/5.CHANGELOG.mdx -s -r 0",
+    "changelog": "conventional-changelog -n changelog.config.mjs -i ./packages/docs/src/stories/5.CHANGELOG.mdx -s -r 0",
     "bump": "bumpp -r"
   },
   "devDependencies": {
