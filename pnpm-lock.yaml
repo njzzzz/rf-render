@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      conventional-changelog-cli:
-        specifier: ^5.0.0
-        version: 5.0.0(conventional-commits-filter@5.0.0)
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^2.6.4
@@ -45,6 +41,9 @@ importers:
       bumpp:
         specifier: ^9.3.0
         version: 9.4.1
+      conventional-changelog-cli:
+        specifier: ^5.0.0
+        version: 5.0.0(conventional-commits-filter@5.0.0)
       eslint:
         specifier: ^8.56.0
         version: 8.57.0

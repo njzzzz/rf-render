@@ -1,38 +1,59 @@
-import { IRfRenderItem } from '@rf-render/antd'
-import { useMemo } from 'react'
+import { CanModifyConfig, IRfRenderItem, UpdateFormData } from '@rf-render/antd'
 
-export function useDeps(schema: IRfRenderItem[]) {
-  function genDependOnMaps(schema: IRfRenderItem[], deps: Record<string, IRfRenderItem[]> = {}, maps: Record<string, IRfRenderItem> = {}) {
-    schema.forEach((item) => {
-      const { dependOn = [], layout = [], name } = item
-      if (name) {
-        maps[name] = item
-      }
-      dependOn.forEach((dep) => {
-        deps[dep] = deps[dep] ? [...deps[dep], item] : [item]
-      })
-      // 递归处理layout
-      if (layout.length) {
-        genDependOnMaps(layout, deps, maps)
-      }
-    })
-    return {
-      deps,
-      maps,
-    }
-  }
-
-  const dependOnMaps = useMemo(() => {
-    return genDependOnMaps(schema)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schema])
-  return {
-    dependOnMaps,
-  }
+export type SchemaMap = Record<string, IRfRenderItem>
+export type SchemaEffectMap = Record<string, any[]>
+export type PreparedIRfRenderItem = Omit<IRfRenderItem, 'initConfig'> & {
+  initConfig: CanModifyConfig
 }
-// export type DepsExec = ReturnType<typeof useDeps>['dependOnMaps']
 
-export interface DependOnMaps {
-  deps: Record<string, IRfRenderItem[]>
-  maps: Record<string, IRfRenderItem>
+function deepForEachSchema(schema: IRfRenderItem[], updateFormData: UpdateFormData) {
+  const preparedSchema: PreparedIRfRenderItem[] = []
+  const schemaMap: SchemaMap = {}
+  const schemaEffectMap: SchemaEffectMap = {}
+  const stack = [...schema]
+  let item = stack.shift()
+  while (item) {
+    const { layout = [], name, dependOn = [], initialValue } = item
+    // layout 可以没有 name
+    if (!name?.length) {
+      console.error(`表单项${item} name 字段为必要配置`)
+    }
+    else {
+      // 初始化提取表单项中的值并更新formData, 这一步提前为了初始化更新deps
+      if (initialValue !== undefined) {
+        updateFormData(name, initialValue)
+      }
+      schemaMap[name!] = item
+      // 收集依赖 map
+      dependOn.forEach((dep: string) => {
+        const deps = schemaEffectMap[dep]
+        schemaEffectMap[dep] = deps ? [...deps, name] : [name]
+      })
+    }
+    if (layout) {
+      stack.concat(layout)
+    }
+    item = stack.shift()
+  }
+
+  return { schemaMap, schemaEffectMap, preparedSchema }
+}
+
+export interface UsePrepareSchema {
+  schema: IRfRenderItem[]
+  formName: symbol
+  updateFormData: UpdateFormData
+}
+/**
+ * @description 准备schema数据
+ */
+export function usePrepareSchema(props: UsePrepareSchema) {
+  const { schema, updateFormData } = props
+  const { schemaMap, schemaEffectMap, preparedSchema } = deepForEachSchema(schema, updateFormData)
+  return {
+    schema,
+    schemaMap,
+    schemaEffectMap,
+    preparedSchema,
+  }
 }

@@ -43,12 +43,13 @@ export type CanModifyConfigKeys =
   | 'display'
   | 'visibility'
   | 'props'
+
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
 export interface CommonRfRenderItemConf<T extends string = string> {
   /**
    * @description 字段名
    */
-  name?: T
+  name: T
   /**
    * @description 表单label
    */
@@ -112,10 +113,7 @@ export interface CommonRfRenderItemConf<T extends string = string> {
    */
   customerProps?: CustomerProps
 }
-export interface ChangedConfig<T extends string, P>
-  extends CommonRfRenderItemConf<T> {
-  props?: P
-}
+
 export interface DefaultRfRenderItemConf<T extends string = string>
   extends CommonRfRenderItemConf<T> {
   widget?: undefined
@@ -129,10 +127,10 @@ export interface DefaultRfRenderItemConf<T extends string = string>
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
   changeConfig?: (
-    config: ChangedConfig<T, DefaultWidgetProps>,
+    config: IRfRenderItem<T>,
     formData: { [K in T]: any } & Record<string, any>
   ) => MaybePromise<
-    Partial<Pick<DefaultRfRenderItemConf<T>, CanModifyConfigKeys>>
+    Partial<Pick<IRfRenderItem<T>, CanModifyConfigKeys>>
   >
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
@@ -149,7 +147,7 @@ export interface DefaultRfRenderItemConf<T extends string = string>
    * @description 初始化config，常用于异步配置一些属性
    */
   initConfig?: (
-    config: ChangedConfig<T, DefaultWidgetProps>
+    config: IRfRenderItem<T>
   ) => MaybePromise<
     Partial<Pick<DefaultRfRenderItemConf<T>, CanModifyConfigKeys>>
   >
@@ -170,7 +168,7 @@ export interface RfRenderItemConf<
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
   changeConfig?: (
-    config: ChangedConfig<T, WidgetProps[W]>,
+    config: IRfRenderItem<T>,
     formData: { [K in T]: any } & Record<string, any>
   ) => MaybePromise<Partial<Pick<RfRenderItemConf<W, T>, CanModifyConfigKeys>>>
   /**
@@ -188,13 +186,13 @@ export interface RfRenderItemConf<
    * @description 初始化config，常用于异步配置一些属性
    */
   initConfig?: (
-    config: ChangedConfig<T, WidgetProps[W]>
-  ) => MaybePromise<Partial<Pick<RfRenderItemConf<W, T>, CanModifyConfigKeys>>>
+    config: IRfRenderItem<T>
+  ) => MaybePromise<Partial<Pick<IRfRenderItem<T>, CanModifyConfigKeys>>>
 }
 
 // 使用联合类型生成所有可能的组合
 export type IRfRenderItem<T extends string = string> = {
-  [K in keyof WidgetProps]: RfRenderItemConf<K, T> | DefaultRfRenderItemConf<T>;
+  [K in keyof WidgetProps]: RfRenderItemConf<K, T> | DefaultRfRenderItemConf<T>
 }[keyof WidgetProps]
 
 export interface IProps {

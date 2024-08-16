@@ -31,7 +31,8 @@ import {
 
 export interface CustomerLayout {
   /**
-   * 一行展示几个
+   * @description 总共几项，不设置默认平分，设置了会计算
+   * @default 2
    */
   span?: number
   rowProps?: RowProps

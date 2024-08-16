@@ -1,6 +1,14 @@
 import { Form } from 'antd'
-import { FormItemBridgeWrapper, FormRenderProps, useDeps } from '@rf-render/antd'
+import {
+  Context,
+  FormItemBridgeWrapper,
+  FormRenderProps,
+  useFormData,
+  usePrepareSchema,
+  useProvider,
+} from '@rf-render/antd'
 import { FileName, Platform, RfRender } from '@rf-render/core'
+import { useEffect } from 'react'
 
 export interface FormRenderParams {
   fileName?: FileName
@@ -13,6 +21,7 @@ export function useFormRender(params: FormRenderParams = {}) {
    */
   const [form] = Form.useForm()
   const formName = Symbol('formName')
+
   const switchFileName = (fileName: FileName) => {
     RfRender.switchFileName(fileName, formName)
   }
@@ -22,48 +31,61 @@ export function useFormRender(params: FormRenderParams = {}) {
   const switchPlatformAndFileName = (fileName: FileName, platform: Platform) => {
     RfRender.switchPlatformAndFileName(platform, fileName, formName)
   }
+
   /**
    * @description 表单渲染组件，多了个schema属性其余和和antd的Form属性一致
    */
   function FormRender(props: FormRenderProps) {
     const { schema, immediateDeps = true, immediateValidate = false, ...antdFromProps } = props
-    const { dependOnMaps } = useDeps(schema)
-    const totalFieldsStatus = Object.keys(dependOnMaps.maps).reduce((acc: Record<string, boolean>, key) => {
-      acc[key] = false
-      return acc
-    }, {})
-    /**
-     * 保证所有异步表单组件均加载完成后执行一次dependOn
-     */
-    const onComplete = (name: string) => {
+    const { formData, updateFormData } = useFormData()
+    const { schemaMap, schemaEffectMap } = usePrepareSchema({
+      schema,
+      formName,
+      updateFormData,
+    })
+    const { context } = useProvider({
+      schemaMap,
+      form,
+      formName,
+      schemaEffectMap,
+      formData,
+      updateFormData,
+    })
+    // 保证所有表单组件均加载完成后执行一次dependOn
+    useEffect(() => {
+      // 默认切换一次平台
+      RfRender.switchPlatformAndFileName(platform, fileName, formName)
+      // 获取所有依赖项
       if (immediateDeps) {
-        totalFieldsStatus[name] = true
-        const isAllLazyComponentsLoaded = Object.values(totalFieldsStatus).every(v => v)
-        const deps = RfRender.getAllDeps(formName) ?? []
-        if (isAllLazyComponentsLoaded) {
-          // 默认切换一次平台
-          RfRender.switchPlatformAndFileName(platform, fileName, formName)
-          deps.forEach(async (dep) => {
-            const { changeConfig, changeValue } = dep
-            await changeValue(immediateValidate)
-            await changeConfig()
-          })
-        }
+        // const deps = RfRender.getAllDeps(formName) ?? []
+        // deps.forEach(async (dep) => {
+        //   const { changeConfig, changeValue } = dep
+        //   await changeValue(immediateValidate)
+        //   await changeConfig()
+        // })
       }
-    }
+    }, [immediateDeps])
+    console.log('FormRender comp renderer')
+
     return (
-      <Form
-        form={form}
-        {...antdFromProps}
-      >
-        {
-          schema.map((item, index) => {
-            return (
-              <FormItemBridgeWrapper key={item.name || index} {...item} dependOnMaps={dependOnMaps} form={form} formName={formName} immediateDeps={immediateDeps} immediateValidate={immediateValidate} onComplete={onComplete} />
-            )
-          })
-        }
-      </Form>
+      <Context.Provider value={context}>
+        <Form
+          form={form}
+          {...antdFromProps}
+        >
+          {
+              schema.map((item) => {
+                return (
+                  <FormItemBridgeWrapper
+                    key={item.name}
+                    itemConfig={item}
+                  />
+                )
+              })
+            }
+        </Form>
+      </Context.Provider>
+
     )
   }
   return {

@@ -1,12 +1,11 @@
-import { WidgetProps } from '@rf-render/antd'
 import { defineConfigure } from '@rf-render/core'
-import { FormInstance, FormItemProps } from 'antd'
+import { FormItemProps } from 'antd'
 
 /**
  * common configure
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export default defineConfigure<keyof WidgetProps, FormInstance>(({ item }) => {
+export default defineConfigure(({ item }) => {
   const { label, widget = '', customerProps = {} } = item
   const prefix = ['AutoComplete', 'Input', 'InputNumber', ''].includes(widget) ? '请输入' : '请选择'
   const placeholder = `${prefix}${label}`

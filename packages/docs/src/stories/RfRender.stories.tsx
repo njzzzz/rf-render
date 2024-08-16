@@ -52,41 +52,41 @@ export const 简单表单: Story = {
           requiredWithRules: true,
         },
       },
-      {
-        label: '年龄',
-        name: 'age',
-        widget: 'InputNumber',
-        customerProps: {
-          requiredWithRules: true,
-        },
-      },
-      {
-        label: '爱好',
-        name: 'favo',
-        widget: 'CheckboxGroup',
-        props: {
-          options: [
-            { label: '吃', value: 'eat' },
-            { label: '喝', value: 'drink' },
-            { label: '玩', value: 'play' },
-            { label: '乐', value: 'happy' },
-          ],
-        },
-      },
-      {
-        name: 'location',
-        widget: 'Layout',
-        layout: [
-          {
-            label: '省',
-            name: 'province',
-          },
-          {
-            label: '市',
-            name: 'city',
-          },
-        ],
-      },
+      // {
+      //   label: '年龄',
+      //   name: 'age',
+      //   widget: 'InputNumber',
+      //   customerProps: {
+      //     requiredWithRules: true,
+      //   },
+      // },
+      // {
+      //   label: '爱好',
+      //   name: 'favo',
+      //   widget: 'CheckboxGroup',
+      //   props: {
+      //     options: [
+      //       { label: '吃', value: 'eat' },
+      //       { label: '喝', value: 'drink' },
+      //       { label: '玩', value: 'play' },
+      //       { label: '乐', value: 'happy' },
+      //     ],
+      //   },
+      // },
+      // {
+      //   name: 'location',
+      //   widget: 'Layout',
+      //   layout: [
+      //     {
+      //       label: '省',
+      //       name: 'province',
+      //     },
+      //     {
+      //       label: '市',
+      //       name: 'city',
+      //     },
+      //   ],
+      // },
     ]),
   },
 }

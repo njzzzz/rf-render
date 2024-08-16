@@ -1,10 +1,7 @@
-import { SuspenseProps, lazy } from 'react'
+import { ComponentType, SuspenseProps } from 'react'
 import {
-  DependOnMaps,
-  ILazyWrapperForCheckCompleteProps,
   IRfRenderItem,
   MaybePromise,
-  RfRenderItemConf,
   WidgetProps,
 } from '@rf-render/antd'
 /**
@@ -21,13 +18,12 @@ import {
  */
 export type Component<
   T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
 > = {
   [K in keyof WidgetProps]: {
     /**
      * 配置文件加载器
      */
-    configure?: ConfigureLoader<T, F>
+    configure?: ConfigureLoader
     /**
      * widget 名称
      */
@@ -43,30 +39,20 @@ export type Component<
  * - 只处理第一层属性以及props、itemProps的第一层属性
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export function defineConfigure<
-  T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
->(configure: DefineConfigure<T, F>) {
+export function defineConfigure(configure: DefineConfigure) {
   return configure
 }
-type DefineConfigure<
-  T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
-> = (
-  rfrender: FormItemBridgeProps<F>['rfrender']
-) => MaybePromise<Partial<RfRenderItemConf<T>>>
+type DefineConfigure = (
+) => MaybePromise<Partial<IRfRenderItem>>
 export type Loader = (
   platform: Platform,
   fileName: FileName
-) => ReturnType<typeof lazy>
-export type ConfigureLoader<
-  T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
-> = (
+) => ComponentType<any>
+export type ConfigureLoader = (
   platform: Platform,
   fileName: FileName
 ) => Promise<{
-  default: DefineConfigure<T, F>
+  default: DefineConfigure
 }>
 export type CustomLoader = (
   component: Component
@@ -79,22 +65,15 @@ export function definePlugin(plugin: Component[]) {
 /**
  * 自定义的loader需要实现这两个函数以更新值
  */
-export interface FormItemBridgeProps<T = any> {
-  // eslint-disable-next-line ts/no-unnecessary-type-constraint
-  onChange: <T extends any>(...val: T[]) => Promise<any>
-  onMapKeysChange: (valueMap: unknown[]) => any
+export interface FormItemBridgeProps {
+  reloadWidget: boolean
+  itemConfig: IRfRenderItem
+  value: unknown
+  mapKeysValue: unknown[]
   /**
-   * 包含当前表单项的配置项、form实例、执行依赖项函数
+   * @description 更新value 和 mapKeys value
    */
-  rfrender: {
-    dependOnMaps: DependOnMaps
-    form: T
-    item: IRfRenderItem
-    formName: symbol
-    immediateDeps: boolean
-    immediateValidate: boolean
-    onComplete: ILazyWrapperForCheckCompleteProps['onComplete']
-  }
+  onChange: (val: unknown[]) => any
 }
 export type Listener = (...args: unknown[]) => unknown
 // eslint-disable-next-line ts/ban-types
@@ -111,7 +90,7 @@ export type RfRenderFormName = symbol
 export type RfRenderDeps = Map<RfRenderFormName, RfRenderDep>
 export interface RfRenderDepEntity {
   changeConfig: () => any
-  changeValue: (runValidate?: boolean) => any
+  changeValue: () => any
 }
 export type RfRenderDep = Map<string, RfRenderDepEntity>
 // 单例

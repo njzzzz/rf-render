@@ -38,9 +38,8 @@ export function useExampleSchema(props: { form: FormInstance }) {
       withFormItem: true,
       label: '爱好',
       dependOn: ['age'],
-      async initConfig(config) {
+      async initConfig() {
         return {
-          ...config,
           props: {
             options: [
               { label: 'AppleDefault', value: 'AppleDefault' },
