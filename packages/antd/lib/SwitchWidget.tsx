@@ -25,7 +25,7 @@ export function SwitchWidget(props: SwitchWidgetProps) {
   const { runtimeItemConfig, updateEffects, doChangeConfig } = useChangeEffects({ itemConfig, onUpdateFormItem, updateFormData, updateVision })
   // 加载默认配置项
   useEffect(() => {
-    const configurePromise = RfRender.loadConfigure(widget, formName, reloadWidget)
+    const configurePromise = RfRender.loadConfigure(widget, formName)
     if (configurePromise) {
       configurePromise.then(async ({ default: fn }) => {
         // 初始化操作都是传入itemConfig
@@ -70,7 +70,7 @@ export function SwitchWidget(props: SwitchWidgetProps) {
 
   // 加载组件
   const Component = useMemo(() => {
-    return RfRender.load(widget, formName, reloadWidget) as ComponentType<FormItemBridgeProps>
+    return RfRender.load(widget, formName) as ComponentType<FormItemBridgeProps>
   }, [reloadWidget])
 
   // 执行deps

@@ -7,7 +7,7 @@ export default defineRfRenderComponentApi<UploadProps>((props: any) => (
   </Upload>
 ), {
   onChange({ fileList = [] }) {
-    return fileList
+    return [fileList]
   },
   propsMap: {
     value: 'fileList',

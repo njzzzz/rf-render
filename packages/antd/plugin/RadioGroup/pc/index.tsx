@@ -1,9 +1,9 @@
 import { defineRfRenderComponentApi } from '@rf-render/antd'
-import { Radio } from 'antd'
+import { Radio, RadioGroupProps } from 'antd'
 
 // eslint-disable-next-line react-refresh/only-export-components
-export default defineRfRenderComponentApi(Radio.Group, {
+export default defineRfRenderComponentApi<RadioGroupProps>(Radio.Group, {
   onChange(e) {
-    return e.target.value
+    return [e.target.value]
   },
 })

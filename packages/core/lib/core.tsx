@@ -50,12 +50,10 @@ type DefineConfigure<Widget extends keyof WidgetProps = DefaultWidget> = (
 export type Loader = (
   platform: Platform,
   fileName: FileName,
-  reloadWidget?: boolean
 ) => ComponentType<any>
 export type ConfigureLoader = (
   platform: Platform,
   fileName: FileName,
-  reloadWidget?: boolean
 ) => Promise<{
   default: DefineConfigure
 }>
@@ -150,7 +148,7 @@ export class RfRender {
     })
   }
 
-  static load(widget: keyof WidgetProps = RfRender.defaultWidget, formName: RfRenderFormName, reloadWidget?: boolean) {
+  static load(widget: keyof WidgetProps = RfRender.defaultWidget, formName: RfRenderFormName) {
     const component = RfRender.components[widget]
     if (!component)
       throw new Error(`未找到widget 【${widget}】, 请确认是否已配置！`)
@@ -161,13 +159,12 @@ export class RfRender {
     }
     const platform = RfRender.platform.get(formName) || 'pc'
     const fileName = RfRender.fileName.get(formName) || 'index'
-    return component.loader(platform, fileName, reloadWidget)
+    return component.loader(platform, fileName)
   }
 
   static loadConfigure<T extends keyof WidgetProps>(
     widget: T,
     formName: RfRenderFormName,
-    reloadWidget?: boolean,
   ): ReturnType<ConfigureLoader> | undefined {
     const component = RfRender.components[widget]
     if (!component)
@@ -176,7 +173,7 @@ export class RfRender {
     if (configureLoader) {
       const platform = RfRender.platform.get(formName) || 'pc'
       const fileName = RfRender.fileName.get(formName) || 'index'
-      return configureLoader(platform, fileName, reloadWidget)
+      return configureLoader(platform, fileName)
     }
   }
 

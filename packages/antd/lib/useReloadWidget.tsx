@@ -4,12 +4,12 @@ import { Context } from '@rf-render/antd'
 
 export function useReloadWidget() {
   const { formName } = useContext(Context)
-  const [reloadWidget, setReloadWidget] = useState(false)
+  const [reloadWidget, setReloadWidget] = useState({})
 
   // 监听表单试图切换事件以切换表单项组件状态
   useEffect(() => {
     const listener = () => {
-      setReloadWidget(v => !v)
+      setReloadWidget({})
     }
     RfRender.addSwitchListener(formName, listener)
     return () => RfRender.removeSwitchListener(formName, listener)

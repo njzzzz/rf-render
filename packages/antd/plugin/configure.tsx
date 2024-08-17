@@ -18,6 +18,8 @@ export default defineConfigure(({ itemConfig }) => {
     props: {
       placeholder,
       allowClear: true,
+      disabled: false,
+      readOnly: false,
     },
     itemProps,
   }
