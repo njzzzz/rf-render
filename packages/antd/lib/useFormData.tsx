@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-export type UpdateFormData = (name: string, val: any) => void
+export type UpdateFormData = (mapKeyname: string, val: any) => void
 
 export function useFormData() {
   const formData = useRef<any>({})

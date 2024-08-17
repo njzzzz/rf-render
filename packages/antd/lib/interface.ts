@@ -45,11 +45,11 @@ export type CanModifyConfigKeys =
   | 'props'
 
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
-export interface CommonRfRenderItemConf<T extends string = string> {
+export interface CommonRfRenderItemConf<Name extends string = string> {
   /**
    * @description 字段名
    */
-  name: T
+  name: Name
   /**
    * @description 表单label
    */
@@ -83,12 +83,12 @@ export interface CommonRfRenderItemConf<T extends string = string> {
    *  - 这样在表单字段中就会产生selectedItem字段，值为你抛出的值
    *  - 常用场景为Select返回的是id但是你又需要Select选中对象中的值，就可以使用mapKeys抛出
    */
-  mapKeys?: Array<T>
+  mapKeys?: Name[]
   /**
    * @description 当前表单的依赖项，
    * - 当依赖项的值发生变动时会执行当前配置的changeConfig和changeValue函数以修改当前项的值或者配置
    */
-  dependOn?: Array<T>
+  dependOn?: Name[]
   /**
    * @description 是否使用Form.Item包裹
    * - 设为false不会使用Form.Item包裹
@@ -100,7 +100,7 @@ export interface CommonRfRenderItemConf<T extends string = string> {
    * @description 布局组件使用，传入layout的子项也会参与dependOn
    */
   layout?: Array<
-    IRfRenderItem<T> & {
+    IRfRenderItem<Name> & {
       /**
        * @description 如果没有使用内置的antd插件，则需要自己实现这个属性的效果
        * - widget为Layout，其layout下的子组件可配
@@ -114,8 +114,8 @@ export interface CommonRfRenderItemConf<T extends string = string> {
   customerProps?: CustomerProps
 }
 
-export interface DefaultRfRenderItemConf<T extends string = string>
-  extends CommonRfRenderItemConf<T> {
+export interface DefaultRfRenderItemConf<Name extends string = string>
+  extends CommonRfRenderItemConf<Name> {
   widget?: undefined
   /**
    * 当前widget对应的组件的属性
@@ -127,10 +127,10 @@ export interface DefaultRfRenderItemConf<T extends string = string>
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
   changeConfig?: (
-    config: IRfRenderItem<T>,
-    formData: { [K in T]: any } & Record<string, any>
+    config: DefaultRfRenderItemConf<Name>,
+    formData: { [K in Name]: any } & Record<string, any>
   ) => MaybePromise<
-    Partial<Pick<IRfRenderItem<T>, CanModifyConfigKeys>>
+   Partial<Pick<DefaultRfRenderItemConf<Name>, CanModifyConfigKeys>>
   >
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
@@ -141,36 +141,36 @@ export interface DefaultRfRenderItemConf<T extends string = string>
    * ```
    */
   changeValue?: (
-    formData: { [K in T]: any } & Record<string, any>
+    formData: { [K in Name]: any } & Record<string, any>
   ) => MaybePromise<any[]>
   /**
    * @description 初始化config，常用于异步配置一些属性
    */
   initConfig?: (
-    config: IRfRenderItem<T>
+    config: DefaultRfRenderItemConf<Name>
   ) => MaybePromise<
-    Partial<Pick<DefaultRfRenderItemConf<T>, CanModifyConfigKeys>>
+    Partial<Pick<DefaultRfRenderItemConf<Name>, CanModifyConfigKeys>>
   >
 }
 
 export interface RfRenderItemConf<
-  W extends keyof WidgetProps = keyof WidgetProps,
-  T extends string = string,
-> extends CommonRfRenderItemConf<T> {
-  widget: W
+  Name extends string = string,
+  Widget extends keyof WidgetProps = keyof WidgetProps,
+> extends CommonRfRenderItemConf<Name> {
+  widget: Widget
   /**
    * 当前widget对应的组件的属性
    */
-  props?: WidgetProps[W]
+  props?: WidgetProps[Widget]
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改配置后返回
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
    */
   changeConfig?: (
-    config: IRfRenderItem<T>,
-    formData: { [K in T]: any } & Record<string, any>
-  ) => MaybePromise<Partial<Pick<RfRenderItemConf<W, T>, CanModifyConfigKeys>>>
+    config: RfRenderItemConf<Name, Widget>,
+    formData: { [K in Name]: any } & Record<string, any>
+  ) => MaybePromise<Partial<Pick<RfRenderItemConf<Name, Widget>, CanModifyConfigKeys>>>
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
@@ -180,23 +180,25 @@ export interface RfRenderItemConf<
    * ```
    */
   changeValue?: (
-    formData: { [K in T]: any } & Record<string, any>
+    formData: { [K in Name]: any } & Record<string, any>
   ) => MaybePromise<any[]>
   /**
    * @description 初始化config，常用于异步配置一些属性
    */
   initConfig?: (
-    config: IRfRenderItem<T>
-  ) => MaybePromise<Partial<Pick<IRfRenderItem<T>, CanModifyConfigKeys>>>
+    config: RfRenderItemConf<Name, Widget>
+  ) => MaybePromise<Partial<Pick<RfRenderItemConf<Name, Widget>, CanModifyConfigKeys>>>
 }
 
 // 使用联合类型生成所有可能的组合
-export type IRfRenderItem<T extends string = string> = {
-  [K in keyof WidgetProps]: RfRenderItemConf<K, T> | DefaultRfRenderItemConf<T>
+export type IRfRenderItem<Name extends string = string> = {
+  [Widget in keyof WidgetProps]:
+    | RfRenderItemConf<Name, Widget>
+    | DefaultRfRenderItemConf<Name>;
 }[keyof WidgetProps]
 
-export interface IProps {
-  schema: IRfRenderItem[]
+export interface IProps<Name extends string = string> {
+  schema: IRfRenderItem<Name>[]
   /**
    * 初始化时是否直接执行一次changeConfig、changeValue
    * @default true
@@ -214,8 +216,8 @@ export type FormRenderProps = TFormProps & IProps
 /**
  * @description 定义表单schema，使用此函数可以获得更好的类型提示
  */
-export function defineSchema<T extends string = string>(
-  schema: IRfRenderItem<T>[],
+export function defineSchema<Name extends string = string>(
+  schema: IRfRenderItem<Name>[],
 ) {
   return schema
 }

@@ -39,18 +39,23 @@ export type Component<
  * - 只处理第一层属性以及props、itemProps的第一层属性
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export function defineConfigure(configure: DefineConfigure) {
+export function defineConfigure<Widget extends keyof WidgetProps = DefaultWidget>(configure: DefineConfigure<Widget>) {
   return configure
 }
-type DefineConfigure = (
+type DefineConfigure<Widget extends keyof WidgetProps = DefaultWidget> = (
+  props: { itemConfig: Omit<IRfRenderItem, 'props'> & {
+    props?: WidgetProps[Widget]
+  } }
 ) => MaybePromise<Partial<IRfRenderItem>>
 export type Loader = (
   platform: Platform,
-  fileName: FileName
+  fileName: FileName,
+  reloadWidget?: boolean
 ) => ComponentType<any>
 export type ConfigureLoader = (
   platform: Platform,
-  fileName: FileName
+  fileName: FileName,
+  reloadWidget?: boolean
 ) => Promise<{
   default: DefineConfigure
 }>
@@ -65,11 +70,10 @@ export function definePlugin(plugin: Component[]) {
 /**
  * 自定义的loader需要实现这两个函数以更新值
  */
-export interface FormItemBridgeProps {
-  reloadWidget: boolean
-  itemConfig: IRfRenderItem
-  value: unknown
-  mapKeysValue: unknown[]
+export interface FormItemBridgeProps<Widget extends keyof WidgetProps = DefaultWidget> {
+  itemConfig: Omit<IRfRenderItem, 'props'> & {
+    props?: WidgetProps[Widget]
+  }
   /**
    * @description 更新value 和 mapKeys value
    */
@@ -146,7 +150,7 @@ export class RfRender {
     })
   }
 
-  static load(widget: keyof WidgetProps = RfRender.defaultWidget, formName: RfRenderFormName) {
+  static load(widget: keyof WidgetProps = RfRender.defaultWidget, formName: RfRenderFormName, reloadWidget?: boolean) {
     const component = RfRender.components[widget]
     if (!component)
       throw new Error(`未找到widget 【${widget}】, 请确认是否已配置！`)
@@ -157,12 +161,13 @@ export class RfRender {
     }
     const platform = RfRender.platform.get(formName) || 'pc'
     const fileName = RfRender.fileName.get(formName) || 'index'
-    return component.loader(platform, fileName)
+    return component.loader(platform, fileName, reloadWidget)
   }
 
   static loadConfigure<T extends keyof WidgetProps>(
     widget: T,
     formName: RfRenderFormName,
+    reloadWidget?: boolean,
   ): ReturnType<ConfigureLoader> | undefined {
     const component = RfRender.components[widget]
     if (!component)
@@ -171,7 +176,7 @@ export class RfRender {
     if (configureLoader) {
       const platform = RfRender.platform.get(formName) || 'pc'
       const fileName = RfRender.fileName.get(formName) || 'index'
-      return configureLoader(platform, fileName)
+      return configureLoader(platform, fileName, reloadWidget)
     }
   }
 
@@ -242,6 +247,11 @@ export class RfRender {
     if (formDeps) {
       formDeps.delete(name)
     }
+  }
+
+  static removeAllDep(formName: RfRenderFormName) {
+    const formDeps = RfRender.deps.get(formName)
+    formDeps?.clear()
   }
 
   static getDep(formName: RfRenderFormName, name: string) {

@@ -8,7 +8,11 @@ export default antfu({
       'ts/consistent-type-imports': 'off',
     },
   },
-  react: true,
+  react: {
+    overrides: {
+      'react-hooks/exhaustive-deps': 'off',
+    },
+  },
   jsx: true,
   rules: {
     'curly': 'off',

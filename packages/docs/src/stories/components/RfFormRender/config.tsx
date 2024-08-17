@@ -85,6 +85,7 @@ export function useExampleSchema(props: { form: FormInstance }) {
     {
       withFormItem: false,
       widget: 'Layout',
+      name: 'layout',
       props: {
         rowProps: {
           gutter: 18,
@@ -92,8 +93,10 @@ export function useExampleSchema(props: { form: FormInstance }) {
       },
       layout: [
         {
+          name: 'submit',
           withFormItem: false,
           widget: 'Button',
+          mapKeys: ['xxx'],
           props: {
             type: 'primary',
             children: '提交',
@@ -106,6 +109,7 @@ export function useExampleSchema(props: { form: FormInstance }) {
         },
         {
           withFormItem: false,
+          name: 'reset',
           widget: 'Button',
           colProps: {
           },

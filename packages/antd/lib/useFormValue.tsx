@@ -1,27 +1,39 @@
 import { Context, IRfRenderItem } from '@rf-render/antd'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 
-export interface UseFormValueProps {
+export interface UseInitialValueProps {
   itemConfig: IRfRenderItem
-
+  onChange: any
 }
-export function useFormValue(props: UseFormValueProps) {
-  const { itemConfig } = props
-  const { updateFormData } = useContext(Context)
-  const { initialValue = null, name, initialMapKeysValue = [], mapKeys = [] } = itemConfig
-
-  const [mapKeysValue, setMapKeysValue] = useState<unknown[]>(initialMapKeysValue)
+export function useInitialValue(props: UseInitialValueProps) {
+  const { updateFormData, initialValues } = useContext(Context)
+  const { itemConfig, onChange } = props
+  const { name, mapKeys } = itemConfig
   useEffect(() => {
-    if (initialValue !== undefined) {
-      updateFormData(name, initialValue)
+    if (initialValues !== undefined) {
+      Object.keys(initialValues).forEach((name) => {
+        updateFormData(name, initialValues[name])
+      })
     }
-    mapKeys.forEach((mapKey, index) => {
-      updateFormData(mapKey, initialMapKeysValue[index])
-    })
-  }, [initialValue, name, updateFormData, initialMapKeysValue, mapKeys])
+  }, [initialValues, updateFormData])
+
+  useEffect(() => {
+    const v = initialValues[name]
+    onChange(v)
+  }, [initialValues, name])
+
+  const value = useMemo(() => {
+    const v = initialValues[name]
+    const value: unknown[] = [v]
+    if (mapKeys?.length) {
+      mapKeys.forEach((mapKey) => {
+        value.push(initialValues[mapKey] ?? null)
+      })
+    }
+    return value
+  }, [initialValues, mapKeys, name])
+
   return {
-    value: initialValue,
-    mapKeysValue,
-    setMapKeysValue,
+    value,
   }
 }

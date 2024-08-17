@@ -1,6 +1,11 @@
-import { FormItemBridgeProps, definePlugin } from '@rf-render/core'
-import { ComponentType, useState } from 'react'
-import { DNCV, MaybePromise } from '../lib/interface.ts'
+import {
+  FormItemBridgeProps,
+  definePlugin,
+} from '@rf-render/core'
+import { ComponentType, useContext } from 'react'
+import { WidgetProps } from '@rf-render/antd'
+import { DNCV } from '../lib/interface.ts'
+import { Context } from '../lib/Context.tsx'
 import LayoutIndex from './Layout/pc'
 import LayoutView from './Layout/pc/view'
 import ButtonIndex from './Button/pc'
@@ -69,7 +74,10 @@ export const antdRfRenderPlugin = definePlugin([
           return LayoutIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Button',
@@ -83,7 +91,10 @@ export const antdRfRenderPlugin = definePlugin([
           return ButtonIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'RadioGroup',
@@ -97,7 +108,10 @@ export const antdRfRenderPlugin = definePlugin([
           return RadioGroupIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'FloatButton',
@@ -111,7 +125,10 @@ export const antdRfRenderPlugin = definePlugin([
           return FloatButtonIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Divider',
@@ -125,7 +142,10 @@ export const antdRfRenderPlugin = definePlugin([
           return DividerIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Breadcrumb',
@@ -139,7 +159,10 @@ export const antdRfRenderPlugin = definePlugin([
           return BreadcrumbIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Dropdown',
@@ -153,7 +176,10 @@ export const antdRfRenderPlugin = definePlugin([
           return DropdownIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Steps',
@@ -167,7 +193,10 @@ export const antdRfRenderPlugin = definePlugin([
           return StepsIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'AutoComplete',
@@ -181,7 +210,10 @@ export const antdRfRenderPlugin = definePlugin([
           return AutoCompleteIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Input',
@@ -195,7 +227,10 @@ export const antdRfRenderPlugin = definePlugin([
           return InputIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'CheckboxGroup',
@@ -209,7 +244,10 @@ export const antdRfRenderPlugin = definePlugin([
           return CheckboxGroupIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Cascader',
@@ -223,7 +261,10 @@ export const antdRfRenderPlugin = definePlugin([
           return CascaderIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Checkbox',
@@ -237,7 +278,10 @@ export const antdRfRenderPlugin = definePlugin([
           return CheckboxIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'ColorPicker',
@@ -251,7 +295,10 @@ export const antdRfRenderPlugin = definePlugin([
           return ColorPickerIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'DatePicker',
@@ -265,7 +312,10 @@ export const antdRfRenderPlugin = definePlugin([
           return DatePickerIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'DateRangePicker',
@@ -279,7 +329,10 @@ export const antdRfRenderPlugin = definePlugin([
           return DateRangePickerIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'InputNumber',
@@ -293,7 +346,10 @@ export const antdRfRenderPlugin = definePlugin([
           return InputNumberIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Mentions',
@@ -307,7 +363,10 @@ export const antdRfRenderPlugin = definePlugin([
           return MentionsIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Rate',
@@ -321,7 +380,10 @@ export const antdRfRenderPlugin = definePlugin([
           return RateIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Select',
@@ -335,7 +397,10 @@ export const antdRfRenderPlugin = definePlugin([
           return SelectIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Slider',
@@ -349,7 +414,10 @@ export const antdRfRenderPlugin = definePlugin([
           return SliderIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Switch',
@@ -363,7 +431,10 @@ export const antdRfRenderPlugin = definePlugin([
           return SwitchIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'TimePicker',
@@ -377,7 +448,10 @@ export const antdRfRenderPlugin = definePlugin([
           return TimePickerIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'TimeRangePicker',
@@ -391,7 +465,10 @@ export const antdRfRenderPlugin = definePlugin([
           return TimeRangePickerIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'TreeSelect',
@@ -405,7 +482,10 @@ export const antdRfRenderPlugin = definePlugin([
           return TreeSelectIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Upload',
@@ -419,7 +499,10 @@ export const antdRfRenderPlugin = definePlugin([
           return UploadIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
   {
     name: 'Transfer',
@@ -433,18 +516,23 @@ export const antdRfRenderPlugin = definePlugin([
           return TransferIndex
       }
     },
-    configure: (_platform, fileName) => fileName === 'view' ? import('./ViewConfigure.tsx') : import('./configure.tsx'),
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
   },
 ])
 
 // eslint-disable-next-line react-refresh/only-export-components
 export * from './props'
 
-export interface DefineRfRenderComponentProps<T extends (...val: any) => any = any > {
+export interface DefineRfRenderComponentProps<
+  T extends (...val: any) => any = any,
+> {
   /**
    * 自定义onChange事件
    */
-  onChange?: (...args: Parameters<T>) => MaybePromise<unknown[]>
+  onChange?: (...args: Parameters<T>) => unknown[]
   /**
    * 事件映射，比如你的组件修改值的事件不叫onChange可以在此处做映射
    */
@@ -459,7 +547,12 @@ export interface DefineRfRenderComponentProps<T extends (...val: any) => any = a
 /**
  * 自定义组件使用以获取类型提示
  */
-export function defineRfRenderComponent<T extends (props: FormItemBridgeProps) => any>(component: T) {
+export function defineRfRenderComponent<
+  Widget extends keyof WidgetProps = keyof WidgetProps,
+  T extends ComponentType<FormItemBridgeProps<Widget>> = ComponentType<
+    FormItemBridgeProps<Widget>
+  >,
+>(component: T) {
   return component
 }
 /**
@@ -468,33 +561,37 @@ export function defineRfRenderComponent<T extends (props: FormItemBridgeProps) =
  * - 默认行为：
  *   - 直接抛出组件onChange事件的值[value, mapKey1 mapKey2, ....]
  */
-export function defineRfRenderComponentApi<T extends Record<string, any> = Record<string, any> >(Component: ComponentType<any>, customer: DefineRfRenderComponentProps<T['onChange']> = {}) {
+export function defineRfRenderComponentApi<
+  T extends Record<string, any> = Record<string, any>,
+>(
+  Component: ComponentType<any>,
+  customer: DefineRfRenderComponentProps<T['onChange']> = {},
+) {
   return function RfrenderComponent(props: FormItemBridgeProps) {
-    const { onChange, itemConfig, value } = props
-    const { props: compProps = {} } = itemConfig
+    const { onChange, itemConfig } = props
+    const { form } = useContext(Context)
+    const { props: compProps, name } = itemConfig
     const { propsMap = {}, onChange: onCustomerChange } = customer
-    const { onChange: onMappedChangeKey = 'onChange', value: valueKey = 'value' } = propsMap
-    const [val, setVal] = useState<unknown>(value)
+    const {
+      onChange: onMappedChangeKey = 'onChange',
+      value: valueKey = 'value',
+    } = propsMap
     const mappedProps = {
-      async [onMappedChangeKey](...args: any) {
+      [onMappedChangeKey](...args: any) {
         if (onCustomerChange) {
-          const customValue = await onCustomerChange(...args)
+          const customValue = onCustomerChange(...args)
           const [val] = customValue
           if (val !== DNCV) {
-            onChange(customValue)
-            setVal(val)
+            onChange([val])
           }
         }
         else {
           onChange([...args])
-          // eslint-disable-next-line ts/ban-ts-comment
-          // @ts-expect-error
-          setVal(...args as any)
         }
       },
-      [valueKey]: val,
+      [valueKey]: form.getFieldValue(name),
     }
-    console.log('real form item comp renderer')
+    console.log('real form item comp renderer', name)
     return (
       <Component
         {...compProps}

@@ -1,9 +1,13 @@
 # 使用
 
+> 首次默认会触发changeConfig函数，但不会触发changeValue，用户需要自己保证初始化数据的准确，因为初始化触发changeValue会给用户带来界面展示的困扰
 
 ## 一个例子
+
 我们可以将配置放在一个单独的`config.tsx`文件中
+
 - 主入口文件 `Page.tsx`
+
 ```tsx
 import { FormRenderProps, useFormRender } from '@rf-render/antd'
 import { useExampleSchema } from './config'
@@ -29,93 +33,95 @@ export default function Page(props: FormRenderProps) {
   )
 }
 ```
+
 - 配置文件 `config.tsx`
+
 ```tsx
-import { defineSchema } from '@rf-render/antd'
-import { FormInstance } from 'antd'
+import { defineSchema } from "@rf-render/antd";
+import { FormInstance } from "antd";
 
 export function useExampleSchema(props: { form: FormInstance }) {
   return defineSchema([
     {
-      name: 'name',
-      label: '姓名',
-      itemProps: { rules: [{ required: true, message: '请输入姓名' }] },
-      props: { placeholder: '请输入姓名', disabled: true },
+      name: "name",
+      label: "姓名",
+      itemProps: { rules: [{ required: true, message: "请输入姓名" }] },
+      props: { placeholder: "请输入姓名", disabled: true },
     },
     {
-      name: 'age',
-      label: '年龄',
-      itemProps: { rules: [{ required: true, message: '请输入年龄' }] },
-      props: { placeholder: '请输入姓名', type: 'number' },
+      name: "age",
+      label: "年龄",
+      itemProps: { rules: [{ required: true, message: "请输入年龄" }] },
+      props: { placeholder: "请输入姓名", type: "number" },
     },
     {
-      name: 'ageOver18',
-      label: '年龄是否大于18',
-      mapKeys: ['ageOver18Egnlish'],
-      dependOn: ['age'],
+      name: "ageOver18",
+      label: "年龄是否大于18",
+      mapKeys: ["ageOver18Egnlish"],
+      dependOn: ["age"],
       changeValue(formData) {
         return [
-          formData.age > 18 ? '是' : '否',
-          formData.age > 18 ? 'yes' : 'no',
-        ]
+          formData.age > 18 ? "是" : "否",
+          formData.age > 18 ? "yes" : "no",
+        ];
       },
       changeConfig(config, formData) {
-        const { props = {} } = config
-        props.disabled = formData.age > 18
-        return { ...config, props }
+        const { props = {} } = config;
+        props.disabled = formData.age > 18;
+        return { ...config, props };
       },
     },
     {
-      name: 'favo',
-      widget: 'CheckboxGroup',
+      name: "favo",
+      widget: "CheckboxGroup",
       withFormItem: true,
-      label: '爱好',
-      dependOn: ['age'],
+      label: "爱好",
+      dependOn: ["age"],
       async initConfig(config) {
         return {
           ...config,
           props: {
             options: [
-              { label: 'AppleDefault', value: 'AppleDefault' },
-              { label: 'PearDefault', value: 'PearDefault' },
-              { label: 'OrangeDefault', value: 'OrangeDefault' },
+              { label: "AppleDefault", value: "AppleDefault" },
+              { label: "PearDefault", value: "PearDefault" },
+              { label: "OrangeDefault", value: "OrangeDefault" },
             ],
           },
-        }
+        };
       },
       async changeConfig(config, formData) {
-        const { props = {} } = config
-        const { age } = formData
-        props.options = age > 18 ? await getOptions1() : await getOptions2()
+        const { props = {} } = config;
+        const { age } = formData;
+        props.options = age > 18 ? await getOptions1() : await getOptions2();
         return {
           ...config,
           props,
-        }
+        };
       },
       changeValue() {
-        return [[]]
+        return [[]];
       },
     },
     {
-      label: '布局',
-      widget: 'Layout',
+      label: "布局",
+      widget: "Layout",
       withFormItem: false,
       layout: [
         {
-          name: 'date',
-          label: '日期',
-          itemProps: { rules: [{ required: true, message: '请输入日期' }] },
-          dependOn: ['date-1'],
+          name: "date",
+          label: "日期",
+          itemProps: { rules: [{ required: true, message: "请输入日期" }] },
+          dependOn: ["date-1"],
           changeValue() {
-            return ['xxx']
+            return ["xxx"];
           },
         },
-        { name: 'date-1', label: '日期-1' },
+        { name: "date-1", label: "日期-1" },
       ],
     },
     {
       withFormItem: false,
-      widget: 'Layout',
+      widget: "Layout",
       props: {
         rowProps: {
           gutter: 18,
@@ -124,33 +130,32 @@ export function useExampleSchema(props: { form: FormInstance }) {
       layout: [
         {
           withFormItem: false,
-          widget: 'Button',
+          widget: "Button",
           props: {
-            type: 'primary',
-            children: '提交',
+            type: "primary",
+            children: "提交",
             onClick() {
-                if(props.form.validateFields()) {
-                    const data = props.form.getFieldsValue()
-                    // 此处提交data
-                }
+              if (props.form.validateFields()) {
+                const data = props.form.getFieldsValue();
+                // 此处提交data
+              }
             },
           },
         },
         {
           withFormItem: false,
-          widget: 'Button',
-          colProps: {
-          },
+          widget: "Button",
+          colProps: {},
           props: {
-            children: '重置',
+            children: "重置",
             onClick() {
-              props.form.resetFields()
+              props.form.resetFields();
             },
           },
         },
       ],
     },
-  ])
+  ]);
 }
 
 // 模拟接口
@@ -159,13 +164,13 @@ async function getOptions1(): Promise<any> {
     setTimeout(
       () =>
         resolve([
-          { label: 'Apple1', value: 'Apple1' },
-          { label: 'Pear1', value: 'Pear1' },
-          { label: 'Orange1', value: 'Orange1' },
+          { label: "Apple1", value: "Apple1" },
+          { label: "Pear1", value: "Pear1" },
+          { label: "Orange1", value: "Orange1" },
         ]),
-      1000,
-    )
-  })
+      1000
+    );
+  });
 }
 
 // 模拟接口
@@ -174,13 +179,12 @@ async function getOptions2() {
     setTimeout(
       () =>
         resolve([
-          { label: 'Apple2', value: 'Apple2' },
-          { label: 'Pear2', value: 'Pear2' },
-          { label: 'Orange2', value: 'Orange2' },
+          { label: "Apple2", value: "Apple2" },
+          { label: "Pear2", value: "Pear2" },
+          { label: "Orange2", value: "Orange2" },
         ]),
-      1000,
-    )
-  })
+      1000
+    );
+  });
 }
-
 ```

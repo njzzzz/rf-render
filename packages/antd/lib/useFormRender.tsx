@@ -8,20 +8,27 @@ import {
   useProvider,
 } from '@rf-render/antd'
 import { FileName, Platform, RfRender } from '@rf-render/core'
-import { useEffect } from 'react'
-
+import { useMemo } from 'react'
+/**
+ * 初次加载渲染次数
+ * Form 组件1次
+ *  1. 默认首次渲染
+ * FormItemBridgeWrapper SwitchWidget 2 次
+ *  1. 默认首次渲染
+ *  2. 加载默认配置项的更新 由于存在异步，必有一次加载完成后的更新
+ */
 export interface FormRenderParams {
   fileName?: FileName
   platform?: Platform
 }
 export function useFormRender(params: FormRenderParams = {}) {
   const { fileName, platform } = { fileName: 'index', platform: 'pc', ...params }
+
   /**
    * @description form实例，使用useForm得到的
    */
   const [form] = Form.useForm()
-  const formName = Symbol('formName')
-
+  const formName = useMemo(() => Symbol('formName'), [])
   const switchFileName = (fileName: FileName) => {
     RfRender.switchFileName(fileName, formName)
   }
@@ -32,6 +39,9 @@ export function useFormRender(params: FormRenderParams = {}) {
     RfRender.switchPlatformAndFileName(platform, fileName, formName)
   }
 
+  // 切换一次平台
+  RfRender.switchPlatformAndFileName(platform, fileName, formName)
+
   /**
    * @description 表单渲染组件，多了个schema属性其余和和antd的Form属性一致
    */
@@ -41,7 +51,6 @@ export function useFormRender(params: FormRenderParams = {}) {
     const { schemaMap, schemaEffectMap } = usePrepareSchema({
       schema,
       formName,
-      updateFormData,
     })
     const { context } = useProvider({
       schemaMap,
@@ -50,21 +59,28 @@ export function useFormRender(params: FormRenderParams = {}) {
       schemaEffectMap,
       formData,
       updateFormData,
+      immediateDeps,
+      immediateValidate,
     })
     // 保证所有表单组件均加载完成后执行一次dependOn
-    useEffect(() => {
-      // 默认切换一次平台
-      RfRender.switchPlatformAndFileName(platform, fileName, formName)
-      // 获取所有依赖项
-      if (immediateDeps) {
-        // const deps = RfRender.getAllDeps(formName) ?? []
-        // deps.forEach(async (dep) => {
-        //   const { changeConfig, changeValue } = dep
-        //   await changeValue(immediateValidate)
-        //   await changeConfig()
-        // })
-      }
-    }, [immediateDeps])
+    // useEffect(() => {
+    //   // 获取所有依赖项
+    //   const promises: any[] = []
+    //   if (immediateDeps) {
+    //     const deps = RfRender.getAllDeps(formName) ?? []
+    //     deps.forEach(async (dep) => {
+    //       const { changeConfig, changeValue } = dep
+    //       promises.push(await changeValue())
+    //       promises.push(await changeConfig())
+    //     })
+    //   }
+    //   Promise.all(promises).then(() => {
+    //     if (immediateValidate) {
+    //       form.validateFields()
+    //     }
+    //   })
+    //   return () => RfRender.removeAllDep(formName)
+    // }, [])
     console.log('FormRender comp renderer')
 
     return (

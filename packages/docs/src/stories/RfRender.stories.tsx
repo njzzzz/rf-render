@@ -52,41 +52,47 @@ export const 简单表单: Story = {
           requiredWithRules: true,
         },
       },
-      // {
-      //   label: '年龄',
-      //   name: 'age',
-      //   widget: 'InputNumber',
-      //   customerProps: {
-      //     requiredWithRules: true,
-      //   },
-      // },
-      // {
-      //   label: '爱好',
-      //   name: 'favo',
-      //   widget: 'CheckboxGroup',
-      //   props: {
-      //     options: [
-      //       { label: '吃', value: 'eat' },
-      //       { label: '喝', value: 'drink' },
-      //       { label: '玩', value: 'play' },
-      //       { label: '乐', value: 'happy' },
-      //     ],
-      //   },
-      // },
-      // {
-      //   name: 'location',
-      //   widget: 'Layout',
-      //   layout: [
-      //     {
-      //       label: '省',
-      //       name: 'province',
-      //     },
-      //     {
-      //       label: '市',
-      //       name: 'city',
-      //     },
-      //   ],
-      // },
+      {
+        label: '年龄',
+        name: 'age',
+        widget: 'InputNumber',
+        customerProps: {
+          requiredWithRules: true,
+        },
+      },
+      {
+        label: '爱好',
+        name: 'favo',
+        widget: 'CheckboxGroup',
+        props: {
+          options: [],
+        },
+        async initConfig(config) {
+          config.props = {
+            options: [
+              { label: '吃', value: 'eat' },
+              { label: '喝', value: 'drink' },
+              { label: '玩', value: 'play' },
+              { label: '乐', value: 'happy' },
+            ],
+          }
+          return config
+        },
+      },
+      {
+        name: 'location',
+        widget: 'Layout',
+        layout: [
+          {
+            label: '省',
+            name: 'province',
+          },
+          {
+            label: '市',
+            name: 'city',
+          },
+        ],
+      },
     ]),
   },
 }
@@ -95,7 +101,7 @@ export const 联动表单之修改配置: Story = {
   args: {
     layout: 'vertical',
     initialValues: {
-      showSelect: '2',
+      showSelect: '1',
     },
     schema: defineSchema([
       {
@@ -133,7 +139,7 @@ export const 联动表单之修改配置: Story = {
         },
         dependOn: ['showSelect'],
         changeConfig(config, formData) {
-          return { ...config, display: formData.showSelect === '1' }
+          return { display: formData.showSelect === '1' }
         },
       },
     ]),
@@ -182,6 +188,7 @@ export const 联动表单之修改值: Story = {
         },
         dependOn: ['changeSelect'],
         changeValue(formData) {
+          console.log(formData)
           return [formData.changeSelect]
         },
       },

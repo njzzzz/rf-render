@@ -1,66 +1,68 @@
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { RfRender } from '@rf-render/core'
-import { CanModifyConfig, Context, DNCV, IRfRenderItem, OnUpdateFormItem } from '@rf-render/antd'
+import { CanModifyConfig, Context, DNCV, IRfRenderItem, OnUpdateFormItem, UpdateFormData } from '@rf-render/antd'
 
 export interface UseChangeEffectsProps {
   itemConfig: IRfRenderItem
   onUpdateFormItem: OnUpdateFormItem
+  updateFormData: UpdateFormData
+  updateVision: Dispatch<SetStateAction<boolean>>
 }
 
 export function useChangeEffects(props: UseChangeEffectsProps) {
-  const { itemConfig, onUpdateFormItem } = props
+  const { itemConfig, onUpdateFormItem, updateFormData, updateVision } = props
   const [runtimeItemConfig, setRuntimeItemConfig] = useState<IRfRenderItem>(itemConfig)
-  const { formName, formData, updateFormData, schemaEffectMap } = useContext(Context)
+  const { formName, schemaEffectMap, form } = useContext(Context)
   // 这些都不能更改的直接从itemConfig中取就行，避免多余更新
-  const { name, changeValue, changeConfig, mapKeys = [], initConfig } = itemConfig
-  // 更新视图,同时处理了formItem和widget
-  const updateEffects = useCallback((data: CanModifyConfig) => {
+  const { name, changeValue, changeConfig, mapKeys } = itemConfig
+  // 配置发生改变-更新视图,同时处理了formItem和widget
+  const updateEffects = (data: CanModifyConfig) => {
     // 只能更新这些
     const { label, itemProps, display, visibility, props } = data
     // 更新formItem
     onUpdateFormItem({ label, itemProps, display, visibility })
     // 更新当前表单项
     setRuntimeItemConfig((config) => {
+      const { itemProps: oldItemProp, props: oldProps, label: oldLabel, display: oldDisplay, visibility: oldVisibility } = config
       return {
         ...config,
-        label,
-        itemProps,
-        display,
-        visibility,
-        props,
+        label: label ?? oldLabel,
+        itemProps: {
+          ...oldItemProp,
+          ...itemProps,
+        },
+        display: display ?? oldDisplay,
+        visibility: visibility ?? oldVisibility,
+        props: {
+          ...oldProps,
+          ...props,
+        },
       }
     })
-  }, [onUpdateFormItem])
+  }
 
-  // 处理initConfig
-  useEffect(() => {
-    if (initConfig) {
-      Promise.resolve(initConfig(itemConfig)).then((config) => {
-        updateEffects(config)
-      })
-    }
-  }, [initConfig, itemConfig, updateEffects])
   // 处理changeConfig
-  const doChangeConfig = useCallback(async () => {
+  const doChangeConfig = async () => {
     if (!changeConfig)
       return
     // 只能更新这些
-    const config = await changeConfig(runtimeItemConfig, formData.current)
+    const config = await changeConfig(runtimeItemConfig as any, form!.getFieldsValue())
     updateEffects(config)
-  }, [changeConfig, formData, runtimeItemConfig, updateEffects])
+  }
   // 处理changeValue
-  const doChangeValue = useCallback(async () => {
+  const doChangeValue = async () => {
     if (!changeValue)
       return
     const [
       value,
       ...mapKeysValue
-    ] = await changeValue(formData.current)
+    ] = await changeValue(form!.getFieldsValue())
     // 更新自身值
     if (value !== DNCV) {
       // 更新表单值
+      form!.setFieldValue(name, value)
       updateFormData(name, value)
-      const needChangeDeps = schemaEffectMap[name]
+      const needChangeDeps = schemaEffectMap[name] ?? []
       // 更新deps
       needChangeDeps.forEach((dep) => {
         const { changeValue, changeConfig } = RfRender.getDep(formName, dep!) ?? {}
@@ -74,13 +76,22 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
       })
     }
     // 更新mapKeys
-    mapKeys.forEach((key, index) => {
-      const mpValue = mapKeysValue[index]
-      if (mpValue !== DNCV) {
-        updateFormData(key, mpValue)
+    if (mapKeys?.length) {
+      let needUpdate = false
+      mapKeys.forEach((mapKey, index) => {
+        const mpValue = mapKeysValue[index]
+        if (mpValue !== DNCV) {
+          form!.setFieldValue(mapKey, mpValue)
+          updateFormData(mapKey, mpValue)
+          needUpdate = true
+        }
+      })
+      if (needUpdate) {
+        // mapKeys值修改时也要触发更新
+        updateVision(v => !v)
       }
-    })
-  }, [changeValue, formData, mapKeys, updateFormData, name, schemaEffectMap, formName])
+    }
+  }
 
   // 注册deps
   useEffect(() => {
@@ -88,10 +99,12 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
       changeConfig: doChangeConfig,
       changeValue: doChangeValue,
     })
-    return () => RfRender.removeDep(formName, name)
-  }, [doChangeConfig, doChangeValue, formName, name])
+  }, [])
 
   return {
     runtimeItemConfig,
+    updateEffects,
+    doChangeConfig,
+    doChangeValue,
   }
 }

@@ -2,19 +2,23 @@ import { MutableRefObject, createContext } from 'react'
 import { SchemaEffectMap, SchemaMap, UpdateFormData } from '@rf-render/antd'
 import { FormInstance } from 'antd'
 
-export interface IContext {
+export interface IContext<Values = any> {
   schemaMap: SchemaMap
-  form: FormInstance | null
+  form: FormInstance<Values>
   formName: symbol
-  updateFormData: UpdateFormData
-  formData: MutableRefObject<any>
   schemaEffectMap: SchemaEffectMap
+  formData: MutableRefObject<Values>
+  updateFormData: UpdateFormData
+  immediateValidate: boolean
+  immediateDeps: boolean
 }
 export const Context = createContext<IContext>({
   schemaMap: {},
-  form: null,
+  form: {} as FormInstance,
   formName: Symbol('formName'),
-  formData: { current: {} },
-  updateFormData: () => {},
   schemaEffectMap: {},
+  formData: { current: {} },
+  updateFormData() {},
+  immediateDeps: true,
+  immediateValidate: false,
 })
