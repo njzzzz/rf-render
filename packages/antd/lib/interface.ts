@@ -223,3 +223,8 @@ export function defineSchema<Name extends string = string>(
 }
 
 export const DNCV = Symbol('do_not_change_value')
+
+/**
+ * @description 获取所有表单key
+ */
+export type FormKeys<Schema extends any[]> = Schema[number]['name']
