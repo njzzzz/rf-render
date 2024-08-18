@@ -187,15 +187,15 @@ export function defineRfRenderComponentApi(Component: any, customer: DefineRfRen
     const { propsMap = {}, onChange: onCustomerChange, onMapKeysChange: onCustomerMapKeysChange } = customer
     const { onChange: onMapedChange = 'onChange', value = 'value' } = propsMap
     const mapedProps = {
-      async [onMapedChange](...args: unknown[]) {
+      [onMapedChange](...args: unknown[]) {
         if (onCustomerChange) {
-          onChange(await onCustomerChange(rfrender, ...args))
+          onChange(onCustomerChange(rfrender, ...args))
         }
         else {
           onChange(...args)
         }
         if (onCustomerMapKeysChange) {
-          onMapKeysChange(await onCustomerMapKeysChange(rfrender, ...args))
+          onMapKeysChange(onCustomerMapKeysChange(rfrender, ...args))
         }
         else {
           onMapKeysChange([args[1]])

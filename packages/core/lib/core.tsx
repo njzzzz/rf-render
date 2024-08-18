@@ -81,7 +81,7 @@ export function definePlugin(plugin: Component[]) {
  */
 export interface FormItemBridgeProps<T = any> {
   // eslint-disable-next-line ts/no-unnecessary-type-constraint
-  onChange: <T extends any>(...val: T[]) => Promise<any>
+  onChange: <T extends any>(...val: T[]) => any
   onMapKeysChange: (valueMap: unknown[]) => any
   /**
    * 包含当前表单项的配置项、form实例、执行依赖项函数
