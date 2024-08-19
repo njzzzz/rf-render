@@ -13,9 +13,10 @@ import { useMemo } from 'react'
  * 初次加载渲染次数
  * Form 组件1次
  *  1. 默认首次渲染
- * FormItemBridgeWrapper SwitchWidget 2 次
+ * FormItemBridgeWrapper SwitchWidget 2 或 3 次
  *  1. 默认首次渲染
  *  2. 加载默认配置项的更新 由于存在异步，必有一次加载完成后的更新
+ *  3. 首次加载， changeConfig 可能会发生一次， 返回undefined 不会触发
  */
 export interface FormRenderParams {
   fileName?: FileName
@@ -62,26 +63,6 @@ export function useFormRender(params: FormRenderParams = {}) {
       immediateDeps,
       immediateValidate,
     })
-    // 保证所有表单组件均加载完成后执行一次dependOn
-    // useEffect(() => {
-    //   // 获取所有依赖项
-    //   const promises: any[] = []
-    //   if (immediateDeps) {
-    //     const deps = RfRender.getAllDeps(formName) ?? []
-    //     deps.forEach(async (dep) => {
-    //       const { changeConfig, changeValue } = dep
-    //       promises.push(await changeValue())
-    //       promises.push(await changeConfig())
-    //     })
-    //   }
-    //   Promise.all(promises).then(() => {
-    //     if (immediateValidate) {
-    //       form.validateFields()
-    //     }
-    //   })
-    //   return () => RfRender.removeAllDep(formName)
-    // }, [])
-    console.log('FormRender comp renderer')
 
     return (
       <Context.Provider value={context}>

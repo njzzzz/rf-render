@@ -7,39 +7,47 @@ import { ReactElement } from 'react'
  */
 export default function Layout(props: FormItemBridgeProps) {
   const { itemConfig } = props
-  const { props: selfProps = {}, layout = [] } = itemConfig
-  const { span = 2, rowProps, colProps } = selfProps as CustomerLayout
-  const getRows = () => {
+  const { props: selfProps = {}, layout = [], display = true, visibility = true } = itemConfig
+  const { span, rowProps, colProps, mode = 'independent' } = selfProps as CustomerLayout
+  const getRow = () => {
     if (!layout.length) {
       return null
     }
     return layout.reduce((acc: ReactElement[], item, currentIndex: number) => {
-      const { name, colProps: itemColProps, display = true, visibility = true } = item
+      const { name, colProps: itemColProps = {}, display = true, visibility = true, itemProps = {}, layout: itemLayout = [] } = item
+      // 处理每一项的隐藏逻辑
       const { itemStyle } = getItemStyle({ visibility })
+      const { style = {} } = itemProps
+      const itemColPropsOverride = {
+        noStyle: mode === 'combine',
+        ...itemProps,
+      }
+      if (itemLayout.length) {
+        itemColPropsOverride.style = {
+          marginBottom: 0,
+          ...style,
+        }
+      }
 
       if (display) {
         acc.push (
           <Col key={name || currentIndex} {...(itemColProps ?? (colProps ?? { span: Math.ceil(24 / (span || layout.length)) }))} style={itemStyle}>
-            <FormItemBridgeWrapper itemConfig={item}></FormItemBridgeWrapper>
+            <FormItemBridgeWrapper itemConfig={{ ...item, itemProps: itemColPropsOverride }}></FormItemBridgeWrapper>
           </Col>,
         )
       }
       return acc
     }, [])
   }
-  const Rows = getRows() ?? []
+  const Rows = getRow() ?? []
+  const { itemStyle } = getItemStyle({ visibility })
   return (
-    <>
-      {
-        Rows.map((cols, index) => {
-          return (
-            // eslint-disable-next-line react/no-array-index-key
-            <Row key={index} gutter={24} {...(rowProps ?? {})}>
-              {cols}
-            </Row>
-          )
-        })
-      }
-    </>
+    display
+      ? (
+        <Row gutter={[24, 16]} {...(rowProps ?? {})} style={itemStyle}>
+          {Rows}
+        </Row>
+        )
+      : null
   )
 }

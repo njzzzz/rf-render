@@ -21,10 +21,6 @@ function deepForEachSchema(
       console.error(`表单项${item} name 字段为必要配置`)
     }
     else {
-      // // 初始化提取表单项中的值并更新formData, 这一步提前为了初始化更新deps
-      // if (initialValue !== undefined) {
-      //   updateFormData(name, initialValue)
-      // }
       schemaMap[name!] = item
       // 收集依赖 map
       dependOn.forEach((dep: string) => {

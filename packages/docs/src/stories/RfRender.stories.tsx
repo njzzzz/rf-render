@@ -317,6 +317,153 @@ export const 联动表单之立即执行deps同时触发表单验证: Story = {
     ]),
   },
 }
+
+export const 组合布局组件: Story = {
+  args: {
+    layout: 'vertical',
+    schema: defineSchema([
+      {
+        widget: 'Layout',
+        label: '一行两列:',
+        name: 'layout1',
+        props: {
+          span: 3,
+          mode: 'combine',
+        },
+        layout: [
+          {
+            name: '项目2-1',
+            label: '项目2-1',
+            customerProps: {
+              requiredWithRules: true,
+            },
+          },
+          {
+            name: '项目2-2',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+
+        ],
+      },
+      {
+        widget: 'Layout',
+        label: '一行三列:',
+        name: 'layout2',
+        props: {
+          span: 3,
+        },
+        layout: [
+          {
+            name: '项目3-1',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-2',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-3',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+
+        ],
+      },
+
+    ]),
+  },
+}
+export const 独立布局组件: Story = {
+  args: {
+    layout: 'vertical',
+    schema: defineSchema([
+      {
+        widget: 'Layout',
+        name: 'layout1',
+        props: {
+          span: 3,
+          mode: 'independent',
+        },
+        layout: [
+          {
+            name: '项目2-1',
+            label: '项目2-1',
+            fileName: 'view',
+            customerProps: {
+              requiredWithRules: true,
+            },
+          },
+          {
+            name: '项目2-3',
+            label: '项目2-3',
+            widget: 'Layout',
+            colProps: {
+              span: 16,
+            },
+            props: {
+              mode: 'combine',
+            },
+            itemProps: {
+              required: true,
+            },
+            layout: [
+              {
+                name: 'x1',
+                customerProps: {
+                  requiredWithRules: true,
+                },
+              },
+              {
+                name: 'x2',
+              },
+            ],
+          },
+
+        ],
+      },
+      {
+        widget: 'Layout',
+        name: 'layout2',
+        props: {
+          span: 3,
+        },
+        layout: [
+          {
+            name: '项目3-1',
+            label: '项目3-1',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-2',
+            label: '项目3-2',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-3',
+            label: '项目3-3',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+
+        ],
+      },
+
+    ]),
+  },
+}
+
 export const 所有内置antd组件: Story = {
   args: {
     layout: 'vertical',

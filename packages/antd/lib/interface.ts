@@ -1,5 +1,6 @@
 import { ColProps, FormInstance, FormItemProps, FormProps } from 'antd'
 import { ReactNode, RefAttributes } from 'react'
+import { FileName, Platform } from '@rf-render/core'
 import IntrinsicAttributes = JSX.IntrinsicAttributes
 
 export type TFormProps = IntrinsicAttributes &
@@ -43,6 +44,8 @@ export type CanModifyConfigKeys =
   | 'display'
   | 'visibility'
   | 'props'
+  | 'platform'
+  | 'fileName'
 
 export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
 export interface CommonRfRenderItemConf<Name extends string = string> {
@@ -112,6 +115,16 @@ export interface CommonRfRenderItemConf<Name extends string = string> {
    * @description 拓展属性，用于拓展属性和类型
    */
   customerProps?: CustomerProps
+  /**
+   * @description 配置组件平台
+   * @default 'pc'
+   */
+  platform?: Platform
+  /**
+   * @description 配置组件文件
+   * @default 'index'
+   */
+  fileName?: FileName
 }
 
 export interface DefaultRfRenderItemConf<Name extends string = string>
@@ -124,7 +137,7 @@ export interface DefaultRfRenderItemConf<Name extends string = string>
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改配置后返回
-   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
+   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' | 'platform' | 'fileName' 这7个属性
    */
   changeConfig?: (
     config: DefaultRfRenderItemConf<Name>,
@@ -165,7 +178,7 @@ export interface RfRenderItemConf<
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 可修改配置后返回
-   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' 这5个属性
+   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' | 'platform' | 'fileName' 这7个属性
    */
   changeConfig?: (
     config: RfRenderItemConf<Name, Widget>,

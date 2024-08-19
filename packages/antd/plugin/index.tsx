@@ -552,8 +552,8 @@ export function defineRfRenderComponent<
   T extends ComponentType<FormItemBridgeProps<Widget>> = ComponentType<
     FormItemBridgeProps<Widget>
   >,
->(component: T) {
-  return component
+>(Component: T) {
+  return Component
 }
 /**
  * - 组件必须有onChange事件，或者配置propsMap映射onChange事件
@@ -591,7 +591,6 @@ export function defineRfRenderComponentApi<
       },
       [valueKey]: form.getFieldValue(name),
     }
-    console.log('real form item comp renderer', name)
     return (
       <Component
         {...compProps}
