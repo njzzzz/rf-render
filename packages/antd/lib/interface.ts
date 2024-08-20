@@ -47,7 +47,28 @@ export type CanModifyConfigKeys =
   | 'platform'
   | 'fileName'
 
-export type CanModifyConfig = Partial<Pick<IRfRenderItem, CanModifyConfigKeys>>
+export type ChangeConfig<
+Name extends string = string,
+Item extends RfRenderItemConf | DefaultRfRenderItemConf = RfRenderItemConf,
+> = (
+  config: Item['widget'] extends undefined ? DefaultRfRenderItemConf<Name> : RfRenderItemConf<Name>,
+  formData: { [K in Name]: any } & Record<string, any>
+) => MaybePromise<CanModifyConfig<Name>>
+
+export type ChangeValue<Name extends string = string> = (
+  formData: { [K in Name]: any } & Record<string, any>
+) => MaybePromise<any[]>
+
+export type InitConfig<
+Name extends string = string,
+Item extends RfRenderItemConf | DefaultRfRenderItemConf = RfRenderItemConf,
+> = (
+  config: Item['widget'] extends undefined ? DefaultRfRenderItemConf<Name> : RfRenderItemConf<Name>,
+  formData: { [K in Name]: any } & Record<string, any>
+) => MaybePromise<CanModifyConfig<Name>>
+
+export type CanModifyConfig<Name extends string = string> = Partial<Pick<IRfRenderItem<Name>, CanModifyConfigKeys>>
+
 export interface CommonRfRenderItemConf<Name extends string = string> {
   /**
    * @description 字段名
@@ -90,8 +111,18 @@ export interface CommonRfRenderItemConf<Name extends string = string> {
   /**
    * @description 当前表单的依赖项，
    * - 当依赖项的值发生变动时会执行当前配置的changeConfig和changeValue函数以修改当前项的值或者配置
+   * - 数组中的所有字符串类型的name，任何一个值变动都会触发当前配置项的changeConfig和changeValue
+   * - 数组中的对象类型，在key变动时只会触发key中配置的changeConfig和changeValue
    */
   dependOn?: Name[]
+  /**
+   * @description 独立的dependO， 此处执行只会根据independentOns 中配置的dependOn配置去执行独立配置项中的changeConfig，changeValue 而不会去执行item的changeConfig，changeValue
+   */
+  independentOn?: {
+    dependOn: Name[]
+    changeConfig?: ChangeConfig<Name>
+    changeValue?: ChangeValue<Name>
+  }[]
   /**
    * @description 是否使用Form.Item包裹
    * - 设为false不会使用Form.Item包裹
@@ -125,6 +156,27 @@ export interface CommonRfRenderItemConf<Name extends string = string> {
    * @default 'index'
    */
   fileName?: FileName
+  /**
+   * @description 当dependOn中依赖的表单项值发生变化时会执行
+   * - 只修改当前配置项的配置
+   * - 可修改配置后返回
+   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' | 'platform' | 'fileName' 这7个属性
+   */
+  changeConfig?: ChangeConfig<Name>
+  /**
+   * @description 当dependOn中依赖的表单项值发生变化时会执行
+   * - 只修改当前配置项的值
+   * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
+   * - 如果某项的值不需要被修改请返回DNCV标识 [DNCV, DNCV]
+   * ```ts
+   * import {DNCV} from "@rf-render/antd"
+   * ```
+   */
+  changeValue?: ChangeValue<Name>
+  /**
+   * @description 初始化config，常用于异步配置一些属性
+   */
+  initConfig?: InitConfig<Name>
 }
 
 export interface DefaultRfRenderItemConf<Name extends string = string>
@@ -134,36 +186,6 @@ export interface DefaultRfRenderItemConf<Name extends string = string>
    * 当前widget对应的组件的属性
    */
   props?: DefaultWidgetProps
-  /**
-   * @description 当dependOn中依赖的表单项值发生变化时会执行
-   * - 可修改配置后返回
-   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' | 'platform' | 'fileName' 这7个属性
-   */
-  changeConfig?: (
-    config: DefaultRfRenderItemConf<Name>,
-    formData: { [K in Name]: any } & Record<string, any>
-  ) => MaybePromise<
-   Partial<Pick<DefaultRfRenderItemConf<Name>, CanModifyConfigKeys>>
-  >
-  /**
-   * @description 当dependOn中依赖的表单项值发生变化时会执行
-   * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
-   * - 如果某项的值不需要被修改请返回DNCV标识 [DNCV, DNCV]
-   * ```ts
-   * import {DNCV} from "@rf-render/antd"
-   * ```
-   */
-  changeValue?: (
-    formData: { [K in Name]: any } & Record<string, any>
-  ) => MaybePromise<any[]>
-  /**
-   * @description 初始化config，常用于异步配置一些属性
-   */
-  initConfig?: (
-    config: DefaultRfRenderItemConf<Name>
-  ) => MaybePromise<
-    Partial<Pick<DefaultRfRenderItemConf<Name>, CanModifyConfigKeys>>
-  >
 }
 
 export interface RfRenderItemConf<
@@ -175,32 +197,6 @@ export interface RfRenderItemConf<
    * 当前widget对应的组件的属性
    */
   props?: WidgetProps[Widget]
-  /**
-   * @description 当dependOn中依赖的表单项值发生变化时会执行
-   * - 可修改配置后返回
-   * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' | 'platform' | 'fileName' 这7个属性
-   */
-  changeConfig?: (
-    config: RfRenderItemConf<Name, Widget>,
-    formData: { [K in Name]: any } & Record<string, any>
-  ) => MaybePromise<Partial<Pick<RfRenderItemConf<Name, Widget>, CanModifyConfigKeys>>>
-  /**
-   * @description 当dependOn中依赖的表单项值发生变化时会执行
-   * - 可修改值后返回数组 [第一项修改的是当前表单项name字段的值, 后面修改的是mapKeys中定义的值]
-   * - 如果某项的值不需要被修改请返回DNCV标识 [DNCV, DNCV]
-   * ```ts
-   * import {DNCV} from "@rf-render/antd"
-   * ```
-   */
-  changeValue?: (
-    formData: { [K in Name]: any } & Record<string, any>
-  ) => MaybePromise<any[]>
-  /**
-   * @description 初始化config，常用于异步配置一些属性
-   */
-  initConfig?: (
-    config: RfRenderItemConf<Name, Widget>
-  ) => MaybePromise<Partial<Pick<RfRenderItemConf<Name, Widget>, CanModifyConfigKeys>>>
 }
 
 // 使用联合类型生成所有可能的组合
@@ -224,6 +220,7 @@ export interface IProps<Name extends string = string> {
    */
   immediateValidate?: boolean
 }
+
 export type FormRenderProps = TFormProps & IProps
 
 /**

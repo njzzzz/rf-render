@@ -1,14 +1,13 @@
-import { FormItemUpdateProps, IRfRenderItem, SwitchWidget, getItemStyle, useFormItemUpdate } from '@rf-render/antd'
+import { CustomerLayout, IRfRenderItem, SwitchWidget, getItemStyle, useFormItemUpdate } from '@rf-render/antd'
 import { Form } from 'antd'
 import { useMemo } from 'react'
 
 export interface FormItemBridgeWrapperProps {
   itemConfig: IRfRenderItem
 }
-export type OnUpdateFormItem = (val: FormItemUpdateProps) => void
 export function FormItemBridgeWrapper(props: FormItemBridgeWrapperProps) {
   const { itemConfig } = props
-  const { name, withFormItem = true, mapKeys, layout = [] } = itemConfig
+  const { name, withFormItem = true, mapKeys, layout = [], widget } = itemConfig
   const { formItemProps, onUpdateFormItem } = useFormItemUpdate({
     itemConfig,
   })
@@ -32,9 +31,12 @@ export function FormItemBridgeWrapper(props: FormItemBridgeWrapperProps) {
   const overrideItemStyle = {
     ...style,
   }
-  if (layout.length) {
+  // layout组件消除其底部的margin
+  const customProps = itemConfig.props as CustomerLayout ?? {}
+  if (widget === 'Layout' && layout.length && customProps.mode === 'independent') {
     overrideItemStyle.marginBottom = 0
   }
+
   return useMemo(() => (
     display
       ? withFormItem

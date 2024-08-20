@@ -90,11 +90,19 @@ export type Debugger = boolean | 'info' | 'trace'
 export type DefaultWidget = keyof WidgetProps
 export type RfRenderFormName = symbol
 export type RfRenderDeps = Map<RfRenderFormName, RfRenderDep>
+export type RfRenderOneDeps = Map<RfRenderFormName, RfRenderOneDep>
 export interface RfRenderDepEntity {
   changeConfig: () => any
   changeValue: () => any
 }
+
+export interface RfRenderOneDepEntity {
+  changeConfigs: Set<() => any>
+  changeValues: Set<() => any>
+}
+
 export type RfRenderDep = Map<string, RfRenderDepEntity>
+export type RfRenderOneDep = Map<string, RfRenderOneDepEntity>
 // 单例
 export class RfRender {
   static components: Partial<Record<keyof WidgetProps, Component>> = {}
@@ -109,8 +117,10 @@ export class RfRender {
   static debugger: Debugger = false
   // 监听器，用于更新组件和配置
   static listeners: Map<RfRenderFormName, Set<Listener>> = new Map()
-  // 表单字段收集器
+  // 表单字段收集器 -- 字符串类型
   static deps: RfRenderDeps = new Map()
+  // 表单字段收集器 -- 对象类型
+  static oneDeps: RfRenderOneDeps = new Map()
   /**
    *
    * @param {object} opts
@@ -262,6 +272,63 @@ export class RfRender {
 
   static getAllDeps(formName: RfRenderFormName) {
     const formDeps = RfRender.deps.get(formName)
+    if (formDeps) {
+      return Array.from(formDeps.values())
+    }
+  }
+
+  static addOneDep(
+    formName: RfRenderFormName,
+    name: string,
+    dep: RfRenderOneDepEntity,
+  ) {
+    const defaultNameDeps = new Map()
+    let formDeps = RfRender.oneDeps.get(formName)
+    if (!formDeps) {
+      RfRender.oneDeps.set(formName, defaultNameDeps)
+      formDeps = defaultNameDeps
+    }
+    // const defaultEntityDeps = new .set(name, { changeConfigs: new Set(), changeValues: new Set() })
+    const { changeConfigs: changeConfigsTodo, changeValues: changeValuesTodo } = dep
+    const recordDep = formDeps.get(name)
+    if (recordDep) {
+      const { changeConfigs, changeValues } = formDeps.get(name)!
+      changeConfigsTodo.forEach((cC) => {
+        changeConfigs.add(cC)
+      })
+      changeValuesTodo.forEach((cV) => {
+        changeValues.add(cV)
+      })
+    }
+    else {
+      formDeps.set(name, {
+        changeConfigs: changeConfigsTodo,
+        changeValues: changeValuesTodo,
+      })
+    }
+  }
+
+  static removeOneDep(formName: RfRenderFormName, name: string) {
+    const formDeps = RfRender.oneDeps.get(formName)
+    if (formDeps) {
+      formDeps.delete(name)
+    }
+  }
+
+  static removeAllOneDep(formName: RfRenderFormName) {
+    const formDeps = RfRender.oneDeps.get(formName)
+    formDeps?.clear()
+  }
+
+  static getOneDep(formName: RfRenderFormName, name: string) {
+    const formDeps = RfRender.oneDeps.get(formName)
+    if (formDeps) {
+      return formDeps.get(name)
+    }
+  }
+
+  static getAllOneDeps(formName: RfRenderFormName) {
+    const formDeps = RfRender.oneDeps.get(formName)
     if (formDeps) {
       return Array.from(formDeps.values())
     }

@@ -49,7 +49,7 @@ export function useFormRender(params: FormRenderParams = {}) {
   function FormRender(props: FormRenderProps) {
     const { schema, immediateDeps = true, immediateValidate = false, ...antdFromProps } = props
     const { formData, updateFormData } = useFormData()
-    const { schemaMap, schemaEffectMap } = usePrepareSchema({
+    const { schemaMap, dependOnMap, independentOnsMap } = usePrepareSchema({
       schema,
       formName,
     })
@@ -57,11 +57,12 @@ export function useFormRender(params: FormRenderParams = {}) {
       schemaMap,
       form,
       formName,
-      schemaEffectMap,
+      dependOnMap,
       formData,
       updateFormData,
       immediateDeps,
       immediateValidate,
+      independentOnsMap,
     })
 
     return (

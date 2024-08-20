@@ -138,7 +138,7 @@ export const 联动表单之修改配置: Story = {
           ],
         },
         dependOn: ['showSelect'],
-        changeConfig(config, formData) {
+        changeConfig(_config, formData) {
           return { display: formData.showSelect === '1' }
         },
       },
@@ -464,6 +464,71 @@ export const 独立布局组件: Story = {
   },
 }
 
+async function MockRequestWithId(id: string) {
+  try {
+    await fetch(`http://mock.com/mockwithid?ud=${id}`)
+  }
+  catch (error) {
+
+  }
+  return new Promise<string>((resolve) => {
+    setTimeout(() => resolve(id), 3000)
+  })
+}
+
+export const 远程获取数据: Story = {
+  args: {
+    initialValues: {
+      数据源id: '1',
+    },
+    schema: defineSchema([
+      {
+        name: '数据源id',
+        label: '数据源id',
+        widget: 'Select',
+        props: {
+          options: [
+            { label: '请求id为1返回1', value: '1' },
+            { label: '请求id为2返回2', value: '2' },
+            { label: '请求id为3返回3', value: '3' },
+          ],
+        },
+      },
+      {
+        name: '返回数据源展示',
+        label: '返回数据源展示',
+        widget: 'Select',
+        dependOn: [
+          '数据源id',
+        ],
+        independentOn: [{
+          dependOn: ['text', '返回数据源展示'],
+          changeConfig(config, { 返回数据源展示, text }) {
+            console.log(111)
+
+            config.display = 返回数据源展示 === '返回数据源展示' ? false : text !== 'text'
+            return config
+          },
+        }],
+        async changeConfig(config, { 数据源id }) {
+          const id = await MockRequestWithId(数据源id)
+          config.props = {
+            ...config.props,
+            options: [
+              { label: id, value: id },
+            ],
+          }
+          return config
+        },
+      },
+      {
+        name: 'text',
+        label: '文字',
+
+      },
+    ]),
+  },
+}
 export const 所有内置antd组件: Story = {
   args: {
     layout: 'vertical',
@@ -827,3 +892,13 @@ export const 所有内置antd组件: Story = {
     ]),
   },
 }
+
+// export const Array组件: Story = {
+//   args: {
+//     schema: defineSchema([
+//       {
+//         name: 'x',
+//       },
+//     ]),
+//   },
+// }
