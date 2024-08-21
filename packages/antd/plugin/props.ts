@@ -1,4 +1,3 @@
-import { IRfRenderItem } from '@rf-render/antd'
 import {
   AutoComplete,
   Breadcrumb,
@@ -11,7 +10,6 @@ import {
   Divider,
   Dropdown,
   FloatButton,
-  FormInstance,
   Input,
   InputNumber,
   InputProps,
@@ -31,12 +29,15 @@ import {
 
 export interface CustomerLayout {
   /**
-   * 一行展示几个
+   * @description 总共几项，不设置默认平分，设置了会计算
    */
   span?: number
   rowProps?: RowProps
   colProps?: ColProps
-  onFieldValueChange?: (config: IRfRenderItem, formData: any, form: FormInstance) => any
+  /**
+   * @description independent 表示独立一行，展示所有子项的label combine 表示组合不展示所有子项的label
+   */
+  mode?: 'independent' | 'combine'
 }
 
 /**

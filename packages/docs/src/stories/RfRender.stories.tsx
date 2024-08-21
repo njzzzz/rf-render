@@ -65,12 +65,18 @@ export const 简单表单: Story = {
         name: 'favo',
         widget: 'CheckboxGroup',
         props: {
-          options: [
-            { label: '吃', value: 'eat' },
-            { label: '喝', value: 'drink' },
-            { label: '玩', value: 'play' },
-            { label: '乐', value: 'happy' },
-          ],
+          options: [],
+        },
+        async initConfig(config) {
+          config.props = {
+            options: [
+              { label: '吃', value: 'eat' },
+              { label: '喝', value: 'drink' },
+              { label: '玩', value: 'play' },
+              { label: '乐', value: 'happy' },
+            ],
+          }
+          return config
         },
       },
       {
@@ -95,7 +101,7 @@ export const 联动表单之修改配置: Story = {
   args: {
     layout: 'vertical',
     initialValues: {
-      showSelect: '2',
+      showSelect: '1',
     },
     schema: defineSchema([
       {
@@ -132,8 +138,8 @@ export const 联动表单之修改配置: Story = {
           ],
         },
         dependOn: ['showSelect'],
-        changeConfig(config, formData) {
-          return { ...config, display: formData.showSelect === '1' }
+        changeConfig(_config, formData) {
+          return { display: formData.showSelect === '1' }
         },
       },
     ]),
@@ -182,6 +188,7 @@ export const 联动表单之修改值: Story = {
         },
         dependOn: ['changeSelect'],
         changeValue(formData) {
+          console.log(formData)
           return [formData.changeSelect]
         },
       },
@@ -306,6 +313,219 @@ export const 联动表单之立即执行deps同时触发表单验证: Story = {
         changeValue(formData) {
           return [formData.first === 1 ? null : formData.first + 1]
         },
+      },
+    ]),
+  },
+}
+
+export const 组合布局组件: Story = {
+  args: {
+    layout: 'vertical',
+    schema: defineSchema([
+      {
+        widget: 'Layout',
+        label: '一行两列:',
+        name: 'layout1',
+        props: {
+          span: 3,
+          mode: 'combine',
+        },
+        layout: [
+          {
+            name: '项目2-1',
+            label: '项目2-1',
+            customerProps: {
+              requiredWithRules: true,
+            },
+          },
+          {
+            name: '项目2-2',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+
+        ],
+      },
+      {
+        widget: 'Layout',
+        label: '一行三列:',
+        name: 'layout2',
+        props: {
+          span: 3,
+        },
+        layout: [
+          {
+            name: '项目3-1',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-2',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-3',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+
+        ],
+      },
+
+    ]),
+  },
+}
+export const 独立布局组件: Story = {
+  args: {
+    layout: 'vertical',
+    schema: defineSchema([
+      {
+        widget: 'Layout',
+        name: 'layout1',
+        props: {
+          span: 3,
+          mode: 'independent',
+        },
+        layout: [
+          {
+            name: '项目2-1',
+            label: '项目2-1',
+            fileName: 'view',
+            customerProps: {
+              requiredWithRules: true,
+            },
+          },
+          {
+            name: '项目2-3',
+            label: '项目2-3',
+            widget: 'Layout',
+            colProps: {
+              span: 16,
+            },
+            props: {
+              mode: 'combine',
+            },
+            itemProps: {
+              required: true,
+            },
+            layout: [
+              {
+                name: 'x1',
+                customerProps: {
+                  requiredWithRules: true,
+                },
+              },
+              {
+                name: 'x2',
+              },
+            ],
+          },
+
+        ],
+      },
+      {
+        widget: 'Layout',
+        name: 'layout2',
+        props: {
+          span: 3,
+        },
+        layout: [
+          {
+            name: '项目3-1',
+            label: '项目3-1',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-2',
+            label: '项目3-2',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+          {
+            name: '项目3-3',
+            label: '项目3-3',
+            props: {
+              placeholder: '请输入项目',
+            },
+          },
+
+        ],
+      },
+
+    ]),
+  },
+}
+
+async function MockRequestWithId(id: string) {
+  try {
+    await fetch(`http://mock.com/mockwithid?ud=${id}`)
+  }
+  catch (error) {
+
+  }
+  return new Promise<string>((resolve) => {
+    setTimeout(() => resolve(id), 3000)
+  })
+}
+
+export const 远程获取数据: Story = {
+  args: {
+    initialValues: {
+      数据源id: '1',
+    },
+    schema: defineSchema([
+      {
+        name: '数据源id',
+        label: '数据源id',
+        widget: 'Select',
+        props: {
+          options: [
+            { label: '请求id为1返回1', value: '1' },
+            { label: '请求id为2返回2', value: '2' },
+            { label: '请求id为3返回3', value: '3' },
+          ],
+        },
+      },
+      {
+        name: '返回数据源展示',
+        label: '返回数据源展示',
+        widget: 'Select',
+        dependOn: [
+          '数据源id',
+        ],
+        independentOn: [{
+          dependOn: ['text', '返回数据源展示'],
+          changeConfig(config, { 返回数据源展示, text }) {
+            console.log(111)
+            config.display = 返回数据源展示 === '返回数据源展示' ? false : text !== 'text'
+            return config
+          },
+        }],
+        props: {
+        },
+        async changeConfig(config, { 数据源id }) {
+          const id = await MockRequestWithId(数据源id)
+          config.props = {
+            ...config.props,
+            options: [
+              { label: id, value: id },
+            ],
+          }
+          return config
+        },
+      },
+      {
+        name: 'text',
+        label: '文字',
+
       },
     ]),
   },
@@ -673,3 +893,13 @@ export const 所有内置antd组件: Story = {
     ]),
   },
 }
+
+// export const Array组件: Story = {
+//   args: {
+//     schema: defineSchema([
+//       {
+//         name: 'x',
+//       },
+//     ]),
+//   },
+// }

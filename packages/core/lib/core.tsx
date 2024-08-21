@@ -1,10 +1,7 @@
-import { SuspenseProps, lazy } from 'react'
+import { ComponentType, SuspenseProps } from 'react'
 import {
-  DependOnMaps,
-  ILazyWrapperForCheckCompleteProps,
   IRfRenderItem,
   MaybePromise,
-  RfRenderItemConf,
   WidgetProps,
 } from '@rf-render/antd'
 /**
@@ -21,13 +18,12 @@ import {
  */
 export type Component<
   T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
 > = {
   [K in keyof WidgetProps]: {
     /**
      * 配置文件加载器
      */
-    configure?: ConfigureLoader<T, F>
+    configure?: ConfigureLoader
     /**
      * widget 名称
      */
@@ -43,30 +39,23 @@ export type Component<
  * - 只处理第一层属性以及props、itemProps的第一层属性
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export function defineConfigure<
-  T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
->(configure: DefineConfigure<T, F>) {
+export function defineConfigure<Widget extends keyof WidgetProps = DefaultWidget>(configure: DefineConfigure<Widget>) {
   return configure
 }
-type DefineConfigure<
-  T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
-> = (
-  rfrender: FormItemBridgeProps<F>['rfrender']
-) => MaybePromise<Partial<RfRenderItemConf<T>>>
+type DefineConfigure<Widget extends keyof WidgetProps = DefaultWidget> = (
+  props: { itemConfig: Omit<IRfRenderItem, 'props'> & {
+    props?: WidgetProps[Widget]
+  } }
+) => MaybePromise<Partial<IRfRenderItem>>
 export type Loader = (
   platform: Platform,
-  fileName: FileName
-) => ReturnType<typeof lazy>
-export type ConfigureLoader<
-  T extends keyof WidgetProps = keyof WidgetProps,
-  F = any,
-> = (
+  fileName: FileName,
+) => ComponentType<any>
+export type ConfigureLoader = (
   platform: Platform,
-  fileName: FileName
+  fileName: FileName,
 ) => Promise<{
-  default: DefineConfigure<T, F>
+  default: DefineConfigure
 }>
 export type CustomLoader = (
   component: Component
@@ -79,22 +68,14 @@ export function definePlugin(plugin: Component[]) {
 /**
  * 自定义的loader需要实现这两个函数以更新值
  */
-export interface FormItemBridgeProps<T = any> {
-  // eslint-disable-next-line ts/no-unnecessary-type-constraint
-  onChange: <T extends any>(...val: T[]) => any
-  onMapKeysChange: (valueMap: unknown[]) => any
-  /**
-   * 包含当前表单项的配置项、form实例、执行依赖项函数
-   */
-  rfrender: {
-    dependOnMaps: DependOnMaps
-    form: T
-    item: IRfRenderItem
-    formName: symbol
-    immediateDeps: boolean
-    immediateValidate: boolean
-    onComplete: ILazyWrapperForCheckCompleteProps['onComplete']
+export interface FormItemBridgeProps<Widget extends keyof WidgetProps = DefaultWidget> {
+  itemConfig: Omit<IRfRenderItem, 'props'> & {
+    props?: WidgetProps[Widget]
   }
+  /**
+   * @description 更新value 和 mapKeys value
+   */
+  onChange: (val: unknown[]) => any
 }
 export type Listener = (...args: unknown[]) => unknown
 // eslint-disable-next-line ts/ban-types
@@ -109,11 +90,19 @@ export type Debugger = boolean | 'info' | 'trace'
 export type DefaultWidget = keyof WidgetProps
 export type RfRenderFormName = symbol
 export type RfRenderDeps = Map<RfRenderFormName, RfRenderDep>
+export type RfRenderOneDeps = Map<RfRenderFormName, RfRenderOneDep>
 export interface RfRenderDepEntity {
   changeConfig: () => any
-  changeValue: (runValidate?: boolean) => any
+  changeValue: () => any
 }
+
+export interface RfRenderOneDepEntity {
+  changeConfigs: Set<() => any>
+  changeValues: Set<() => any>
+}
+
 export type RfRenderDep = Map<string, RfRenderDepEntity>
+export type RfRenderOneDep = Map<string, RfRenderOneDepEntity>
 // 单例
 export class RfRender {
   static components: Partial<Record<keyof WidgetProps, Component>> = {}
@@ -128,8 +117,10 @@ export class RfRender {
   static debugger: Debugger = false
   // 监听器，用于更新组件和配置
   static listeners: Map<RfRenderFormName, Set<Listener>> = new Map()
-  // 表单字段收集器
+  // 表单字段收集器 -- 字符串类型
   static deps: RfRenderDeps = new Map()
+  // 表单字段收集器 -- 对象类型
+  static oneDeps: RfRenderOneDeps = new Map()
   /**
    *
    * @param {object} opts
@@ -167,7 +158,7 @@ export class RfRender {
     })
   }
 
-  static load(widget: keyof WidgetProps = RfRender.defaultWidget, formName: RfRenderFormName) {
+  static load(widget: keyof WidgetProps = RfRender.defaultWidget, formName: RfRenderFormName, platform?: Platform, fileName?: FileName) {
     const component = RfRender.components[widget]
     if (!component)
       throw new Error(`未找到widget 【${widget}】, 请确认是否已配置！`)
@@ -176,23 +167,25 @@ export class RfRender {
         `未找到widget 【${widget}】对应的loader, 请确认是否已配置！`,
       )
     }
-    const platform = RfRender.platform.get(formName) || 'pc'
-    const fileName = RfRender.fileName.get(formName) || 'index'
-    return component.loader(platform, fileName)
+    const _platform = platform || RfRender.platform.get(formName) || 'pc'
+    const _fileName = fileName || RfRender.fileName.get(formName) || 'index'
+    return component.loader(_platform, _fileName)
   }
 
   static loadConfigure<T extends keyof WidgetProps>(
     widget: T,
     formName: RfRenderFormName,
+    platform?: Platform,
+    fileName?: FileName,
   ): ReturnType<ConfigureLoader> | undefined {
     const component = RfRender.components[widget]
     if (!component)
       return
     const configureLoader = component.configure
     if (configureLoader) {
-      const platform = RfRender.platform.get(formName) || 'pc'
-      const fileName = RfRender.fileName.get(formName) || 'index'
-      return configureLoader(platform, fileName)
+      const _platform = platform || RfRender.platform.get(formName) || 'pc'
+      const _fileName = fileName || RfRender.fileName.get(formName) || 'index'
+      return configureLoader(_platform, _fileName)
     }
   }
 
@@ -265,6 +258,11 @@ export class RfRender {
     }
   }
 
+  static removeAllDep(formName: RfRenderFormName) {
+    const formDeps = RfRender.deps.get(formName)
+    formDeps?.clear()
+  }
+
   static getDep(formName: RfRenderFormName, name: string) {
     const formDeps = RfRender.deps.get(formName)
     if (formDeps) {
@@ -274,6 +272,63 @@ export class RfRender {
 
   static getAllDeps(formName: RfRenderFormName) {
     const formDeps = RfRender.deps.get(formName)
+    if (formDeps) {
+      return Array.from(formDeps.values())
+    }
+  }
+
+  static addOneDep(
+    formName: RfRenderFormName,
+    name: string,
+    dep: RfRenderOneDepEntity,
+  ) {
+    const defaultNameDeps = new Map()
+    let formDeps = RfRender.oneDeps.get(formName)
+    if (!formDeps) {
+      RfRender.oneDeps.set(formName, defaultNameDeps)
+      formDeps = defaultNameDeps
+    }
+    // const defaultEntityDeps = new .set(name, { changeConfigs: new Set(), changeValues: new Set() })
+    const { changeConfigs: changeConfigsTodo, changeValues: changeValuesTodo } = dep
+    const recordDep = formDeps.get(name)
+    if (recordDep) {
+      const { changeConfigs, changeValues } = formDeps.get(name)!
+      changeConfigsTodo.forEach((cC) => {
+        changeConfigs.add(cC)
+      })
+      changeValuesTodo.forEach((cV) => {
+        changeValues.add(cV)
+      })
+    }
+    else {
+      formDeps.set(name, {
+        changeConfigs: changeConfigsTodo,
+        changeValues: changeValuesTodo,
+      })
+    }
+  }
+
+  static removeOneDep(formName: RfRenderFormName, name: string) {
+    const formDeps = RfRender.oneDeps.get(formName)
+    if (formDeps) {
+      formDeps.delete(name)
+    }
+  }
+
+  static removeAllOneDep(formName: RfRenderFormName) {
+    const formDeps = RfRender.oneDeps.get(formName)
+    formDeps?.clear()
+  }
+
+  static getOneDep(formName: RfRenderFormName, name: string) {
+    const formDeps = RfRender.oneDeps.get(formName)
+    if (formDeps) {
+      return formDeps.get(name)
+    }
+  }
+
+  static getAllOneDeps(formName: RfRenderFormName) {
+    const formDeps = RfRender.oneDeps.get(formName)
     if (formDeps) {
       return Array.from(formDeps.values())
     }

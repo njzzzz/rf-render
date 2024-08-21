@@ -1,10 +1,10 @@
 import { defineRfRenderComponentApi } from '@rf-render/antd'
-import { Checkbox } from 'antd'
+import { Checkbox, CheckboxProps } from 'antd'
 
 // eslint-disable-next-line react-refresh/only-export-components
-export default defineRfRenderComponentApi(Checkbox, {
-  onChange(_rfrender, e: { target: { checked: boolean } }) {
-    return e.target.checked
+export default defineRfRenderComponentApi<CheckboxProps>(Checkbox, {
+  onChange(e) {
+    return [e.target.checked]
   },
   propsMap: {
     value: 'checked',

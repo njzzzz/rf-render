@@ -54,17 +54,18 @@ configures 文件为整个项目默认的组件配置
        - 如果我想支持mapKeys属性，比如UserSelect组件只给了id， 我还想返回整个对象，其中包含了name等字段, 那就需要自定义onMapKeysChange返回这个对象
 
          ```ts
-           import { defineRfRenderComponentApi } from '@rf-render/antd'
+           import { defineRfRenderComponentApi, DNCV } from '@rf-render/antd'
            import UserSelect from 'UserSelect'
            export default defineRfRenderComponentApi(UserSelect, {
                // 这里的val是changeConfig返回的值, rfrender里包含了当前表单的配置项
-               onMapKeysChange:(rfrender, ...val) => {
-                   const userInfo  {}
-                   // 在这里可以经过各种处理得到userInfo
-                   return [userInfo]
+               onChange:(...val) => {
+                  const userInfo  {}
+                  // 在这里可以经过各种处理得到userInfo
+                  // 第一位表示表单的值后续的表示mapKeys对应的值，如果只希望改mapKeys对应的值，需要将第一项的值传递DNCV，表示不改此项的值
+                  return [DNCV,userInfo]
                },
                propsMap: {
-                   onChange: 'onValue'
+                  onChange: 'onValue'
                }
            })
          ```
@@ -75,8 +76,8 @@ configures 文件为整个项目默认的组件配置
      import { WidgetProps } from "@rf-render/antd";
      import { defineConfigure } from "@rf-render/core";
      import { FormInstance, FormItemProps } from "antd";
-     export default defineConfigure<keyof WidgetProps, FormInstance>(
-       ({ item }) => 
+     export default defineConfigure(
+       ({ item }) =>
          return {
            props: {
             type: 'primary'

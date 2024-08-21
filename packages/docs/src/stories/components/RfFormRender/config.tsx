@@ -38,9 +38,8 @@ export function useExampleSchema(props: { form: FormInstance }) {
       withFormItem: true,
       label: '爱好',
       dependOn: ['age'],
-      async initConfig(config) {
+      async initConfig() {
         return {
-          ...config,
           props: {
             options: [
               { label: 'AppleDefault', value: 'AppleDefault' },
@@ -86,6 +85,7 @@ export function useExampleSchema(props: { form: FormInstance }) {
     {
       withFormItem: false,
       widget: 'Layout',
+      name: 'layout',
       props: {
         rowProps: {
           gutter: 18,
@@ -93,8 +93,10 @@ export function useExampleSchema(props: { form: FormInstance }) {
       },
       layout: [
         {
+          name: 'submit',
           withFormItem: false,
           widget: 'Button',
+          mapKeys: ['xxx'],
           props: {
             type: 'primary',
             children: '提交',
@@ -107,6 +109,7 @@ export function useExampleSchema(props: { form: FormInstance }) {
         },
         {
           withFormItem: false,
+          name: 'reset',
           widget: 'Button',
           colProps: {
           },

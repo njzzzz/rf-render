@@ -1,13 +1,13 @@
 import { defineRfRenderComponentApi } from '@rf-render/antd'
-import { Button, Upload } from 'antd'
+import { Button, Upload, UploadProps } from 'antd'
 // eslint-disable-next-line react-refresh/only-export-components
-export default defineRfRenderComponentApi((props: any) => (
+export default defineRfRenderComponentApi<UploadProps>((props: any) => (
   <Upload {...props}>
     {props.children ? props.children : <Button>上传</Button>}
   </Upload>
 ), {
-  onChange(_rfrender, { fileList = [] }) {
-    return fileList
+  onChange({ fileList = [] }) {
+    return [fileList]
   },
   propsMap: {
     value: 'fileList',
