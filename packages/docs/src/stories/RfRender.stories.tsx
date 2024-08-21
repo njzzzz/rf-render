@@ -505,11 +505,12 @@ export const 远程获取数据: Story = {
           dependOn: ['text', '返回数据源展示'],
           changeConfig(config, { 返回数据源展示, text }) {
             console.log(111)
-
             config.display = 返回数据源展示 === '返回数据源展示' ? false : text !== 'text'
             return config
           },
         }],
+        props: {
+        },
         async changeConfig(config, { 数据源id }) {
           const id = await MockRequestWithId(数据源id)
           config.props = {

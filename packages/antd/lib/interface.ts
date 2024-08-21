@@ -49,9 +49,9 @@ export type CanModifyConfigKeys =
 
 export type ChangeConfig<
 Name extends string = string,
-Item extends RfRenderItemConf | DefaultRfRenderItemConf = RfRenderItemConf,
+Widget extends keyof WidgetProps = keyof WidgetProps,
 > = (
-  config: Item['widget'] extends undefined ? DefaultRfRenderItemConf<Name> : RfRenderItemConf<Name>,
+  config: DefaultRfRenderItemConf<Name> | RfRenderItemConf<Name, Widget>,
   formData: { [K in Name]: any } & Record<string, any>
 ) => MaybePromise<CanModifyConfig<Name>>
 
@@ -61,15 +61,15 @@ export type ChangeValue<Name extends string = string> = (
 
 export type InitConfig<
 Name extends string = string,
-Item extends RfRenderItemConf | DefaultRfRenderItemConf = RfRenderItemConf,
+Widget extends keyof WidgetProps = keyof WidgetProps,
 > = (
-  config: Item['widget'] extends undefined ? DefaultRfRenderItemConf<Name> : RfRenderItemConf<Name>,
+  config: DefaultRfRenderItemConf<Name> | RfRenderItemConf<Name, Widget>,
   formData: { [K in Name]: any } & Record<string, any>
 ) => MaybePromise<CanModifyConfig<Name>>
 
 export type CanModifyConfig<Name extends string = string> = Partial<Pick<IRfRenderItem<Name>, CanModifyConfigKeys>>
 
-export interface CommonRfRenderItemConf<Name extends string = string> {
+export interface CommonRfRenderItemConf<Name extends string = string, Widget extends keyof WidgetProps = keyof WidgetProps> {
   /**
    * @description 字段名
    */
@@ -120,7 +120,7 @@ export interface CommonRfRenderItemConf<Name extends string = string> {
    */
   independentOn?: {
     dependOn: Name[]
-    changeConfig?: ChangeConfig<Name>
+    changeConfig?: ChangeConfig<Name, Widget>
     changeValue?: ChangeValue<Name>
   }[]
   /**
@@ -162,7 +162,7 @@ export interface CommonRfRenderItemConf<Name extends string = string> {
    * - 可修改配置后返回
    * - 只支持修改 'label' | 'itemProps' | 'props' | 'display' | 'visibility' | 'platform' | 'fileName' 这7个属性
    */
-  changeConfig?: ChangeConfig<Name>
+  changeConfig?: ChangeConfig<Name, Widget>
   /**
    * @description 当dependOn中依赖的表单项值发生变化时会执行
    * - 只修改当前配置项的值
@@ -191,7 +191,7 @@ export interface DefaultRfRenderItemConf<Name extends string = string>
 export interface RfRenderItemConf<
   Name extends string = string,
   Widget extends keyof WidgetProps = keyof WidgetProps,
-> extends CommonRfRenderItemConf<Name> {
+> extends CommonRfRenderItemConf<Name, Widget> {
   widget: Widget
   /**
    * 当前widget对应的组件的属性
