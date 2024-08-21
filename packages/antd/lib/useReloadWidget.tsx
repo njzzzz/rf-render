@@ -55,7 +55,7 @@ export function useReloadWidget(props: UseReloadWidgetProps) {
          */
         if (immediateDeps) {
           // 默认只改配置，不要修改用户值，初始值的正确需要用户自己保证
-          await doChangeConfig(changeConfig)
+          await doChangeConfig(changeConfig as any)
         }
         // 异步延迟触发校验
         if (immediateValidate) {

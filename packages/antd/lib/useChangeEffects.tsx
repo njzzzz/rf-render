@@ -116,7 +116,7 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
   // 注册deps
   useEffect(() => {
     RfRender.addDep(formName, name, {
-      changeConfig: () => doChangeConfig(changeConfig),
+      changeConfig: () => doChangeConfig(changeConfig as any),
       changeValue: () => doChangeValue(changeValue),
     })
 
@@ -128,7 +128,7 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
           changeValues: new Set<() => any>(),
         }
         if (changeConfig) {
-          depUnit.changeConfigs.add(() => doChangeConfig(changeConfig))
+          depUnit.changeConfigs.add(() => doChangeConfig(changeConfig as any))
         }
         if (changeValue) {
           depUnit.changeValues.add(() => doChangeValue(changeValue))
