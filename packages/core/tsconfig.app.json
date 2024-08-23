@@ -1,0 +1,4 @@
+{
+  "extends": ["@tsconfig/vite-react", "../../tsconfig.path.json"],
+  "include": ["./index.tsx", "lib/**/*.ts", "lib/**/*.tsx", "types/**/*.ts"]
+}
