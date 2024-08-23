@@ -34,6 +34,7 @@
     "dev": "vite build --watch"
   },
   "dependencies": {
+    "@ant-design/icons": "> 5.0",
     "@rf-render/antd": "workspace:^",
     "@rf-render/core": "workspace:^",
     "antd": "> 5.0",

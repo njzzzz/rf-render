@@ -13,7 +13,7 @@ configures 文件为整个项目默认的组件配置
 2. 创建平台目录和文件目录结构大致如下
 
 ```
-|--rf-render-components
+|--rfrender-components
     |--Button
         |--pc
             |--index.tsx
@@ -70,15 +70,12 @@ configures 文件为整个项目默认的组件配置
            })
          ```
 
-     - 新增configure.tsx文件
+     - 新增configure.tsx文件, 默认会加载此处配置
 
      ```tsx
-     import { WidgetProps } from "@rf-render/antd";
      import { defineConfigure } from "@rf-render/core";
-     import { FormInstance, FormItemProps } from "antd";
      export default defineConfigure(
-       ({ item }) =>
-         return {
+       ({ item }) => {
            props: {
             type: 'primary'
            },
@@ -92,42 +89,29 @@ configures 文件为整个项目默认的组件配置
 
      - 完全自定义
        - 完全自定义只要记住两点
-         1. 插件类型是单纯的layout组件还是参与表单运算的组件 Layout组件请参考`@rf-render/antd/plugins/Layout/pc/indexedDB.tsx`
-         2. 调用props.onChange事件以修改表单值,如果要支持mapKeys属性请调用props.onMapKeysChange事件并传入一个数组，数组的值会和mapKeys定义的键顺序对应
+         1. 插件类型是单纯的layout组件还是参与表单运算的组件 Layout组件请参考`@rf-render/antd/plugins/Layout/pc/index.tsx`
+         2. 调用props.onChange事件以修改表单值，并传入一个数组，数组的值第一项为value,后续的值和mapKeys定义的键顺序对应
+
        ```tsx
-       import { FormItemBridgeProps } from "@rf-render/core";
+       import { defineRfRenderComponent } from "@rf-render/antd";
        interface MyCustomerComponentProps {
          prop1?: string;
          prop2: string;
        }
-       export function MyCustomerComponent(
-         props: FormItemBridgeProps & MyCustomerComponentProps
-       ) {
-         const { rfrender, prop1, prop2, onChange, onMapKeysChange } = props;
-         const { item } = rfrender;
+        export default defineRfRenderComponent<'MyCustomerComponent'>(({ itemConfig, onChange }) => {
          // 如果是layout组件可以获取layout配置进行自定义布局, item是当前表单项的配置
-         const { layout = [] } = item;
+         const { props: MyCustomerComponentProps } = itemConfig;
          return (
            <input
-             placeholder={prop1}
-             type={prop2}
              onInput={(e) => {
                const value = e.target.value;
-               onChange(value);
-               onMapKeysChange([
-                 `mapKeys-index0-${value}`,
-                 `mapKeys-index1-${value}`,
-               ]);
+               onChange([value, `mapKeys-0-${value}`, `mapKeys-1-${value}`]);
              }}
            />
          );
        }
        ```
        具体可以查看`@rf-render/antd`包下面的plugin文件夹
-
-   ```
-
-   ```
 
 4. 拓展widget及组件属性
 
@@ -137,45 +121,76 @@ configures 文件为整个项目默认的组件配置
      import "@rf-render/antd";
      import { AntdDefaultWidgetProps, AntdWidgetProps } from "@rf-render/antd";
      import { ButtonProps } from "antd";
-     import UserSelectProps from "UserSelectProps";
+     import MyCustomerComponentProps from "MyCustomerComponentProps";
      declare module "@rf-render/antd" {
        export interface WidgetProps extends AntdWidgetProps {
          // 在WidgetProps中新增一个widget类型Button, 并配置其属性
          Button: ButtonProps;
          // 在WidgetProps中新增一个widget类型UserSelect, 并配置其属性
-         UserSelect: UserSelectProps;
+         MyCustomerComponent: MyCustomerComponentProps;
        }
        export interface DefaultWidgetProps extends AntdDefaultWidgetProps {}
      }
      ```
 
 5. 创建插件导出
-   - 新增文件 `rf-render-components/index.tsx`, 写入以下内容
+   - 新增文件 `rfrender-components/index.tsx`, 写入以下内容
      ```ts
      import { definePlugin } from "@rf-render/core";
-     import { lazy } from "react";
+     import ButtonIndex from "./rfrender-components/Button/pc";
+     import ButtonIndexConfig from "./rfrender-components/Button/pc/config";
+     import ButtonView from "./rfrender-components/Button/pc/view";
+     import ButtonViewConfig from "./rfrender-components/Button/pc/view/viewConfig";
+
+     import MyCustomerComponentIndex from "./rfrender-components/MyCustomerComponent/pc";
+     import MyCustomerComponentIndexConfig from "./rfrender-components/MyCustomerComponent/pc/config";
+     import MyCustomerComponentView from "./rfrender-components/MyCustomerComponent/pc/view";
+     import MyCustomerComponentViewConfig from "./rfrender-components/MyCustomerComponent/pc/view/viewConfig";
      /**
       * 这里我们只适配了pc，如果只支持pc则修改`${platform}`为 'pc' 即可
       */
      export const customerRfRenderPlugin = definePlugin([
        {
          name: "Button",
-         loader: (platform, fileName) =>
-           lazy(() => import(`./Button/${platform}/${fileName}.tsx`)),
-         configure: () => import(`./Button/${platform}/configure.tsx`))
+        loader: (_platform, fileName) => {
+              switch (fileName) {
+                case 'index':
+                  return ButtonIndex
+                case 'view':
+                  return ButtonView
+                default:
+                  return ButtonIndex
+              }
+        },
+        configure: (_platform, fileName) =>
+            fileName === 'view'
+                ? ButtonViewConfig
+                : ButtonIndexConfig
        },
        {
-         name: "UserSelect",
-         loader: (platform, fileName) =>
-           lazy(() => import(`./UserSelect/${platform}/${fileName}.tsx`)),
-         configure: () => import(`./UserSelect/${platform}/configure.tsx`))
+         name: "MyCustomerComponent",
+         loader: (_platform, fileName) => {
+              switch (fileName) {
+                case 'index':
+                  return MyCustomerComponentIndex
+                case 'view':
+                  return MyCustomerComponentView
+                default:
+                  return MyCustomerComponentIndex
+              }
+        },
+        configure: (_platform, fileName) =>
+            fileName === 'view'
+                ? MyCustomerComponentViewConfig
+                : MyCustomerComponentIndexConfig
        },
      ]);
      ```
+
 6. 注册插件
 
 ```ts
-import customerRfRenderPlugin from "./src/rf-render-components/index.tsx";
+import customerRfRenderPlugin from "./src/rfrender-components/index.tsx";
 new RfRender({
   // ...其他配置
   plugins: [

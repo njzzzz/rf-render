@@ -1,14 +1,13 @@
-import { Form } from 'antd'
+import { Form, FormInstance } from 'antd'
 import {
   Context,
   FormItemBridgeWrapper,
   FormRenderProps,
   useFormData,
-  usePrepareSchema,
   useProvider,
 } from '@rf-render/antd'
 import { FileName, Platform, RfRender } from '@rf-render/core'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 /**
  * 初次加载渲染次数
  * Form 组件1次
@@ -49,22 +48,20 @@ export function useFormRender(params: FormRenderParams = {}) {
   function FormRender(props: FormRenderProps) {
     const { schema, immediateDeps = true, immediateValidate = false, ...antdFromProps } = props
     const { formData, updateFormData } = useFormData()
-    const { schemaMap, dependOnMap, independentOnsMap } = usePrepareSchema({
-      schema,
-      formName,
-    })
     const { context } = useProvider({
-      schemaMap,
       form,
       formName,
-      dependOnMap,
       formData,
       updateFormData,
       immediateDeps,
       immediateValidate,
-      independentOnsMap,
     })
 
+    useEffect(() => {
+      return () => {
+        RfRender.removeAllOneDep(formName)
+      }
+    }, [])
     return (
       <Context.Provider value={context}>
         <Form
@@ -92,6 +89,21 @@ export function useFormRender(params: FormRenderParams = {}) {
     switchPlatform,
     switchPlatformAndFileName,
     formName,
-    form,
+    form: {
+      ...form,
+      /**
+       * @description 会过滤掉键包含/\.\d+\./，只对单层有效
+       */
+      getRfFieldsValue() {
+        return form.getFieldsValue(true, rfrenderFieldsFilter)
+      },
+    } as FormInstance & {
+      getRfFieldsValue: <T>() => T
+    },
+
   }
+}
+export function rfrenderFieldsFilter(meta: any) {
+  const { name = [] } = meta
+  return !name[0].match(/\.\d+\./)
 }

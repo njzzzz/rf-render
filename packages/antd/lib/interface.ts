@@ -52,11 +52,13 @@ Name extends string = string,
 Widget extends keyof WidgetProps = keyof WidgetProps,
 > = (
   config: DefaultRfRenderItemConf<Name> | RfRenderItemConf<Name, Widget>,
-  formData: { [K in Name]: any } & Record<string, any>
+  formData: { [K in Name]: any } & Record<string, any>,
+  customProps: any
 ) => MaybePromise<CanModifyConfig<Name>>
 
 export type ChangeValue<Name extends string = string> = (
-  formData: { [K in Name]: any } & Record<string, any>
+  formData: { [K in Name]: any } & Record<string, any>,
+  customProps: any
 ) => MaybePromise<any[]>
 
 export type InitConfig<
@@ -64,7 +66,8 @@ Name extends string = string,
 Widget extends keyof WidgetProps = keyof WidgetProps,
 > = (
   config: DefaultRfRenderItemConf<Name> | RfRenderItemConf<Name, Widget>,
-  formData: { [K in Name]: any } & Record<string, any>
+  formData: { [K in Name]: any } & Record<string, any>,
+  customProps: any
 ) => MaybePromise<CanModifyConfig<Name>>
 
 export type CanModifyConfig<Name extends string = string> = Partial<Pick<IRfRenderItem<Name>, CanModifyConfigKeys>>
@@ -116,7 +119,7 @@ export interface CommonRfRenderItemConf<Name extends string = string, Widget ext
    */
   dependOn?: Name[]
   /**
-   * @description 独立的dependO， 此处执行只会根据independentOns 中配置的dependOn配置去执行独立配置项中的changeConfig，changeValue 而不会去执行item的changeConfig，changeValue
+   * @description 独立的dependO， 此处执行只会根据independentOns 中配置的dependOn配置去执行独立配置项中的changeConfig，changeValue 而不会去执行item的changeConfig，changeValue,优先级比dependOn更高
    */
   independentOn?: {
     dependOn: Name[]

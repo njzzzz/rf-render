@@ -26,7 +26,7 @@ function deepForEachSchema(
     }
     else {
       schemaMap[name!] = item
-      // 收集dependOn依赖 map
+
       dependOn.forEach((dep) => {
         const deps = dependOnMap[dep]
         dependOnMap[dep] = deps
@@ -36,6 +36,7 @@ function deepForEachSchema(
             ]
           : [name]
       })
+
       // 收集independentOn依赖 map
       independentOn.forEach(({ dependOn = [] }) => {
         dependOn.forEach((independentOnName) => {

@@ -11,21 +11,22 @@ import {
 export interface SwitchWidgetProps {
   itemConfig: IRfRenderItem
   onUpdateFormItem: OnUpdateFormItem
-  // antd 默认的 onChange for validate
-  onChange?: any
+  onValuesChange?: any
+  customProps?: any
 }
 
 export function SwitchWidget(props: SwitchWidgetProps) {
-  const { itemConfig, onUpdateFormItem } = props
+  const { itemConfig, onUpdateFormItem, onValuesChange, customProps } = props
   const { name, mapKeys } = itemConfig
   const [vision, updateVision] = useState(false)
   const { form, updateFormData } = useContext(Context)
-  const { runtimeItemConfig, updateEffects, doChangeConfig, callDeps } = useChangeEffects({ itemConfig, onUpdateFormItem, updateVision })
+  const { runtimeItemConfig, updateEffects, callDeps, doChangeConfig } = useChangeEffects({ itemConfig, onUpdateFormItem, updateVision, customProps })
   const { Component } = useReloadWidget({
     updateEffects,
     doChangeConfig,
     itemConfig,
     runtimeItemConfig,
+    customProps,
   })
   // console.count('switch widget render count')
   // 用于value变更时更新组件
@@ -37,14 +38,16 @@ export function SwitchWidget(props: SwitchWidgetProps) {
         itemConfig={runtimeItemConfig}
         onChange={([val, ...mapKeysValues]: unknown[]) => {
           let needUpdate = false
+          let mapValues: any = []
           if (mapKeys?.length) {
-            mapKeys.forEach((mapKey, index) => {
+            mapValues = mapKeys.map((mapKey, index) => {
               const mapKeyValue = mapKeysValues[index]
               if (mapKeyValue !== DNCV) {
                 form!.setFieldValue(mapKey, mapKeyValue)
                 updateFormData(mapKey, mapKeyValue)
                 needUpdate = true
               }
+              return form.getFieldValue(mapKey)
             })
           }
           if (val !== DNCV) {
@@ -57,6 +60,7 @@ export function SwitchWidget(props: SwitchWidgetProps) {
             // mapKeys值修改时也要触发更新
             updateVision(v => !v)
           }
+          onValuesChange && onValuesChange([form.getFieldValue(name), ...mapValues])
         }}
       >
       </Component>

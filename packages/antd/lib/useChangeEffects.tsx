@@ -1,21 +1,31 @@
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { RfRender } from '@rf-render/core'
-import { CanModifyConfig, ChangeConfig, ChangeValue, Context, DNCV, IRfRenderItem, OnUpdateFormItem } from '@rf-render/antd'
+import {
+  CanModifyConfig,
+  ChangeConfig,
+  ChangeValue,
+  Context,
+  DNCV,
+  IRfRenderItem,
+  OnUpdateFormItem,
+} from '@rf-render/antd'
 
 export interface UseChangeEffectsProps {
   itemConfig: IRfRenderItem
   onUpdateFormItem: OnUpdateFormItem
   updateVision: Dispatch<SetStateAction<boolean>>
+  customProps?: any
 }
 export type UpdateEffects = (data: CanModifyConfig) => void
 export type DoChangeConfig = (changeConfig?: ChangeConfig) => Promise<void>
 export type DoChangeValue = (changeConfig?: ChangeValue) => Promise<void>
+export type AddDep = <CC, CV>(dependOn: string[], changeConfig: CC, changeValue: CV) => void
 export function useChangeEffects(props: UseChangeEffectsProps) {
-  const { itemConfig, onUpdateFormItem, updateVision } = props
+  const { itemConfig, onUpdateFormItem, updateVision, customProps } = props
   const [runtimeItemConfig, setRuntimeItemConfig] = useState<IRfRenderItem>(itemConfig)
-  const { formName, dependOnMap, form, updateFormData, independentOnsMap } = useContext(Context)
+  const { formName, form, updateFormData } = useContext(Context)
   // 这些都不能更改的直接从itemConfig中取就行，避免多余更新
-  const { name, changeValue, changeConfig, mapKeys, independentOn = [] } = itemConfig
+  const { name, changeValue, changeConfig, mapKeys, independentOn = [], dependOn = [] } = itemConfig
   // 配置发生改变-更新视图,同时处理了formItem和widget
   const updateEffects: UpdateEffects = (data) => {
     // 只能更新这些
@@ -45,26 +55,16 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
   }
   // 执行deps
   const callDeps = () => {
-    // 触发所有字符串dependOn依赖
-    const deps = dependOnMap[name] ?? []
-    deps.forEach((name) => {
-      const { changeValue, changeConfig } = RfRender.getDep(formName, name) ?? {}
-      changeValue && changeValue()
-      changeConfig && changeConfig()
-    })
     // 触发所有对象dependOn依赖
-    const oneDeps = independentOnsMap[name] ?? []
-    oneDeps.forEach((name) => {
-      const { changeValues = [], changeConfigs = [] } = RfRender.getOneDep(formName, name) ?? {}
-      changeValues.forEach(cb => cb())
-      changeConfigs.forEach(cb => cb())
-    })
+    const { changeValues = [], changeConfigs = [] } = RfRender.getOneDep(formName, name) ?? {}
+    changeValues.forEach(cb => cb())
+    changeConfigs.forEach(cb => cb())
   }
   // 处理changeConfig
   const doChangeConfig: DoChangeConfig = async (changeConfig) => {
     if (!changeConfig)
       return
-    const config = await changeConfig(runtimeItemConfig as any, form!.getFieldsValue())
+    const config = await changeConfig(runtimeItemConfig as any, form!.getFieldsValue(), customProps)
     config && updateEffects(config)
   }
   // 处理changeValue
@@ -74,26 +74,16 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
     const [
       value,
       ...mapKeysValue
-    ] = await changeValue(form!.getFieldsValue())
+    ] = await changeValue(form!.getFieldsValue(), customProps)
     // 更新自身值
     if (value !== DNCV) {
       // 更新表单值
-      form.validateFields([name])
       form!.setFieldValue(name, value)
       updateFormData(name, value)
-      // const needChangeDeps = dependOnMap[name] ?? []
       // 更新deps
       callDeps()
-      // needChangeDeps.forEach((dep) => {
-      //   const { changeValue, changeConfig } = RfRender.getDep(formName, dep!) ?? {}
-      //   // 先执行value变更再执行config变更
-      //   if (changeValue) {
-      //     changeValue()
-      //   }
-      //   if (changeConfig) {
-      //     changeConfig()
-      //   }
-      // })
+      // 触发表单验证
+      form.validateFields([name])
     }
     // 更新mapKeys
     if (mapKeys?.length) {
@@ -112,29 +102,27 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
       }
     }
   }
-
+  const addDep: AddDep = (dependOn, changeConfig, changeValue) => {
+    dependOn?.forEach((name) => {
+      const depUnit = {
+        changeConfigs: new Set<() => any>(),
+        changeValues: new Set<() => any>(),
+      }
+      if (changeConfig) {
+        depUnit.changeConfigs.add(() => doChangeConfig(changeConfig as any))
+      }
+      if (changeValue) {
+        depUnit.changeValues.add(() => doChangeValue(changeValue as any))
+      }
+      RfRender.addOneDep(formName, name, depUnit)
+    })
+  }
   // 注册deps
   useEffect(() => {
-    RfRender.addDep(formName, name, {
-      changeConfig: () => doChangeConfig(changeConfig as any),
-      changeValue: () => doChangeValue(changeValue),
-    })
-
+    addDep(dependOn, changeConfig, changeValue)
     independentOn.forEach((dep) => {
       const { dependOn, changeConfig, changeValue } = dep
-      dependOn.forEach((name) => {
-        const depUnit = {
-          changeConfigs: new Set<() => any>(),
-          changeValues: new Set<() => any>(),
-        }
-        if (changeConfig) {
-          depUnit.changeConfigs.add(() => doChangeConfig(changeConfig as any))
-        }
-        if (changeValue) {
-          depUnit.changeValues.add(() => doChangeValue(changeValue))
-        }
-        RfRender.addOneDep(formName, name, depUnit)
-      })
+      addDep(dependOn, changeConfig, changeValue)
     })
   }, [])
 

@@ -3,6 +3,7 @@ import type { BuildOptions } from 'vite'
 export const external = [
   'react',
   'antd',
+  '@ant-design/icons',
   '@rf-render/core',
   '@rf-render/antd',
 ]

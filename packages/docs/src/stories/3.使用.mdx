@@ -11,18 +11,17 @@
 ```tsx
 import { FormRenderProps, useFormRender } from '@rf-render/antd'
 import { useExampleSchema } from './config'
-import { RfRender } from '@rf-render/core'
 
 export default function Page(props: FormRenderProps) {
-  const { FormRender, form } = useFormRender()
+  const { FormRender, form, switchFileName, switchPlatform, switchPlatformAndFileName } = useFormRender()
   const schema = useExampleSchema({
     form,
   })
   const switch = () => {
     // 切换场景
-    RfRender.switchPlatform('mobile')
+    switchPlatform('mobile')
     // 切换文件
-    RfRender.switchFileName('view')
+    switchFileName('view')
   }
   return (
     <>

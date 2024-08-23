@@ -60,6 +60,8 @@ import UploadIndex from './Upload/pc/index'
 import UploadView from './Upload/pc/view'
 import TransferIndex from './Transfer/pc/index'
 import TransferView from './Transfer/pc/view'
+import ArrayIndex from './Array/pc/index'
+import ArrayView from './Array/pc/view'
 
 export const antdRfRenderPlugin = definePlugin([
   {
@@ -514,6 +516,23 @@ export const antdRfRenderPlugin = definePlugin([
           return TransferView
         default:
           return TransferIndex
+      }
+    },
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
+  },
+  {
+    name: 'Array',
+    loader: (_platform, fileName) => {
+      switch (fileName) {
+        case 'index':
+          return ArrayIndex
+        case 'view':
+          return ArrayView
+        default:
+          return ArrayIndex
       }
     },
     configure: (_platform, fileName) =>

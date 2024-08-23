@@ -7,12 +7,13 @@ export interface UseReloadWidgetProps {
   updateEffects: UpdateEffects
   doChangeConfig: DoChangeConfig
   runtimeItemConfig: IRfRenderItem
+  customProps: any
 }
 export function useReloadWidget(props: UseReloadWidgetProps) {
-  const { itemConfig, updateEffects, doChangeConfig, runtimeItemConfig } = props
+  const { itemConfig, updateEffects, doChangeConfig, runtimeItemConfig, customProps } = props
   const [reloadWidget, setReloadWidget] = useState({})
   const { formName, form, immediateValidate, immediateDeps } = useContext(Context)
-  const { widget = RfRender.defaultWidget, name, initConfig, changeConfig } = itemConfig
+  const { widget = RfRender.defaultWidget, name, initConfig, changeConfig, independentOn } = itemConfig
   const { fileName, platform } = runtimeItemConfig
   // 监听表单试图切换事件以切换表单项组件状态
   useEffect(() => {
@@ -30,7 +31,7 @@ export function useReloadWidget(props: UseReloadWidgetProps) {
         // 初始化操作都是传入itemConfig
         const defaultConfigure = await fn({ itemConfig: runtimeItemConfig })
         // 处理initConfig, 只处理一次
-        const config = initConfig ? await initConfig(runtimeItemConfig as any, form.getFieldsValue()) : {}
+        const config = initConfig ? await initConfig(runtimeItemConfig as any, form.getFieldsValue(), customProps) : {}
         const { props: initProps = {}, itemProps: initItemProps = {} } = config
         const { props: customerProps = {}, itemProps: customerItemProps = {} } = itemConfig
         const { props: defaultProps = {}, itemProps: defaultItemProps = {} } = defaultConfigure
@@ -55,7 +56,9 @@ export function useReloadWidget(props: UseReloadWidgetProps) {
          */
         if (immediateDeps) {
           // 默认只改配置，不要修改用户值，初始值的正确需要用户自己保证
-          await doChangeConfig(changeConfig as any)
+          doChangeConfig(changeConfig as any)
+          // 处理 independentOn的changeConfig
+          independentOn?.map(({ changeConfig }) => doChangeConfig(changeConfig as any))
         }
         // 异步延迟触发校验
         if (immediateValidate) {

@@ -14,10 +14,19 @@ export default function RfFormRender(props: FormRenderProps) {
         <Col>
           <Button onClick={() => {
             const formData = form.getFieldsValue()
-            console.log(formData)
+            const formDataWithoutVirtualKey = form.getRfFieldsValue()
+            console.log(formData, formDataWithoutVirtualKey)
           }}
           >
             打印表单值
+          </Button>
+        </Col>
+        <Col>
+          <Button onClick={() => {
+            form.resetFields()
+          }}
+          >
+            重置
           </Button>
         </Col>
         <Col>

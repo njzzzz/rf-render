@@ -26,6 +26,18 @@ import {
   TreeSelect,
   Upload,
 } from 'antd'
+import { ComponentType, ReactNode } from 'react'
+
+export interface ArrayComponentProps {
+  /**
+   * @description 包裹组件
+   */
+  Wrapper?: ComponentType<{ children: ReactNode, add: () => void, remove: () => void }>
+  /**
+   * @description 底部边距
+   */
+  marginBottom?: string
+}
 
 export interface CustomerLayout {
   /**
@@ -71,6 +83,7 @@ export interface AntdWidgetProps {
   Transfer: GetPropsType<typeof Transfer>
   TreeSelect: GetPropsType<typeof TreeSelect>
   Upload: GetPropsType<typeof Upload>
+  Array: ArrayComponentProps
 }
 export interface AntdDefaultWidgetProps extends InputProps {
 
