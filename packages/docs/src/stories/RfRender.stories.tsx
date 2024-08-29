@@ -607,7 +607,10 @@ export const Array组件: Story = {
               tooltip: '数组项的第三项依赖数组项的第二项，placeholder为数组项的第二项的值',
             },
             changeConfig(config, formData, customProps) {
-              console.log('name-2变动触发', formData, customProps)
+              console.log(formData, customProps)
+              config.props = {
+                placeholder: formData.array[customProps.index]['name-2'],
+              }
               return config
             },
           },

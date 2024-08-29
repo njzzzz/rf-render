@@ -47,18 +47,27 @@ export type CanModifyConfigKeys =
   | 'platform'
   | 'fileName'
 
+/**
+ * @description 自定义组件上的属性
+ */
+export interface ChangeEffectCustomProps {
+  /**
+   * @description 用于 widget Array
+   */
+  index: number
+}
 export type ChangeConfig<
 Name extends string = string,
 Widget extends keyof WidgetProps = keyof WidgetProps,
 > = (
   config: DefaultRfRenderItemConf<Name> | RfRenderItemConf<Name, Widget>,
   formData: { [K in Name]: any } & Record<string, any>,
-  customProps: any
+  customProps: ChangeEffectCustomProps
 ) => MaybePromise<CanModifyConfig<Name>>
 
 export type ChangeValue<Name extends string = string> = (
   formData: { [K in Name]: any } & Record<string, any>,
-  customProps: any
+  customProps: ChangeEffectCustomProps
 ) => MaybePromise<any[]>
 
 export type InitConfig<
@@ -67,7 +76,7 @@ Widget extends keyof WidgetProps = keyof WidgetProps,
 > = (
   config: DefaultRfRenderItemConf<Name> | RfRenderItemConf<Name, Widget>,
   formData: { [K in Name]: any } & Record<string, any>,
-  customProps: any
+  customProps: ChangeEffectCustomProps
 ) => MaybePromise<CanModifyConfig<Name>>
 
 export type CanModifyConfig<Name extends string = string> = Partial<Pick<IRfRenderItem<Name>, CanModifyConfigKeys>>

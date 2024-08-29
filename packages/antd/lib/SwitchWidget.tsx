@@ -54,13 +54,14 @@ export function SwitchWidget(props: SwitchWidgetProps) {
             form!.setFieldValue(name, val)
             form.validateFields([name])
             updateFormData(name, val)
+            // FIX: 修复更新值需要发生在callDeps()之前，否则传入changeEffect的值为旧值
+            onValuesChange && onValuesChange([form.getFieldValue(name), ...mapValues])
             callDeps()
           }
           if (needUpdate) {
             // mapKeys值修改时也要触发更新
             updateVision(v => !v)
           }
-          onValuesChange && onValuesChange([form.getFieldValue(name), ...mapValues])
         }}
       >
       </Component>
