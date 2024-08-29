@@ -26,6 +26,8 @@ import AutoCompleteIndex from './AutoComplete/pc/index'
 import AutoCompleteView from './AutoComplete/pc/view'
 import InputIndex from './Input/pc/index'
 import InputView from './Input/pc/view'
+import TextAreaIndex from './TextArea/pc/index'
+import TextAreaView from './TextArea/pc/view'
 import CheckboxGroupIndex from './CheckboxGroup/pc/index'
 import CheckboxGroupView from './CheckboxGroup/pc/view'
 import CascaderIndex from './Cascader/pc/index'
@@ -227,6 +229,23 @@ export const antdRfRenderPlugin = definePlugin([
           return InputView
         default:
           return InputIndex
+      }
+    },
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
+  },
+  {
+    name: 'TextArea',
+    loader: (_platform, fileName) => {
+      switch (fileName) {
+        case 'index':
+          return TextAreaIndex
+        case 'view':
+          return TextAreaView
+        default:
+          return TextAreaIndex
       }
     },
     configure: (_platform, fileName) =>

@@ -66,6 +66,7 @@ export interface AntdWidgetProps {
   Steps: GetPropsType<typeof Steps>
   AutoComplete: GetPropsType<typeof AutoComplete>
   Input: GetPropsType<typeof Input>
+  TextArea: GetPropsType<typeof Input.TextArea>
   CheckboxGroup: GetPropsType<typeof Checkbox.Group>
   Cascader: GetPropsType<typeof Cascader>
   Checkbox: GetPropsType<typeof Checkbox>

@@ -530,6 +530,93 @@ export const 远程获取数据: Story = {
     ]),
   },
 }
+
+export const Array组件: Story = {
+  args: {
+    initialValues: {
+      array: [{ 'name-1': '111', 'name-2': '222' }],
+    },
+    schema: defineSchema([
+      {
+        name: 'name-1',
+        label: '第一项',
+        customerProps: {
+          requiredWithRules: true,
+        },
+        itemProps: {
+          tooltip: `第一项依赖数组项的第一项的第一项，当其变动会将其值赋值给当前项,当其值为'隐藏第一项'则当前项隐藏'`,
+        },
+        dependOn: ['array.0.name-1'],
+        changeValue(formData) {
+          return [formData['array.0.name-1']]
+        },
+        changeConfig(config, formData) {
+          config.display = formData['array.0.name-1'] !== '隐藏第一项'
+          return config
+        },
+      },
+      {
+        name: 'name-2',
+        label: '第二项',
+        itemProps: {
+          tooltip: '第二项依赖整个数组项,值为整个数组项的长度',
+        },
+        customerProps: {
+          requiredWithRules: true,
+        },
+        dependOn: ['array'],
+        changeValue(formData) {
+          return [formData.array?.length]
+        },
+      },
+      {
+        name: 'array',
+        label: '数组项',
+        widget: 'Array',
+        layout: [
+          {
+            name: 'name-1',
+            label: '数组项的第一项',
+            customerProps: {
+              requiredWithRules: true,
+            },
+            itemProps: {
+              tooltip: '数组项的第一项依赖外部的第一项，placeholder为外部的第一项的值（外部依赖只能通过independentOn进行配置）',
+            },
+            independentOn: [
+              {
+                dependOn: ['name-1'],
+                changeConfig(config, formData) {
+                  config.props = {
+                    placeholder: formData['name-1'],
+                  }
+                  return config
+                },
+              },
+            ],
+          },
+          {
+            name: 'name-2',
+            label: '数组项的第二项',
+          },
+          {
+            name: 'name-3',
+            label: '数组项的第三项',
+            dependOn: ['name-2'],
+            itemProps: {
+              tooltip: '数组项的第三项依赖数组项的第二项，placeholder为数组项的第二项的值',
+            },
+            changeConfig(config, formData, customProps) {
+              console.log('name-2变动触发', formData, customProps)
+              return config
+            },
+          },
+        ],
+      },
+    ]),
+  },
+}
+
 export const 所有内置antd组件: Story = {
   args: {
     layout: 'vertical',
@@ -542,6 +629,7 @@ export const 所有内置antd组件: Story = {
       // DatePicker: dayjs('2023/01/22'),
       // DateRangePicker: [dayjs('2023/01/22 11:11:11'), dayjs('2024/01/22 12:12:12')],
       Input: '输入啥',
+      TextArea: 'TextArea',
       InputNumber: 888,
       Mentions: 'simple',
       RadioGroup: 'Apple',
@@ -712,6 +800,11 @@ export const 所有内置antd组件: Story = {
         label: 'Input',
         name: 'Input',
         widget: 'Input',
+      },
+      {
+        label: 'TextArea',
+        name: 'TextArea',
+        widget: 'TextArea',
       },
       {
         label: 'InputNumber',
@@ -889,92 +982,6 @@ export const 所有内置antd组件: Story = {
         label: 'Upload',
         name: 'Upload',
         widget: 'Upload',
-      },
-    ]),
-  },
-}
-
-export const Array组件: Story = {
-  args: {
-    initialValues: {
-      array: [{ 'name-1': '111', 'name-2': '222' }],
-    },
-    schema: defineSchema([
-      {
-        name: 'name-1',
-        label: '第一项',
-        customerProps: {
-          requiredWithRules: true,
-        },
-        itemProps: {
-          tooltip: `第一项依赖数组项的第一项的第一项，当其变动会将其值赋值给当前项,当其值为'隐藏第一项'则当前项隐藏'`,
-        },
-        dependOn: ['array.0.name-1'],
-        changeValue(formData) {
-          return [formData['array.0.name-1']]
-        },
-        changeConfig(config, formData) {
-          config.display = formData['array.0.name-1'] !== '隐藏第一项'
-          return config
-        },
-      },
-      {
-        name: 'name-2',
-        label: '第二项',
-        itemProps: {
-          tooltip: '第二项依赖整个数组项,值为整个数组项的长度',
-        },
-        customerProps: {
-          requiredWithRules: true,
-        },
-        dependOn: ['array'],
-        changeValue(formData) {
-          return [formData.array?.length]
-        },
-      },
-      {
-        name: 'array',
-        label: '数组项',
-        widget: 'Array',
-        layout: [
-          {
-            name: 'name-1',
-            label: '数组项的第一项',
-            customerProps: {
-              requiredWithRules: true,
-            },
-            itemProps: {
-              tooltip: '数组项的第一项依赖外部的第一项，placeholder为外部的第一项的值（外部依赖只能通过independentOn进行配置）',
-            },
-            independentOn: [
-              {
-                dependOn: ['name-1'],
-                changeConfig(config, formData) {
-                  config.props = {
-                    placeholder: formData['name-1'],
-                  }
-                  return config
-                },
-              },
-            ],
-          },
-          {
-            name: 'name-2',
-            label: '数组项的第二项',
-          },
-          {
-            name: 'name-3',
-            label: '数组项的第三项',
-            dependOn: ['name-2'],
-            itemProps: {
-              tooltip: '数组项的第三项依赖数组项的第二项，placeholder为数组项的第二项的值',
-            },
-            changeConfig(config, formData, customProps) {
-              console.log('name-2变动触发', formData, customProps)
-              return config
-            },
-          },
-        ],
       },
     ]),
   },
