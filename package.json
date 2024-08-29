@@ -3,7 +3,9 @@
   "version": "1.0.4",
   "description": "",
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "homepage": "https://rf-render.pages.dev/",
+  "repository": "https://github.com/njzzzz/rf-render",
   "keywords": [],
   "main": "index.js",
   "scripts": {

@@ -4,7 +4,9 @@
   "version": "1.0.4",
   "description": "client",
   "author": "njzzzz",
-  "license": "ISC",
+  "license": "MIT",
+  "homepage": "https://rf-render.pages.dev/",
+  "repository": "https://github.com/njzzzz/rf-render",
   "keywords": [],
   "exports": {
     ".": {
