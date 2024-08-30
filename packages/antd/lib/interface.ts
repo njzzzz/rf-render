@@ -240,7 +240,7 @@ export type FormRenderProps = TFormProps & IProps
  */
 export function defineSchema<Name extends string = string>(
   schema: IRfRenderItem<Name>[],
-) {
+): IRfRenderItem<Name>[] {
   return schema
 }
 
