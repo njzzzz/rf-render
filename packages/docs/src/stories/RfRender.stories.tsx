@@ -810,6 +810,11 @@ export const 所有内置antd组件: Story = {
         widget: 'TextArea',
       },
       {
+        label: 'Password',
+        name: 'Password',
+        widget: 'Password',
+      },
+      {
         label: 'InputNumber',
         name: 'InputNumber',
         widget: 'InputNumber',
