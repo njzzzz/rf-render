@@ -28,6 +28,8 @@ import InputIndex from './Input/pc/index'
 import InputView from './Input/pc/view'
 import TextAreaIndex from './TextArea/pc/index'
 import TextAreaView from './TextArea/pc/view'
+import PasswordIndex from './Password/pc/index'
+import PasswordView from './Password/pc/view'
 import CheckboxGroupIndex from './CheckboxGroup/pc/index'
 import CheckboxGroupView from './CheckboxGroup/pc/view'
 import CascaderIndex from './Cascader/pc/index'
@@ -246,6 +248,23 @@ export const antdRfRenderPlugin = definePlugin([
           return TextAreaView
         default:
           return TextAreaIndex
+      }
+    },
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
+  },
+  {
+    name: 'Password',
+    loader: (_platform, fileName) => {
+      switch (fileName) {
+        case 'index':
+          return PasswordIndex
+        case 'view':
+          return PasswordView
+        default:
+          return PasswordIndex
       }
     },
     configure: (_platform, fileName) =>
