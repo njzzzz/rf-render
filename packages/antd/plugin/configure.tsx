@@ -7,7 +7,7 @@ import { FormItemProps } from 'antd'
 // eslint-disable-next-line react-refresh/only-export-components
 export default defineConfigure(({ itemConfig }) => {
   const { label, widget = '', customerProps = {} } = itemConfig
-  const prefix = ['AutoComplete', 'Input', 'InputNumber', ''].includes(widget) ? '请输入' : '请选择'
+  const prefix = ['AutoComplete', 'Input', 'InputNumber', '', 'TextArea', 'Password'].includes(widget) ? '请输入' : '请选择'
   const placeholder = `${prefix}${label}`
   const { requiredWithRules = false } = customerProps
   const itemProps: FormItemProps = {}
