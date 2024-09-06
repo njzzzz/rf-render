@@ -21,6 +21,7 @@ import {
   Slider,
   Steps,
   Switch,
+  Table,
   TimePicker,
   Transfer,
   TreeSelect,
@@ -51,7 +52,16 @@ export interface CustomerLayout {
    */
   mode?: 'independent' | 'combine'
 }
-
+export interface TableExtProps {
+  /**
+   * @description 是否开放操作列功能
+   */
+  withOperate?: boolean
+  /**
+   * @description 隐藏底部的添加按钮
+   */
+  hideAddButton?: boolean
+}
 /**
  * 用于widget类型推断,使用本预制插件需要引入此类型
  */
@@ -86,6 +96,7 @@ export interface AntdWidgetProps {
   TreeSelect: GetPropsType<typeof TreeSelect>
   Upload: GetPropsType<typeof Upload>
   Array: ArrayComponentProps
+  Table: Omit<GetPropsType<typeof Table>, 'dataSource' | 'columns'> & TableExtProps
 }
 export interface AntdDefaultWidgetProps extends InputProps {
 

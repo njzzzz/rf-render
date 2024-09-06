@@ -3,6 +3,7 @@ import { RfRender } from '@rf-render/core'
 import { antdRfRenderPlugin, defineSchema } from '@rf-render/antd'
 // import dayjs from 'dayjs'
 import { BaseOptionType } from 'antd/es/select'
+import { Button } from 'antd'
 import RfFormRender from './components/RfFormRender'
 
 // eslint-disable-next-line no-new
@@ -619,7 +620,95 @@ export const Array组件: Story = {
     ]),
   },
 }
-
+export const Table组件: Story = {
+  args: {
+    initialValues: {
+      table: [
+        {
+          name: '111',
+          age: 11,
+        },
+        {
+          name: '222',
+          age: 22,
+        },
+      ],
+    },
+    schema: defineSchema([
+      {
+        name: 'table',
+        label: '表格',
+        widget: 'Table',
+        layout: [
+          {
+            name: 'name',
+            label: '姓名',
+          },
+          {
+            name: 'age',
+            label: '年龄',
+          },
+        ],
+      },
+    ]),
+  },
+}
+export const Table组件之自定义操作栏同时隐藏底部添加按钮: Story = {
+  args: {
+    initialValues: {
+      table: [
+        {
+          name: '111',
+          age: 11,
+        },
+        {
+          name: '222',
+          age: 22,
+        },
+      ],
+    },
+    schema: defineSchema([
+      {
+        name: 'table',
+        label: '表格',
+        widget: 'Table',
+        props: {
+          withOperate: false,
+          hideAddButton: true,
+        },
+        layout: [
+          {
+            name: 'name',
+            label: '姓名',
+            customerProps: {
+              requiredWithRules: true,
+            },
+          },
+          {
+            name: 'age',
+            label: '年龄',
+          },
+          {
+            name: 'operate',
+            label: '操作',
+            render: (_val, record, index, { add, remove }) => {
+              return (
+                <div>
+                  <Button onClick={() => add(index + 1)} type="link" style={{ padding: 0, marginRight: '8px' }}>
+                    添加
+                  </Button>
+                  <Button onClick={() => remove(record)} type="link" danger style={{ padding: 0, margin: 0 }}>
+                    删除
+                  </Button>
+                </div>
+              )
+            },
+          },
+        ],
+      },
+    ]),
+  },
+}
 export const 所有内置antd组件: Story = {
   args: {
     layout: 'vertical',

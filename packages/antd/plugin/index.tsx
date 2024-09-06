@@ -66,6 +66,8 @@ import TransferIndex from './Transfer/pc/index'
 import TransferView from './Transfer/pc/view'
 import ArrayIndex from './Array/pc/index'
 import ArrayView from './Array/pc/view'
+import TableIndex from './Table/pc/index'
+import TableView from './Table/pc/view'
 
 export const antdRfRenderPlugin = definePlugin([
   {
@@ -571,6 +573,23 @@ export const antdRfRenderPlugin = definePlugin([
           return ArrayView
         default:
           return ArrayIndex
+      }
+    },
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
+  },
+  {
+    name: 'Table',
+    loader: (_platform, fileName) => {
+      switch (fileName) {
+        case 'index':
+          return TableIndex
+        case 'view':
+          return TableView
+        default:
+          return TableIndex
       }
     },
     configure: (_platform, fileName) =>

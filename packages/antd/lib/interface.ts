@@ -1,6 +1,7 @@
-import { ColProps, FormInstance, FormItemProps, FormProps } from 'antd'
+import { ColProps, FormInstance, FormItemProps, FormProps, TableColumnProps } from 'antd'
 import { ReactNode, RefAttributes } from 'react'
 import { FileName, Platform } from '@rf-render/core'
+import { RfRenderFormInstance } from '@rf-render/antd'
 import IntrinsicAttributes = JSX.IntrinsicAttributes
 
 export type TFormProps = IntrinsicAttributes &
@@ -80,7 +81,30 @@ Widget extends keyof WidgetProps = keyof WidgetProps,
 ) => MaybePromise<CanModifyConfig<Name>>
 
 export type CanModifyConfig<Name extends string = string> = Partial<Pick<IRfRenderItem<Name>, CanModifyConfigKeys>>
-
+export type TableLayout<Name extends string = string> = Array<
+  IRfRenderItem<Name > & {
+    /**
+     * @description 如果没有使用内置的antd插件，则需要自己实现这个属性的效果
+     * - widget为Layout，其layout下的子组件可配
+     */
+    colProps?: ColProps
+    /**
+     * @description 自定义表格render
+     * - 自定义操作项需要自己关闭 props的 withOperate
+     * - remove 需要提供的参数为 value[index]引用值
+     */
+    render?: (val: any, record: Record<string, any>, index: number, opts: { form: RfRenderFormInstance, render: Element, add: (index?: number) => void, remove: (v: any) => void }) => any
+    /**
+     * @description 表格列属性 'title' | 'dataIndex' 均不可设置
+     */
+    columnProps?: Omit< TableColumnProps<any>, 'title' | 'dataIndex' | 'render'> & {
+      /**
+       * @description 表头是否展示必填,只是ui层面的展示，具体的校验请配置itemProps
+       */
+      required?: boolean
+    }
+  }
+>
 export interface CommonRfRenderItemConf<Name extends string = string, Widget extends keyof WidgetProps = keyof WidgetProps> {
   /**
    * @description 字段名
@@ -90,6 +114,10 @@ export interface CommonRfRenderItemConf<Name extends string = string, Widget ext
    * @description 表单label
    */
   label?: ReactNode
+  /**
+   * @description 是否隐藏label
+   */
+  hideLabelUi?: boolean
   /**
    * 是否显示，false时会隐藏组件，值会被保留
    */
@@ -145,7 +173,7 @@ export interface CommonRfRenderItemConf<Name extends string = string, Widget ext
   /**
    * @description 布局组件使用，传入layout的子项也会参与dependOn
    */
-  layout?: Array<
+  layout?: Widget extends 'Table' ? TableLayout<Name> : Array<
     IRfRenderItem<Name> & {
       /**
        * @description 如果没有使用内置的antd插件，则需要自己实现这个属性的效果

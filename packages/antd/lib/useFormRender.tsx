@@ -97,12 +97,14 @@ export function useFormRender(params: FormRenderParams = {}) {
       getRfFieldsValue() {
         return form.getFieldsValue(true, rfrenderFieldsFilter)
       },
-    } as FormInstance & {
-      getRfFieldsValue: <T>() => T
-    },
-
+    } as RfRenderFormInstance,
   }
 }
+
+export interface RfRenderFormInstance extends FormInstance {
+  getRfFieldsValue: <T>() => T
+}
+
 export function rfrenderFieldsFilter(meta: any) {
   const { name = [] } = meta
   return !name[0].match(/\.\d+\./)

@@ -1,6 +1,6 @@
 import { CustomerLayout, IRfRenderItem, MaybePromise, SwitchWidget, getItemStyle, useFormItemUpdate } from '@rf-render/antd'
 import { Form } from 'antd'
-import { useMemo } from 'react'
+import { CSSProperties, useMemo } from 'react'
 
 export interface FormItemBridgeWrapperProps {
   itemConfig: IRfRenderItem
@@ -12,10 +12,14 @@ export interface FormItemBridgeWrapperProps {
    * @description 会在changeConfig 和changeValue时作为最后一项提供
    */
   customProps?: any
+  /**
+   * @description Form.Item style
+   */
+  style?: CSSProperties
 }
 export function FormItemBridgeWrapper(props: FormItemBridgeWrapperProps) {
-  const { itemConfig, onValuesChange, customProps } = props
-  const { name, withFormItem = true, mapKeys, layout = [], widget } = itemConfig
+  const { itemConfig, onValuesChange, customProps, style: propsStyle = {} } = props
+  const { name, withFormItem = true, mapKeys, layout = [], widget, hideLabelUi = false } = itemConfig
   const { formItemProps, onUpdateFormItem } = useFormItemUpdate({
     itemConfig,
   })
@@ -37,6 +41,7 @@ export function FormItemBridgeWrapper(props: FormItemBridgeWrapperProps) {
   // console.count('form item wrapper render count')
   // layout组件消除其底部的margin
   const overrideItemStyle = {
+    ...propsStyle,
     ...style,
   }
   // layout组件消除其底部的margin
@@ -50,7 +55,7 @@ export function FormItemBridgeWrapper(props: FormItemBridgeWrapperProps) {
       ? withFormItem
         ? (
           <>
-            <Form.Item name={name} label={label} {...itemProps} style={{ ...itemStyle, ...overrideItemStyle }}>
+            <Form.Item name={name} label={hideLabelUi ? undefined : label} {...itemProps} style={{ ...itemStyle, ...overrideItemStyle }}>
               <SwitchWidget itemConfig={itemConfig} onUpdateFormItem={onUpdateFormItem} onValuesChange={onValuesChange} customProps={customProps} />
             </Form.Item>
             {MapKeysItemForValue}
