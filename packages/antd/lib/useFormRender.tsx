@@ -101,7 +101,7 @@ export function useFormRender(params: FormRenderParams = {}) {
   }
 }
 
-export interface RfRenderFormInstance extends FormInstance {
+export interface RfRenderFormInstance<T = any> extends FormInstance<T> {
   getRfFieldsValue: <T>() => T
 }
 
