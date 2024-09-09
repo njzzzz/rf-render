@@ -93,17 +93,9 @@ export type TableLayout<Name extends string = string> = Array<
      * - 自定义操作项需要自己关闭 props的 withOperate
      * - remove 需要提供的参数为 value[index]引用值
      */
-    render?: (val: any, record: Record<string, any>, index: number, opts: { form: RfRenderFormInstance, render: Element, add: (index?: number) => void, remove: (v: any) => void }) => any
-    /**
-     * @description 表格列属性 'title' | 'dataIndex' 均不可设置
-     */
-    columnProps?: Omit< TableColumnProps<any>, 'title' | 'dataIndex' | 'render'> & {
-      /**
-       * @description 表头是否展示必填,只是ui层面的展示，具体的校验请配置itemProps
-       */
-      required?: boolean
-    }
-  }
+    render?: (val: any, record: Record<string, any>, index: number, opts: { form: RfRenderFormInstance, render: JSX.Element, name: any, add: (index?: number) => void, remove: (v: any) => void }) => any
+    layout?: TableLayout<Name>
+  } & Omit< TableColumnProps<any>, 'title' | 'dataIndex' | 'render' | 'children'>
 >
 export interface CommonRfRenderItemConf<Name extends string = string, Widget extends keyof WidgetProps = keyof WidgetProps> {
   /**

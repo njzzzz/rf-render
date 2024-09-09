@@ -1,6 +1,7 @@
 import {
   Context,
   FormItemBridgeWrapper,
+  TableLayout,
   defineRfRenderComponent,
 } from '@rf-render/antd'
 import { useContext, useEffect, useMemo, useRef } from 'react'
@@ -24,14 +25,22 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
       return map
     }, new Map()),
   )
-  // 初始化设置子项值
-  useEffect(() => {
+  const genFormData = (layout: TableLayout) => {
     value.forEach((values, index) => {
       valueIdsRef.current.set(values, valueIdsRef.current.get(values) || generateUID())
-      layout.forEach(({ name }) => {
-        form.setFieldValue(`${parentName}.${index}.${name}`, values[name])
+      layout.forEach(({ name, layout = [] }) => {
+        if (layout.length) {
+          genFormData(layout)
+        }
+        else {
+          form.setFieldValue(`${parentName}.${index}.${name}`, values[name])
+        }
       })
     })
+  }
+  // 初始化设置子项值
+  useEffect(() => {
+    genFormData(layout)
   }, [value])
 
   const add = (index?: number) => {
@@ -53,30 +62,36 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
     valueIdsRef.current.delete(v)
     onChange([value.filter(val => val !== v)])
   }
-  const columns = useMemo(() => {
-    const layoutToColumns = layout.map((item) => {
-      const { name, label, mapKeys, dependOn, render, columnProps = {}, customerProps = {} } = item as any
-      const { requiredWithRules = false } = customerProps
-      const { required } = columnProps
+  const genRender = (item: TableLayout[number]): any => {
+    const { name, label, mapKeys, dependOn, render, customerProps = {}, layout = [], ...columnProps } = item as TableLayout[number]
+    const { requiredWithRules = false } = customerProps
+    const commonProps = {
+      ...columnProps,
+      title: requiredWithRules
+        ? (
+          <span>
+            <span style={{ color: '#ff4d4f', marginRight: '4px', lineHeight: 1 }}>*</span>
+            {label}
+          </span>
+          )
+        : label,
+    }
+    if (layout?.length) {
       return {
-        ...columnProps,
-        title: required === false
-          ? label
-          : required || requiredWithRules
-            ? (
-              <span>
-                <span style={{ color: '#ff4d4f', marginRight: '4px', lineHeight: 1 }}>*</span>
-                {label}
-              </span>
-              )
-            : label,
+        ...commonProps,
+        children: layout.map(genRender),
+      }
+    }
+    else {
+      return {
+        ...commonProps,
         render(val: any, record: Value, index: number) {
           // 处理dependOn映射，以解决数组类型同层依赖
           const mapName = `${parentName}.${index}.${name}`
           const mapDependOn = dependOn?.map((dep: any) => {
             return `${parentName}.${index}.${dep}`
           })
-          const colRender = (
+          const ColRender = (
             <FormItemBridgeWrapper
               key={mapName}
               itemConfig={{ hideLabelUi: true, ...item, name: mapName, dependOn: mapDependOn }}
@@ -111,9 +126,15 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
               }}
             />
           )
-          return render ? render(val, record, index, { render: colRender, form, add, remove, value }) : colRender
+          return render ? render(val, record, index, { render: ColRender, form, add, remove, name: mapName }) : ColRender
         },
+
       }
+    }
+  }
+  const columns = useMemo(() => {
+    const layoutToColumns = layout.map((item) => {
+      return genRender(item)
     })
     if (withOperate) {
       return [

@@ -65,13 +65,14 @@ export type CustomLoader = (
 export function definePlugin(plugin: Component[]) {
   return plugin
 }
+export type WidgetItemConfig<Widget extends keyof WidgetProps = DefaultWidget> = Omit<IRfRenderItem, 'props'> & {
+  props?: WidgetProps[Widget]
+}
 /**
  * 自定义的loader需要实现这两个函数以更新值
  */
 export interface FormItemBridgeProps<Widget extends keyof WidgetProps = DefaultWidget> {
-  itemConfig: Omit<IRfRenderItem, 'props'> & {
-    props?: WidgetProps[Widget]
-  }
+  itemConfig: WidgetItemConfig<Widget>
   /**
    * @description 更新value 和 mapKeys value
    */

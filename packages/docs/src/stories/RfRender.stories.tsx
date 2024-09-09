@@ -658,12 +658,14 @@ export const Table组件之自定义操作栏同时隐藏底部添加按钮: Sto
     initialValues: {
       table: [
         {
-          name: '111',
-          age: 11,
+          name: '张三',
+          age: 20,
+          lover: 'smoke',
         },
         {
-          name: '222',
+          name: '李四',
           age: 22,
+          lover: 'smoke',
         },
       ],
     },
@@ -678,15 +680,25 @@ export const Table组件之自定义操作栏同时隐藏底部添加按钮: Sto
         },
         layout: [
           {
-            name: 'name',
-            label: '姓名',
-            customerProps: {
-              requiredWithRules: true,
-            },
+            name: '-name-',
+            label: '个人信息',
+            layout: [
+              {
+                label: '姓名',
+                name: 'name',
+              },
+              {
+                label: '年龄',
+                name: 'age',
+                customerProps: {
+                  requiredWithRules: true,
+                },
+              },
+            ],
           },
           {
-            name: 'age',
-            label: '年龄',
+            name: 'lover',
+            label: '爱好',
           },
           {
             name: 'operate',
