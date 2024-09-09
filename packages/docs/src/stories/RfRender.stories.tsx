@@ -735,8 +735,17 @@ export const 所有内置antd组件: Story = {
       Transfer: ['0', '1', '2'],
       TransferSelectedKeys: ['0', '1', '2'],
       TreeSelect: 'leaf5',
+      Text: 'Text',
     },
     schema: defineSchema([
+      {
+        label: 'Text',
+        name: 'Text',
+        widget: 'Text',
+        props: {
+          render: val => <div style={{ color: 'red' }}>{val}</div>,
+        },
+      },
       {
         label: 'AutoComplete',
         name: 'AutoComplete',
