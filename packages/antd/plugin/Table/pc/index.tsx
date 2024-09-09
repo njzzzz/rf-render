@@ -86,10 +86,11 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
       return {
         ...commonProps,
         render(val: any, record: Value, index: number) {
+          const realIndex = value.findIndex(item => item === record)
           // 处理dependOn映射，以解决数组类型同层依赖
-          const mapName = `${parentName}.${index}.${name}`
+          const mapName = `${parentName}.${realIndex}.${name}`
           const mapDependOn = dependOn?.map((dep: any) => {
-            return `${parentName}.${index}.${dep}`
+            return `${parentName}.${realIndex}.${dep}`
           })
           const ColRender = (
             <FormItemBridgeWrapper
@@ -100,7 +101,7 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
                 // 更新父级表单项值
                 onChange([
                   value.map((item, vIndex) => {
-                    if (vIndex === index) {
+                    if (vIndex === realIndex) {
                       const mapKeysValue = mapKeys?.reduce((acc: Record<string, unknown>, mapKey: any, index: number) => {
                         acc[mapKey] = mapValue[index]
                         return acc
@@ -111,7 +112,8 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
                         ...mapKeysValue,
                       }
                       // 更新key
-                      valueIdsRef.current.set(newValue, valueIdsRef.current.get(value[index]) ?? generateUID())
+                      valueIdsRef.current.set(newValue, valueIdsRef.current.get(record) ?? generateUID())
+                      valueIdsRef.current.delete(record)
                       return newValue
                     }
                     return item
@@ -119,14 +121,14 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
                 ])
               }}
               customProps={{
-                index,
+                index: realIndex,
               }}
               style={{
                 marginBottom: 0,
               }}
             />
           )
-          return render ? render(val, record, index, { render: ColRender, form, add, remove, name: mapName }) : ColRender
+          return render ? render(val, record, index, { render: ColRender, form, add, remove, name: mapName, realIndex }) : ColRender
         },
 
       }
@@ -143,13 +145,14 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
           title: '操作',
           width: 130,
           dataIndex: 'operate',
-          render: (_val: any, _record: Value, index: number) => {
+          render: (_val: any, record: Value) => {
+            const realIndex = value.findIndex(item => item === record)
             return (
               <>
-                <Button onClick={() => add(index + 1)} type="link" style={{ padding: 0, marginRight: '8px' }}>
+                <Button onClick={() => add(realIndex + 1)} type="link" style={{ padding: 0, marginRight: '8px' }}>
                   添加项
                 </Button>
-                <Button onClick={() => remove(value[index])} type="link" danger style={{ padding: 0, margin: 0 }}>
+                <Button onClick={() => remove(record)} type="link" danger style={{ padding: 0, margin: 0 }}>
                   删除项
                 </Button>
               </>

@@ -6,6 +6,7 @@ export default antfu({
     overrides: {
       'ts/consistent-type-exports': 'off',
       'ts/consistent-type-imports': 'off',
+      'ts/ ban-ts-comment': 'off',
     },
   },
   react: {

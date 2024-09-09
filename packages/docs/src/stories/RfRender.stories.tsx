@@ -677,6 +677,9 @@ export const Table组件之自定义操作栏同时隐藏底部添加按钮: Sto
         props: {
           withOperate: false,
           hideAddButton: true,
+          pagination: {
+            pageSize: 5,
+          },
         },
         layout: [
           {
@@ -703,10 +706,10 @@ export const Table组件之自定义操作栏同时隐藏底部添加按钮: Sto
           {
             name: 'operate',
             label: '操作',
-            render: (_val, record, index, { add, remove }) => {
+            render: (_val, record, _index, { add, remove, realIndex }) => {
               return (
                 <div>
-                  <Button onClick={() => add(index + 1)} type="link" style={{ padding: 0, marginRight: '8px' }}>
+                  <Button onClick={() => add(realIndex + 1)} type="link" style={{ padding: 0, marginRight: '8px' }}>
                     添加
                   </Button>
                   <Button onClick={() => remove(record)} type="link" danger style={{ padding: 0, margin: 0 }}>

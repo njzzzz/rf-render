@@ -92,8 +92,18 @@ export type TableLayout<Name extends string = string> = Array<
      * @description 自定义表格render
      * - 自定义操作项需要自己关闭 props的 withOperate
      * - remove 需要提供的参数为 value[index]引用值
+     * - render是内置的渲染组件
+     * - name 是实际的运行时的表单字段名
+     * - realIndex 为表格项在数组中真正的index，因为分页时会从0开始导致错误
      */
-    render?: (val: any, record: Record<string, any>, index: number, opts: { form: RfRenderFormInstance, render: JSX.Element, name: any, add: (index?: number) => void, remove: (v: any) => void }) => any
+    render?: (val: any, record: Record<string, any>, index: number, opts: {
+      form: RfRenderFormInstance
+      realIndex: number
+      render: JSX.Element
+      name: any
+      add: (index?: number) => void
+      remove: (v: any) => void
+    }) => any
     layout?: TableLayout<Name>
   } & Omit< TableColumnProps<any>, 'title' | 'dataIndex' | 'render' | 'children'>
 >
