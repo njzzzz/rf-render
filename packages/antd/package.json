@@ -40,6 +40,7 @@
     "@rf-render/antd": "workspace:^",
     "@rf-render/core": "workspace:^",
     "antd": "> 5.0",
+    "lodash-es": "> 4.0",
     "react": "> 16.7",
     "react-dom": "> 16.7"
   },

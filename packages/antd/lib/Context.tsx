@@ -1,9 +1,8 @@
 import { MutableRefObject, createContext } from 'react'
-import { UpdateFormData } from '@rf-render/antd'
-import { FormInstance } from 'antd'
+import { RfRenderFormInstance, UpdateFormData } from '@rf-render/antd'
 
 export interface IContext<Values = any> {
-  form: FormInstance<Values>
+  form: RfRenderFormInstance<Values>
   formName: symbol
   formData: MutableRefObject<Values>
   updateFormData: UpdateFormData
@@ -12,7 +11,7 @@ export interface IContext<Values = any> {
 
 }
 export const Context = createContext<IContext>({
-  form: {} as FormInstance,
+  form: {} as RfRenderFormInstance,
   formName: Symbol('formName'),
   formData: { current: {} },
   updateFormData() {},

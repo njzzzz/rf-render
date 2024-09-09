@@ -7,7 +7,7 @@ import {
   useProvider,
 } from '@rf-render/antd'
 import { FileName, Platform, RfRender } from '@rf-render/core'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 /**
  * 初次加载渲染次数
  * Form 组件1次
@@ -48,6 +48,7 @@ export function useFormRender(params: FormRenderParams = {}) {
   function FormRender(props: FormRenderProps) {
     const { schema, immediateDeps = true, immediateValidate = false, ...antdFromProps } = props
     const { formData, updateFormData } = useFormData()
+    const [currentFileName, setCurrentFileName] = useState<FileName>(fileName)
     const { context } = useProvider({
       form,
       formName,
@@ -58,13 +59,24 @@ export function useFormRender(params: FormRenderParams = {}) {
     })
 
     useEffect(() => {
+      const toggleClass = () => {
+        setCurrentFileName(RfRender.fileName.get(formName)!)
+      }
+      RfRender.addSwitchListener(formName, toggleClass)
       return () => {
         RfRender.removeAllOneDep(formName)
+        RfRender.removeSwitchListener(formName, toggleClass)
       }
     }, [])
+
+    const className = useMemo(() => {
+      return `rf-render-form rf-render-form-${currentFileName}`
+    }, [currentFileName])
+
     return (
       <Context.Provider value={context}>
         <Form
+          className={className}
           form={form}
           {...antdFromProps}
         >

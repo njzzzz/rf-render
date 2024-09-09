@@ -28,6 +28,8 @@ import {
   Upload,
 } from 'antd'
 import { ComponentType, ReactNode } from 'react'
+import { FormItemBridgeProps } from '@rf-render/core'
+import { RfRenderFormInstance } from '../lib/useFormRender.tsx'
 
 export interface ArrayComponentProps {
   /**
@@ -61,6 +63,13 @@ export interface TableExtProps {
    * @description 隐藏底部的添加按钮
    */
   hideAddButton?: boolean
+}
+
+/**
+ * @description 用于widget为 Text 的类型推断
+ */
+export interface TextProps {
+  render?: (value: any, form: RfRenderFormInstance, itemConfig: FormItemBridgeProps<'Text'>['itemConfig']) => ReactNode
 }
 /**
  * 用于widget类型推断,使用本预制插件需要引入此类型
@@ -97,6 +106,7 @@ export interface AntdWidgetProps {
   Upload: GetPropsType<typeof Upload>
   Array: ArrayComponentProps
   Table: Omit<GetPropsType<typeof Table>, 'dataSource' | 'columns'> & TableExtProps
+  Text: TextProps
 }
 export interface AntdDefaultWidgetProps extends InputProps {
 

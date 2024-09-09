@@ -68,6 +68,8 @@ import ArrayIndex from './Array/pc/index'
 import ArrayView from './Array/pc/view'
 import TableIndex from './Table/pc/index'
 import TableView from './Table/pc/view'
+import TextIndex from './Text/pc/index'
+import TextView from './Text/pc/view'
 
 export const antdRfRenderPlugin = definePlugin([
   {
@@ -590,6 +592,23 @@ export const antdRfRenderPlugin = definePlugin([
           return TableView
         default:
           return TableIndex
+      }
+    },
+    configure: (_platform, fileName) =>
+      fileName === 'view'
+        ? import('./ViewConfigure.tsx')
+        : import('./configure.tsx'),
+  },
+  {
+    name: 'Text',
+    loader: (_platform, fileName) => {
+      switch (fileName) {
+        case 'index':
+          return TextIndex
+        case 'view':
+          return TextView
+        default:
+          return TextIndex
       }
     },
     configure: (_platform, fileName) =>
