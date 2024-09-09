@@ -50,7 +50,15 @@ export function useFormRender(params: FormRenderParams = {}) {
     const { formData, updateFormData } = useFormData()
     const [currentFileName, setCurrentFileName] = useState<FileName>(fileName)
     const { context } = useProvider({
-      form,
+      form: {
+        ...form,
+        /**
+         * @description 会过滤掉键包含/\.\d+\./，只对单层有效
+         */
+        getRfFieldsValue() {
+          return form.getFieldsValue(true, rfrenderFieldsFilter)
+        },
+      } as RfRenderFormInstance,
       formName,
       formData,
       updateFormData,
