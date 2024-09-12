@@ -1,7 +1,7 @@
 {
   "name": "@rf-render/antd",
   "type": "module",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "client",
   "author": "njzzzz",
   "license": "MIT",
