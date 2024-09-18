@@ -627,10 +627,12 @@ export const Table组件: Story = {
         {
           name: '111',
           age: 11,
+          disabled: false,
         },
         {
           name: '222',
           age: 22,
+          disabled: true,
         },
       ],
     },
@@ -647,6 +649,12 @@ export const Table组件: Story = {
           {
             name: 'age',
             label: '年龄',
+          },
+          {
+            name: 'disabled',
+            label: '是否禁用',
+            widget: 'Checkbox',
+            width: '100px',
           },
         ],
       },

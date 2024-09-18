@@ -3,6 +3,9 @@ import { Button, Col, Row } from 'antd'
 
 export default function RfFormRender(props: FormRenderProps) {
   const { FormRender, form, switchFileName } = useFormRender()
+  form.onRfValuesChange((formData, itemConfig, customProps) => {
+    console.log('=>(index.tsx:9) formData, itemConfig, customProps', formData, itemConfig, customProps)
+  })
   return (
     <div style={{ width: '680px' }}>
       <FormRender {...props}>

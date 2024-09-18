@@ -19,8 +19,8 @@ export function SwitchWidget(props: SwitchWidgetProps) {
   const { itemConfig, onUpdateFormItem, onValuesChange, customProps } = props
   const { name, mapKeys } = itemConfig
   const [vision, updateVision] = useState(false)
-  const { form, updateFormData } = useContext(Context)
-  const { runtimeItemConfig, updateEffects, callDeps, doChangeConfig } = useChangeEffects({ itemConfig, onUpdateFormItem, updateVision, customProps })
+  const { form, updateFormData, onRfValuesChangeSet } = useContext(Context)
+  const { runtimeItemConfig, updateEffects, callDeps, doChangeConfig } = useChangeEffects({ onValuesChange, itemConfig, onUpdateFormItem, updateVision, customProps })
   const { Component } = useReloadWidget({
     updateEffects,
     doChangeConfig,
@@ -55,7 +55,11 @@ export function SwitchWidget(props: SwitchWidgetProps) {
             form.validateFields([name])
             updateFormData(name, val)
             // FIX: 修复更新值需要发生在callDeps()之前，否则传入changeEffect的值为旧值
-            onValuesChange && onValuesChange([form.getFieldValue(name), ...mapValues])
+            const values = [form.getFieldValue(name), ...mapValues]
+            onValuesChange && onValuesChange(values)
+            onRfValuesChangeSet.forEach((cb) => {
+              cb(form.getFieldsValue(), itemConfig, customProps)
+            })
             callDeps()
           }
           if (needUpdate) {

@@ -1,5 +1,5 @@
 import { MutableRefObject, createContext } from 'react'
-import { RfRenderFormInstance, UpdateFormData } from '@rf-render/antd'
+import { OnRfValuesChangeCb, RfRenderFormInstance, UpdateFormData } from '@rf-render/antd'
 
 export interface IContext<Values = any> {
   form: RfRenderFormInstance<Values>
@@ -8,7 +8,7 @@ export interface IContext<Values = any> {
   updateFormData: UpdateFormData
   immediateValidate: boolean
   immediateDeps: boolean
-
+  onRfValuesChangeSet: Set<OnRfValuesChangeCb>
 }
 export const Context = createContext<IContext>({
   form: {} as RfRenderFormInstance,
@@ -17,4 +17,5 @@ export const Context = createContext<IContext>({
   updateFormData() {},
   immediateDeps: true,
   immediateValidate: false,
+  onRfValuesChangeSet: new Set(),
 })

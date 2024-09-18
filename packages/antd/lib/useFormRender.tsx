@@ -1,8 +1,10 @@
 import { Form, FormInstance } from 'antd'
 import {
   Context,
+  CustomerProps,
   FormItemBridgeWrapper,
   FormRenderProps,
+  IRfRenderItem,
   useFormData,
   useProvider,
 } from '@rf-render/antd'
@@ -23,12 +25,27 @@ export interface FormRenderParams {
 }
 export function useFormRender(params: FormRenderParams = {}) {
   const { fileName, platform } = { fileName: 'index', platform: 'pc', ...params }
-
+  const formName = useMemo(() => Symbol('formName'), [])
+  const onRfValuesChangeSet: Set<OnRfValuesChangeCb> = new Set()
   /**
    * @description form实例，使用useForm得到的
    */
   const [form] = Form.useForm()
-  const formName = useMemo(() => Symbol('formName'), [])
+  const overrideForm = {
+    ...form,
+    /**
+     * @description 会过滤掉键包含/\.\d+\./，只对单层有效
+     */
+    getRfFieldsValue() {
+      return form.getFieldsValue(true, rfrenderFieldsFilter)
+    },
+    /**
+     * @description 当表单项触发onChange或者changeValue被触发时，新旧值不一致时触发
+     */
+    onRfValuesChange(cb) {
+      onRfValuesChangeSet.add(cb)
+    },
+  } as RfRenderFormInstance
   const switchFileName = (fileName: FileName) => {
     RfRender.switchFileName(fileName, formName)
   }
@@ -50,20 +67,13 @@ export function useFormRender(params: FormRenderParams = {}) {
     const { formData, updateFormData } = useFormData()
     const [currentFileName, setCurrentFileName] = useState<FileName>(fileName)
     const { context } = useProvider({
-      form: {
-        ...form,
-        /**
-         * @description 会过滤掉键包含/\.\d+\./，只对单层有效
-         */
-        getRfFieldsValue() {
-          return form.getFieldsValue(true, rfrenderFieldsFilter)
-        },
-      } as RfRenderFormInstance,
+      form: overrideForm,
       formName,
       formData,
       updateFormData,
       immediateDeps,
       immediateValidate,
+      onRfValuesChangeSet,
     })
 
     useEffect(() => {
@@ -100,7 +110,6 @@ export function useFormRender(params: FormRenderParams = {}) {
             }
         </Form>
       </Context.Provider>
-
     )
   }
   return {
@@ -109,22 +118,15 @@ export function useFormRender(params: FormRenderParams = {}) {
     switchPlatform,
     switchPlatformAndFileName,
     formName,
-    form: {
-      ...form,
-      /**
-       * @description 会过滤掉键包含/\.\d+\./，只对单层有效
-       */
-      getRfFieldsValue() {
-        return form.getFieldsValue(true, rfrenderFieldsFilter)
-      },
-    } as RfRenderFormInstance,
+    form: overrideForm,
   }
 }
-
+export type OnRfValuesChange<T = any> = (cb: OnRfValuesChangeCb<T>) => void
+export type OnRfValuesChangeCb<T = any> = (formData: T, itemConfig: IRfRenderItem, customProps: CustomerProps,) => void
 export interface RfRenderFormInstance<T = any> extends FormInstance<T> {
-  getRfFieldsValue: <T>() => T
+  getRfFieldsValue: <V>() => V
+  onRfValuesChange: OnRfValuesChange<T>
 }
-
 export function rfrenderFieldsFilter(meta: any) {
   const { name = [] } = meta
   return !name[0].match(/\.\d+\./)

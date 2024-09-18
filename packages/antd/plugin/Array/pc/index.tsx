@@ -73,6 +73,8 @@ export default defineRfRenderComponent<'Array'>(({ itemConfig, onChange }) => {
           }}
           customProps={{
             index,
+            parentName,
+            parentConfig: itemConfig,
           }}
         >
         </FormItemBridgeWrapper>

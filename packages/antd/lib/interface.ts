@@ -53,9 +53,17 @@ export type CanModifyConfigKeys =
  */
 export interface ChangeEffectCustomProps {
   /**
-   * @description 用于 widget Array
+   * @description 用于 widget Array, Table
    */
   index: number
+  /**
+   * @description 用于 widget Array, Table
+   */
+  parentName: string
+  /**
+   * @description 用于 widget Array, Table
+   */
+  parentConfig: IRfRenderItem
 }
 export type ChangeConfig<
 Name extends string = string,

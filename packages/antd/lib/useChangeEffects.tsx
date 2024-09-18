@@ -8,6 +8,7 @@ import {
   DNCV,
   IRfRenderItem,
   OnUpdateFormItem,
+  SwitchWidgetProps,
 } from '@rf-render/antd'
 
 export interface UseChangeEffectsProps {
@@ -15,15 +16,16 @@ export interface UseChangeEffectsProps {
   onUpdateFormItem: OnUpdateFormItem
   updateVision: Dispatch<SetStateAction<boolean>>
   customProps?: any
+  onValuesChange: SwitchWidgetProps['onValuesChange']
 }
 export type UpdateEffects = (data: CanModifyConfig) => void
 export type DoChangeConfig = (changeConfig?: ChangeConfig) => Promise<void>
 export type DoChangeValue = (changeConfig?: ChangeValue) => Promise<void>
 export type AddDep = <CC, CV>(dependOn: string[], changeConfig: CC, changeValue: CV) => void
 export function useChangeEffects(props: UseChangeEffectsProps) {
-  const { itemConfig, onUpdateFormItem, updateVision, customProps } = props
+  const { itemConfig, onUpdateFormItem, updateVision, customProps, onValuesChange } = props
   const [runtimeItemConfig, setRuntimeItemConfig] = useState<IRfRenderItem>(itemConfig)
-  const { formName, form, updateFormData } = useContext(Context)
+  const { formName, form, updateFormData, onRfValuesChangeSet } = useContext(Context)
   // 这些都不能更改的直接从itemConfig中取就行，避免多余更新
   const { name, changeValue, changeConfig, mapKeys, independentOn = [], dependOn = [] } = itemConfig
   // 配置发生改变-更新视图,同时处理了formItem和widget
@@ -73,32 +75,43 @@ export function useChangeEffects(props: UseChangeEffectsProps) {
       return
     const [
       value,
-      ...mapKeysValue
+      ...mapKeysValues
     ] = await changeValue(form!.getFieldsValue(), customProps)
-    // 更新自身值
-    if (value !== DNCV) {
-      // 更新表单值
-      form!.setFieldValue(name, value)
-      updateFormData(name, value)
-      // 更新deps
-      callDeps()
-      // 触发表单验证
-      form.validateFields([name])
-    }
+    let needUpdate = false
+    let mapValues: any = []
     // 更新mapKeys
     if (mapKeys?.length) {
-      let needUpdate = false
-      mapKeys.forEach((mapKey, index) => {
-        const mpValue = mapKeysValue[index]
-        if (mpValue !== DNCV) {
-          form!.setFieldValue(mapKey, mpValue)
-          updateFormData(mapKey, mpValue)
+      mapValues = mapKeys.map((mapKey, index) => {
+        const mapKeyValue = mapKeysValues[index]
+        if (mapKeyValue !== DNCV) {
+          form!.setFieldValue(mapKey, mapKeyValue)
+          updateFormData(mapKey, mapKeyValue)
           needUpdate = true
         }
+        return form.getFieldValue(mapKey)
       })
       if (needUpdate) {
         // mapKeys值修改时也要触发更新
         updateVision(v => !v)
+      }
+    }
+    // 更新自身值，全等比较，如果值一致则不更新
+    if (value !== DNCV) {
+      // 更新表单值
+      form!.setFieldValue(name, value)
+      updateFormData(name, value)
+      // 触发表单验证
+      form.validateFields([name])
+      // FIX: 修复更新值需要发生在callDeps()之前，否则传入changeEffect的值为旧值
+      const values = [form.getFieldValue(name), ...mapValues]
+      onValuesChange && onValuesChange(values)
+      onRfValuesChangeSet.forEach((cb) => {
+        cb(form.getFieldsValue(), itemConfig, customProps)
+      })
+      // 全等比较，值一致不再出发change* 配置，解决自身循环依赖问题
+      if (value !== form.getFieldValue(name)) {
+        // 更新deps
+        callDeps()
       }
     }
   }

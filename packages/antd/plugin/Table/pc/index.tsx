@@ -122,6 +122,8 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
               }}
               customProps={{
                 index: realIndex,
+                parentName,
+                parentConfig: itemConfig,
               }}
               style={{
                 marginBottom: 0,
