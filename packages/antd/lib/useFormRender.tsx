@@ -1,7 +1,7 @@
 import { Form, FormInstance } from 'antd'
 import {
+  ChangeEffectCustomProps,
   Context,
-  CustomerProps,
   FormItemBridgeWrapper,
   FormRenderProps,
   IRfRenderItem,
@@ -122,7 +122,7 @@ export function useFormRender(params: FormRenderParams = {}) {
   }
 }
 export type OnRfValuesChange<T = any> = (cb: OnRfValuesChangeCb<T>) => void
-export type OnRfValuesChangeCb<T = any> = (formData: T, itemConfig: IRfRenderItem, customProps: CustomerProps,) => void
+export type OnRfValuesChangeCb<T = any> = (formData: T, itemConfig: IRfRenderItem, customProps: ChangeEffectCustomProps) => void
 export interface RfRenderFormInstance<T = any> extends FormInstance<T> {
   getRfFieldsValue: <V>() => V
   onRfValuesChange: OnRfValuesChange<T>
