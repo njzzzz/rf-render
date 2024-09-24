@@ -74,6 +74,7 @@ export default defineRfRenderComponent<'Array'>(({ itemConfig, onChange }) => {
           customProps={{
             index,
             parentName,
+            name,
             parentConfig: itemConfig,
           }}
         >

@@ -40,7 +40,6 @@ export function useFormModal(props: UseFormModalProps = {}) {
   const [modalProps, setModalProps] = useState<FormModalProps>({})
   const [initialValues, setInitialValues] = useState({})
   const [schema, setSchema] = useState<any[]>([])
-  const { FormRender, form } = useFormRender()
   const [layout, setLayout] = useState<UseFormModalProps['labelPosition']>(labelPosition)
 
   const open = (props: FormModalOpenProps) => {
@@ -56,6 +55,8 @@ export function useFormModal(props: UseFormModalProps = {}) {
   }
 
   const FormModal = useCallback(() => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { FormRender, form } = useFormRender()
     const confirm = async () => {
       const { onOk } = modalProps
       try {

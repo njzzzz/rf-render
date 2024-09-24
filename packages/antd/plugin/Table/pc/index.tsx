@@ -85,7 +85,7 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
     else {
       return {
         ...commonProps,
-        render(val: any, record: Value, index: number) {
+        render(_: any, record: Value, index: number) {
           const realIndex = value.findIndex(item => item === record)
           // 处理dependOn映射，以解决数组类型同层依赖
           const mapName = `${parentName}.${realIndex}.${name}`
@@ -123,6 +123,7 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
               customProps={{
                 index: realIndex,
                 parentName,
+                name,
                 parentConfig: itemConfig,
               }}
               style={{
@@ -130,7 +131,7 @@ export default defineRfRenderComponent<'Table'>(({ itemConfig, onChange }) => {
               }}
             />
           )
-          return render ? render(val, record, index, { render: ColRender, form, add, remove, name: mapName, realIndex }) : ColRender
+          return render ? render(record[name], record, index, { render: ColRender, form, add, remove, name: mapName, realIndex }) : ColRender
         },
 
       }

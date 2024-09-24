@@ -396,7 +396,6 @@ export const 独立布局组件: Story = {
           {
             name: '项目2-1',
             label: '项目2-1',
-            fileName: 'view',
             customerProps: {
               requiredWithRules: true,
             },
@@ -433,7 +432,6 @@ export const 独立布局组件: Story = {
         widget: 'Layout',
         name: 'layout2',
         props: {
-          span: 3,
         },
         layout: [
           {
